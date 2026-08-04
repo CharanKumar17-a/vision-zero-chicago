@@ -1,0 +1,62 @@
+{
+  "verification_name": "CDC/ATSDR SVI 2022 equity-source verification",
+  "checked_at_utc": "2026-08-04T12:13:22+00:00",
+  "source_year": 2022,
+  "geography": "Illinois census tracts",
+  "intended_project_use": "Project-defined corridor equity constraint",
+  "download_page": {
+    "url": "https://www.atsdr.cdc.gov/place-health/php/svi/svi-data-documentation-download.html",
+    "status_code": 200,
+    "status": "PASS"
+  },
+  "documentation": {
+    "url": "https://www.atsdr.cdc.gov/place-health/media/pdfs/2024/10/SVI2022Documentation.pdf",
+    "status_code": 200,
+    "pdf_signature_present": true,
+    "status": "PASS"
+  },
+  "csv_source": {
+    "url": "https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=csv&category=states&name=ILLINOIS",
+    "status_code": 200,
+    "content_type": "text/csv",
+    "row_count": 3263,
+    "column_count": 158,
+    "state_values": [
+      "IL"
+    ],
+    "cook_county_tract_rows": 1331,
+    "populated_cook_tract_rows": 1328,
+    "missing_fips_count": 0,
+    "duplicate_fips_count": 0,
+    "documented_zero_population_unranked_count": 3,
+    "unexpected_invalid_cook_rpl_themes_count": 0,
+    "valid_populated_rank_coverage_percent": 100.0,
+    "required_fields": [
+      "ST",
+      "STATE",
+      "ST_ABBR",
+      "STCNTY",
+      "COUNTY",
+      "FIPS",
+      "LOCATION",
+      "E_TOTPOP",
+      "RPL_THEME1",
+      "RPL_THEME2",
+      "RPL_THEME3",
+      "RPL_THEME4",
+      "RPL_THEMES"
+    ],
+    "missing_fields": [],
+    "required_fields_status": "PASS",
+    "data_quality_status": "PASS"
+  },
+  "geodatabase_source": {
+    "url": "https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=db&category=states&name=ILLINOIS",
+    "status_code": 200,
+    "content_type": "text/csv",
+    "content_disposition": "attachment; filename=ILLINOIS.zip; filename*=UTF-8''ILLINOIS.zip",
+    "zip_signature_present": true,
+    "status": "PASS"
+  },
+  "overall_status": "PASS"
+}

@@ -1,0 +1,65 @@
+{
+  "verification_name": "Road-safety treatment-source verification",
+  "checked_at_utc": "2026-08-04T12:48:50+00:00",
+  "required_sources": {
+    "proven_countermeasure_booklet": {
+      "source_name": "FHWA Proven Safety Countermeasures booklet",
+      "url": "https://highways.dot.gov/sites/fhwa.dot.gov/files/Proven%20Safety%20Countermeasures%20Booklet.pdf",
+      "status_code": 200,
+      "content_type": "application/pdf",
+      "content_length_bytes": 8313598,
+      "pdf_signature_present": true,
+      "status": "PASS"
+    },
+    "step_studio": {
+      "source_name": "FHWA STEP Studio treatment and cost guide",
+      "url": "https://highways.dot.gov/sites/fhwa.dot.gov/files/2022-06/step_studio.pdf",
+      "status_code": 200,
+      "content_type": "application/pdf",
+      "content_length_bytes": 5840065,
+      "pdf_signature_present": true,
+      "status": "PASS"
+    }
+  },
+  "optional_access_checks": {
+    "cmf_fact_sheet": {
+      "source_name": "FHWA Crash Modification Factors fact sheet",
+      "url": "https://highways.dot.gov/media/14286",
+      "status_code": 403,
+      "content_type": "text/html",
+      "status": "AUTOMATED_ACCESS_BLOCKED"
+    },
+    "cmf_information_page": {
+      "source_name": "FHWA CMF Clearinghouse information page",
+      "url": "https://highways.dot.gov/safety/data-analysis-tools/rsdp/rsdp-tools/cmf-clearinghouse",
+      "status_code": 403,
+      "content_type": "text/html",
+      "status": "AUTOMATED_ACCESS_BLOCKED"
+    },
+    "countermeasure_page": {
+      "source_name": "FHWA Proven Safety Countermeasures page",
+      "url": "https://highways.dot.gov/safety/proven-safety-countermeasures",
+      "status_code": 403,
+      "content_type": "text/html",
+      "status": "AUTOMATED_ACCESS_BLOCKED"
+    },
+    "direct_cmf_clearinghouse": {
+      "source_name": "Direct CMF Clearinghouse",
+      "url": "https://cmfclearinghouse.fhwa.dot.gov/",
+      "status": "SSL_VALIDATION_FAILED_OPTIONAL",
+      "error_type": "SSLError",
+      "error": "HTTPSConnectionPool(host='cmfclearinghouse.fhwa.dot.gov', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1028)')))"
+    }
+  },
+  "verified_scope": {
+    "treatment_effect_framework": "Official FHWA countermeasure evidence with cited CMF IDs",
+    "planning_cost_framework": "Official FHWA STEP Studio planning cost references"
+  },
+  "limitations": [
+    "Individual production CMFs have not yet been selected or validated.",
+    "Blocked or certificate-failing websites were not treated as successful checks.",
+    "National planning costs require scenario ranges and are not Chicago engineering estimates.",
+    "Treatment applicability requires engineering review."
+  ],
+  "overall_status": "PASS"
+}

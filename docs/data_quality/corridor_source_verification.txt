@@ -1,0 +1,22 @@
+Corridor source verification
+======================================================================
+High Crash Corridors Framework Plan
+Status code: 200
+Content type: application/pdf
+PDF signature present: True
+Plan verification: PASS
+----------------------------------------------------------------------
+Street Center Lines metadata
+Status code: 200
+Dataset name: Street Center Lines
+Dataset ID: 6imu-meau
+Attribution: City of Chicago
+Metadata verification: PASS
+----------------------------------------------------------------------
+Street Center Lines GeoJSON export
+Status code: 200
+Content type: application/vnd.geo+json
+JSON signature present: True
+GeoJSON export verification: PASS
+======================================================================
+Overall corridor-source status: PASS

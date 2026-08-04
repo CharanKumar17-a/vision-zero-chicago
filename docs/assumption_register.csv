@@ -1,9 +1,9 @@
 assumption_id,category,assumption,reason,evidence,status,sensitivity_required
 A001,scope,The verified candidate set will contain 43 corridors,This is the confirmed initial project boundary,Source verification not completed,pending_validation,false
-A002,temporal,There will be 96 complete historical months available,A balanced history is required for corridor-month modelling,Data extraction not completed,pending_validation,true
+A002,temporal,There are 96 complete monthly periods from January 2018 through December 2025,A balanced history is required for corridor-month modelling,Live API profile on 2026-08-04 confirmed all 96 periods,validated,true
 A003,spatial,A 75-foot corridor buffer will provide a reasonable primary crash assignment rule,A spatial tolerance is required for imperfect crash coordinates,Spatial sensitivity testing not completed,pending_validation,true
 A004,treatment,Published CMFs can support planning estimates when treatment context is applicable,Observed local treatment outcomes are not available,CMF evidence review not completed,pending_validation,true
 A005,economic,Published treatment costs can support price-adjusted planning scenarios,Project-level engineering cost estimates are not available,Cost evidence review not completed,pending_validation,true
 A006,equity,A transparent project-defined equity constraint can be evaluated,No official equity requirement has been verified for this project,Equity definition not finalized,pending_validation,true
 A007,exposure,Historical crash counts represent recorded crash burden rather than traffic-volume-adjusted risk,Consistent corridor traffic-volume exposure data may not be available,Known methodological limitation,active_limitation,false
-A008,data_maturity,Incomplete recent reporting periods will be excluded from final modelling,Partial periods would bias temporal comparisons,Final data coverage not yet inspected,pending_validation,true
+A008,data_maturity,The incomplete 2026 reporting period will be excluded from historical modelling,Partial periods would bias temporal comparisons,The live source contained only eight 2026 months and August was partial as of 2026-08-04,validated_rule,true

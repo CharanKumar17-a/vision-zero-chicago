@@ -19,8 +19,8 @@ analysis:
   expected_panel_rows: 4128
   expected_forecast_rows: 516
 
-  history_start: null
-  history_end: null
+  history_start: "2018-01-01"
+  history_end: "2025-12-31"
   forecast_start: null
   forecast_end: null
 

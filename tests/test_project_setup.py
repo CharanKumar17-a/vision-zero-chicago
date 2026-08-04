@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -56,11 +57,13 @@ def test_expected_dataset_sizes_are_correct():
     analysis = config["analysis"]
 
     assert analysis["expected_panel_rows"] == (
-        analysis["corridor_count"] * analysis["history_months"]
+        analysis["corridor_count"]
+        * analysis["history_months"]
     )
 
     assert analysis["expected_forecast_rows"] == (
-        analysis["corridor_count"] * analysis["forecast_months"]
+        analysis["corridor_count"]
+        * analysis["forecast_months"]
     )
 
 
@@ -68,7 +71,11 @@ def test_governance_boundary_is_configured():
     config = load_config()
     governance = config["governance"]
 
-    assert governance["final_decision_authority"] == "city_and_engineering_team"
+    assert (
+        governance["final_decision_authority"]
+        == "city_and_engineering_team"
+    )
+
     assert governance["automated_project_approval"] is False
 
 
@@ -78,6 +85,33 @@ def test_decision_contract_exists():
     assert contract_path.is_file()
     assert contract_path.stat().st_size > 0
 
-    contract_text = contract_path.read_text(encoding="utf-8").lower()
+    contract_text = contract_path.read_text(
+        encoding="utf-8"
+    ).lower()
 
     assert "final decision remains with the city" in contract_text
+
+
+def test_historical_window_matches_expected_months():
+    config = load_config()
+    analysis = config["analysis"]
+
+    history_start = date.fromisoformat(
+        analysis["history_start"]
+    )
+
+    history_end = date.fromisoformat(
+        analysis["history_end"]
+    )
+
+    calculated_months = (
+        (history_end.year - history_start.year) * 12
+        + history_end.month
+        - history_start.month
+        + 1
+    )
+
+    assert history_start == date(2018, 1, 1)
+    assert history_end == date(2025, 12, 31)
+    assert calculated_months == analysis["history_months"]
+    assert calculated_months == 96

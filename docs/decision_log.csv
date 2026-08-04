@@ -5,3 +5,4 @@ D003,2026-08-04,Use time-based model validation only,Random splitting would leak
 D004,2026-08-04,Treat budget and equity values as planning scenarios,No official City values have been verified for this project,project_owner,config/project.yml;docs/decision_contract.md
 D005,2026-08-04,Keep final authority with the City and engineering teams,The analytical system is decision support and cannot replace feasibility review,project_owner,docs/decision_contract.md
 D006,2026-08-04,Preserve raw source files without manual modification,Reproducibility requires cleaning to occur only in interim and processed layers,project_owner,data/raw;data/interim;data/processed
+D007,2026-08-04,Use January 2018 through December 2025 as the candidate historical window,This provides exactly 96 citywide monthly periods while excluding incomplete 2017 coverage and partial 2026 data,project_owner,config/project.yml;docs/assumption_register.csv;docs/data_quality/crash_monthly_coverage.csv

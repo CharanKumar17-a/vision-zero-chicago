@@ -1,0 +1,149 @@
+sources:
+  crashes:
+    source_name: Chicago Traffic Crashes - Crashes
+    owner: City of Chicago
+    dataset_id: 85ca-t3if
+    page_url: https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if
+    api_url: https://data.cityofchicago.org/resource/85ca-t3if.json
+    metadata_url: https://data.cityofchicago.org/api/views/85ca-t3if
+    expected_grain: one row per recorded crash
+    primary_key: crash_record_id
+    relationship_to_crashes: primary_table
+    required_fields:
+      - crash_record_id
+      - crash_date
+      - most_severe_injury
+      - injuries_total
+      - injuries_fatal
+      - injuries_incapacitating
+      - latitude
+      - longitude
+    status: verified_api_access
+
+  vehicles:
+    source_name: Chicago Traffic Crashes - Vehicles
+    owner: City of Chicago
+    dataset_id: 68nd-jvt3
+    page_url: https://data.cityofchicago.org/Transportation/Traffic-Crashes-Vehicles/68nd-jvt3
+    api_url: https://data.cityofchicago.org/resource/68nd-jvt3.json
+    metadata_url: https://data.cityofchicago.org/api/views/68nd-jvt3
+    expected_grain: one row per crash unit
+    primary_key: crash_unit_id
+    join_key: crash_record_id
+    relationship_to_crashes: many_to_one
+    required_fields:
+      - crash_unit_id
+      - crash_record_id
+      - crash_date
+      - unit_type
+      - num_passengers
+      - vehicle_type
+    status: verified_api_access
+
+  people:
+    source_name: Chicago Traffic Crashes - People
+    owner: City of Chicago
+    dataset_id: u6pd-qa9d
+    page_url: https://data.cityofchicago.org/Transportation/Traffic-Crashes-People/u6pd-qa9d
+    api_url: https://data.cityofchicago.org/resource/u6pd-qa9d.json
+    metadata_url: https://data.cityofchicago.org/api/views/u6pd-qa9d
+    expected_grain: one row per person involved in a crash
+    primary_key: person_id
+    join_key: crash_record_id
+    relationship_to_crashes: many_to_one
+    required_fields:
+      - person_id
+      - person_type
+      - crash_record_id
+      - crash_date
+      - injury_classification
+      - age
+    status: verified_api_access
+
+
+corridor_sources:
+  high_crash_corridor_plan:
+    source_name: Chicago Vision Zero High Crash Corridors Framework Plan
+    source_type: official_pdf
+    publisher: City of Chicago
+    document_url: "https://www.chicago.gov/content/dam/city/sites/complete-streets/pdfs/06-28-18%20VZ_HCC_FrameworkPlan_reduced%20size.pdf"
+    expected_grain: one official planning document defining 43 high-crash corridors
+    verification_status: verified_source_access_pending_geometry
+    geometry_validation_required: true
+    evidence_path: docs/data_quality/corridor_source_verification.txt
+
+  street_center_lines:
+    source_name: Chicago Street Center Lines
+    source_type: socrata_geospatial
+    publisher: City of Chicago
+    dataset_id: 6imu-meau
+    page_url: "https://data.cityofchicago.org/Transportation/Street-Center-Lines/6imu-meau"
+    metadata_url: "https://data.cityofchicago.org/api/views/6imu-meau"
+    geojson_url: "https://data.cityofchicago.org/api/geospatial/6imu-meau?method=export&format=GeoJSON"
+    expected_grain: one row per street centerline segment
+    verification_status: verified_geospatial_access
+    geometry_validation_required: true
+    evidence_path: docs/data_quality/corridor_source_verification.txt
+
+equity_sources:
+  cdc_atsdr_svi_2022_illinois:
+    source_name: CDC ATSDR Social Vulnerability Index 2022 - Illinois
+    source_type: official_csv_and_geodatabase
+    publisher: CDC and ATSDR
+    source_year: 2022
+    geography: Illinois census tracts
+    expected_grain: one row per Illinois census tract
+    primary_key: FIPS
+
+    download_page_url: "https://www.atsdr.cdc.gov/place-health/php/svi/svi-data-documentation-download.html"
+    documentation_url: "https://www.atsdr.cdc.gov/place-health/media/pdfs/2024/10/SVI2022Documentation.pdf"
+    csv_url: "https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=csv&category=states&name=ILLINOIS"
+    geodatabase_url: "https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=db&category=states&name=ILLINOIS"
+
+    population_field: E_TOTPOP
+    overall_rank_field: RPL_THEMES
+    theme_rank_fields:
+      - RPL_THEME1
+      - RPL_THEME2
+      - RPL_THEME3
+      - RPL_THEME4
+
+    missing_value_code: -999
+    missing_value_rule: exclude zero-population unranked tracts from equity scoring
+
+    intended_use: project-defined corridor equity constraint
+    verification_status: verified_source_access_pending_spatial_overlay
+    evidence_path: docs/data_quality/equity_source_verification.json
+
+treatment_sources:
+  fhwa_proven_safety_countermeasures:
+    source_name: FHWA Proven Safety Countermeasures Booklet
+    source_type: official_pdf
+    publisher: Federal Highway Administration
+    document_url: "https://highways.dot.gov/sites/fhwa.dot.gov/files/Proven%20Safety%20Countermeasures%20Booklet.pdf"
+    intended_use: identify candidate treatments and referenced CMF IDs
+    verification_status: verified_framework_pending_cmf_selection
+    cmf_selection_status: pending
+    engineering_applicability_review_required: true
+    evidence_path: docs/data_quality/treatment_source_verification.json
+
+  fhwa_step_studio:
+    source_name: FHWA STEP Studio
+    source_type: official_pdf
+    publisher: Federal Highway Administration
+    document_url: "https://highways.dot.gov/sites/fhwa.dot.gov/files/2022-06/step_studio.pdf"
+    intended_use: create planning-level treatment cost ranges
+    verification_status: verified_reference_pending_local_adjustment
+    local_cost_adjustment_status: pending
+    engineering_cost_estimate: false
+    evidence_path: docs/data_quality/treatment_source_verification.json
+
+  cmf_clearinghouse:
+    source_name: FHWA Crash Modification Factors Clearinghouse
+    source_type: optional_search_database
+    publisher: Federal Highway Administration
+    website_url: "https://cmfclearinghouse.fhwa.dot.gov/"
+    intended_use: review treatment-specific CMFs and study applicability
+    automated_access_status: ssl_validation_failed
+    selection_status: pending_manual_or_browser_review
+    required_for_current_source_gate: false

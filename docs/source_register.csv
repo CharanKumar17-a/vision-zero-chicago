@@ -1,7 +1,9 @@
-source_id,source_name,owner,url,expected_grain,planned_use,status,access_date,notes
-SRC001,Chicago Traffic Crashes - Crashes,City of Chicago Data Portal,,One row per recorded crash,Crash outcomes dates and locations,pending_verification,,
-SRC002,Chicago Traffic Crashes - Vehicles,City of Chicago Data Portal,,One row per involved vehicle,Vehicle and crash-level flags,pending_verification,,
-SRC003,High-Crash Corridor Geometry,City of Chicago or verified project source,,One row per corridor geometry,Candidate corridors and spatial assignment,pending_verification,,
-SRC004,Equity Geography,City of Chicago or US Census Bureau,,One row per equity geography,Portfolio equity measurement,pending_verification,,
-SRC005,Crash Modification Factor Evidence,USDOT CMF Clearinghouse,,One row per treatment study or CMF,Treatment effectiveness estimates,pending_verification,,
-SRC006,Road-Safety Treatment Cost Evidence,Official transportation sources,,One row per treatment cost estimate,Treatment cost scenarios,pending_verification,,
+﻿"source_id","source_name","owner","url","expected_grain","planned_use","status","access_date","notes"
+"SRC001","Chicago Traffic Crashes - Crashes","City of Chicago Data Portal","https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if","One row per recorded crash","Crash outcomes dates severity and locations","verified_api_access","2026-08-04","Official City source; 1080723 rows observed; citywide coverage begins September 2017; records may be amended"
+"SRC002","Chicago Traffic Crashes - Vehicles","City of Chicago Data Portal","https://data.cityofchicago.org/Transportation/Traffic-Crashes-Vehicles/68nd-jvt3","One row per crash unit","Vehicle mode and crash-level flags","verified_api_access","2026-08-04","Official City source; 2203490 rows observed; several units can belong to one crash; aggregate before joining"
+"SRC003","High-Crash Corridor Definition","City of Chicago","https://www.chicago.gov/content/dam/city/sites/complete-streets/pdfs/06-28-18%20VZ_HCC_FrameworkPlan_reduced%20size.pdf","One documented corridor segment","Candidate-corridor definition","verified_source_access_pending_geometry","2026-08-04",""
+"SRC004","CDC ATSDR SVI 2022 - Illinois Census Tracts","City of Chicago or verified public agency","","One row per equity geography","Portfolio equity measurement","verified_source_access_pending_spatial_overlay","2026-08-04",""
+"SRC005","FHWA Countermeasure and CMF Evidence","USDOT CMF Clearinghouse","","One row per treatment study or CMF","Treatment-effectiveness estimates","verified_framework_pending_cmf_selection","2026-08-04",""
+"SRC006","FHWA STEP Studio Planning Cost Evidence","Official transportation sources","","One row per treatment cost estimate","Treatment-cost scenarios","verified_reference_pending_local_adjustment","2026-08-04",""
+"SRC007","Chicago Traffic Crashes - People","City of Chicago Data Portal","https://data.cityofchicago.org/Transportation/Traffic-Crashes-People/u6pd-qa9d","One row per person involved in a crash","Injury and road-user flags","verified_api_access","2026-08-04","Official City source; 2372047 rows observed; several people can belong to one crash; aggregate before joining"
+"SRC008","Chicago Street Center Lines","","","","","verified_geospatial_access","2026-08-04",""
