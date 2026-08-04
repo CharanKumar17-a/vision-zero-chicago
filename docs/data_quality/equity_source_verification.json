@@ -1,6 +1,6 @@
 {
   "verification_name": "CDC/ATSDR SVI 2022 equity-source verification",
-  "checked_at_utc": "2026-08-04T12:13:22+00:00",
+  "checked_at_utc": "2026-08-04T16:07:12+00:00",
   "source_year": 2022,
   "geography": "Illinois census tracts",
   "intended_project_use": "Project-defined corridor equity constraint",

@@ -1,0 +1,51 @@
+{
+  "validated_at_utc": "2026-08-04T16:15:30.654360+00:00",
+  "historical_window": {
+    "start": "2018-01-01T00:00:00.000",
+    "end_exclusive": "2026-01-01T00:00:00.000"
+  },
+  "batch_size": 50000,
+  "global_issues": [],
+  "sources": {
+    "crashes": {
+      "source_name": "crashes",
+      "source_config_key": "crashes",
+      "primary_key": "crash_record_id",
+      "date_field": "crash_date",
+      "selected_field_count": 39,
+      "available_field_count": 50,
+      "duplicate_selected_fields": [],
+      "required_fields_not_selected": [],
+      "selected_fields_missing_from_live_schema": [],
+      "issues": [],
+      "status": "PASS"
+    },
+    "vehicles": {
+      "source_name": "vehicles",
+      "source_config_key": "vehicles",
+      "primary_key": "crash_unit_id",
+      "date_field": "crash_date",
+      "selected_field_count": 15,
+      "available_field_count": 71,
+      "duplicate_selected_fields": [],
+      "required_fields_not_selected": [],
+      "selected_fields_missing_from_live_schema": [],
+      "issues": [],
+      "status": "PASS"
+    },
+    "people": {
+      "source_name": "people",
+      "source_config_key": "people",
+      "primary_key": "person_id",
+      "date_field": "crash_date",
+      "selected_field_count": 12,
+      "available_field_count": 29,
+      "duplicate_selected_fields": [],
+      "required_fields_not_selected": [],
+      "selected_fields_missing_from_live_schema": [],
+      "issues": [],
+      "status": "PASS"
+    }
+  },
+  "overall_status": "PASS"
+}

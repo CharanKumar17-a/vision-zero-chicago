@@ -1,0 +1,109 @@
+acquisition:
+  history_start: "2018-01-01T00:00:00.000"
+  history_end_exclusive: "2026-01-01T00:00:00.000"
+
+  batch_size: 50000
+  request_timeout_seconds: 120
+  maximum_retries: 5
+  retry_backoff_seconds: 2
+
+  output_format: "csv.gz"
+  raw_root: "data/raw/chicago_traffic_crashes"
+  manifest_root: "docs/data_quality/acquisition_manifests"
+
+  preserve_raw_files: true
+  overwrite_existing_files: false
+
+sources:
+  crashes:
+    source_config_key: "crashes"
+    date_field: "crash_date"
+    order_by:
+      - "crash_date"
+      - "crash_record_id"
+
+    select_fields:
+      - "crash_record_id"
+      - "crash_date"
+      - "posted_speed_limit"
+      - "traffic_control_device"
+      - "device_condition"
+      - "weather_condition"
+      - "lighting_condition"
+      - "first_crash_type"
+      - "trafficway_type"
+      - "lane_cnt"
+      - "alignment"
+      - "roadway_surface_cond"
+      - "road_defect"
+      - "crash_type"
+      - "intersection_related_i"
+      - "dooring_i"
+      - "work_zone_i"
+      - "hit_and_run_i"
+      - "damage"
+      - "prim_contributory_cause"
+      - "sec_contributory_cause"
+      - "street_no"
+      - "street_direction"
+      - "street_name"
+      - "beat_of_occurrence"
+      - "num_units"
+      - "most_severe_injury"
+      - "injuries_total"
+      - "injuries_fatal"
+      - "injuries_incapacitating"
+      - "injuries_non_incapacitating"
+      - "injuries_reported_not_evident"
+      - "injuries_no_indication"
+      - "injuries_unknown"
+      - "crash_hour"
+      - "crash_day_of_week"
+      - "crash_month"
+      - "latitude"
+      - "longitude"
+
+  vehicles:
+    source_config_key: "vehicles"
+    date_field: "crash_date"
+    order_by:
+      - "crash_date"
+      - "crash_unit_id"
+
+    select_fields:
+      - "crash_unit_id"
+      - "crash_record_id"
+      - "crash_date"
+      - "unit_no"
+      - "unit_type"
+      - "num_passengers"
+      - "vehicle_id"
+      - "vehicle_defect"
+      - "vehicle_type"
+      - "vehicle_use"
+      - "travel_direction"
+      - "maneuver"
+      - "first_contact_point"
+      - "occupant_cnt"
+      - "exceed_speed_limit_i"
+
+  people:
+    source_config_key: "people"
+    date_field: "crash_date"
+    order_by:
+      - "crash_date"
+      - "person_id"
+
+    select_fields:
+      - "person_id"
+      - "person_type"
+      - "crash_record_id"
+      - "vehicle_id"
+      - "crash_date"
+      - "sex"
+      - "age"
+      - "safety_equipment"
+      - "injury_classification"
+      - "pedpedal_action"
+      - "pedpedal_visibility"
+      - "pedpedal_location"

@@ -1,0 +1,391 @@
+{
+  "validated_at_utc": "2026-08-04T16:38:56.167788+00:00",
+  "source_name": "crashes",
+  "run_id": "20260804T161823Z",
+  "manifest_path": "docs\\data_quality\\acquisition_manifests\\crashes_20260804T161823Z_manifest.json",
+  "snapshot_directory": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z",
+  "acquisition_integrity_status": "PASS",
+  "downstream_readiness": "PASS_WITH_LIMITATIONS",
+  "expected_rows": 877919,
+  "observed_rows": 877919,
+  "manifest_part_count": 18,
+  "physical_part_count": 18,
+  "primary_key": "crash_record_id",
+  "missing_primary_keys": 0,
+  "duplicate_primary_keys": 0,
+  "unique_primary_keys": 877919,
+  "date_field": "crash_date",
+  "minimum_date": "2018-01-01T00:00:00",
+  "maximum_date": "2025-12-31T23:52:00",
+  "invalid_dates": 0,
+  "dates_outside_window": 0,
+  "coordinate_profile": {
+    "valid_coordinate_pairs": 870769,
+    "missing_coordinate_pairs": 7150,
+    "incomplete_coordinate_pairs": 0,
+    "invalid_coordinate_pairs": 0,
+    "valid_coordinate_coverage_rate": 0.991856
+  },
+  "null_profile": {
+    "crash_record_id": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "crash_date": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "posted_speed_limit": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "traffic_control_device": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "device_condition": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "weather_condition": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "lighting_condition": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "first_crash_type": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "trafficway_type": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "lane_cnt": {
+      "null_count": 786216,
+      "null_rate": 0.895545
+    },
+    "alignment": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "roadway_surface_cond": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "road_defect": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "crash_type": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "intersection_related_i": {
+      "null_count": 671641,
+      "null_rate": 0.765038
+    },
+    "dooring_i": {
+      "null_count": 875107,
+      "null_rate": 0.996797
+    },
+    "work_zone_i": {
+      "null_count": 873546,
+      "null_rate": 0.995019
+    },
+    "hit_and_run_i": {
+      "null_count": 596784,
+      "null_rate": 0.679771
+    },
+    "damage": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "prim_contributory_cause": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "sec_contributory_cause": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "street_no": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "street_direction": {
+      "null_count": 1,
+      "null_rate": 1e-06
+    },
+    "street_name": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "beat_of_occurrence": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "num_units": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "most_severe_injury": {
+      "null_count": 1994,
+      "null_rate": 0.002271
+    },
+    "injuries_total": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "injuries_fatal": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "injuries_incapacitating": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "injuries_non_incapacitating": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "injuries_reported_not_evident": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "injuries_no_indication": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "injuries_unknown": {
+      "null_count": 1987,
+      "null_rate": 0.002263
+    },
+    "crash_hour": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "crash_day_of_week": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "crash_month": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "latitude": {
+      "null_count": 7150,
+      "null_rate": 0.008144
+    },
+    "longitude": {
+      "null_count": 7150,
+      "null_rate": 0.008144
+    }
+  },
+  "hard_failures": [],
+  "limitations": [
+    "Rows without complete coordinates cannot be assigned to corridor geometry without an additional location-recovery rule or exclusion."
+  ],
+  "parts": [
+    {
+      "part_number": 1,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00001.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6391463,
+      "observed_compressed_bytes": 6391463,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 2,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00002.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6379983,
+      "observed_compressed_bytes": 6379983,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 3,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00003.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6409455,
+      "observed_compressed_bytes": 6409455,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 4,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00004.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6344319,
+      "observed_compressed_bytes": 6344319,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 5,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00005.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6359218,
+      "observed_compressed_bytes": 6359218,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 6,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00006.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6366938,
+      "observed_compressed_bytes": 6366938,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 7,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00007.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6373365,
+      "observed_compressed_bytes": 6373365,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 8,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00008.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6346434,
+      "observed_compressed_bytes": 6346434,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 9,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00009.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6356619,
+      "observed_compressed_bytes": 6356619,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 10,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00010.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6346639,
+      "observed_compressed_bytes": 6346639,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 11,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00011.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6344539,
+      "observed_compressed_bytes": 6344539,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 12,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00012.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6347926,
+      "observed_compressed_bytes": 6347926,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 13,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00013.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6340244,
+      "observed_compressed_bytes": 6340244,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 14,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00014.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6356685,
+      "observed_compressed_bytes": 6356685,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 15,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00015.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6335599,
+      "observed_compressed_bytes": 6335599,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 16,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00016.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6358878,
+      "observed_compressed_bytes": 6358878,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 17,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00017.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 6330937,
+      "observed_compressed_bytes": 6330937,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 18,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z\\part-00018.csv.gz",
+      "expected_rows": 27919,
+      "observed_rows": 27919,
+      "expected_compressed_bytes": 3552903,
+      "observed_compressed_bytes": 3552903,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    }
+  ]
+}

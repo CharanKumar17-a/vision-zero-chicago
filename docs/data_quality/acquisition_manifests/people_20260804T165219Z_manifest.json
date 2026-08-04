@@ -1,0 +1,434 @@
+{
+  "run_id": "20260804T165219Z",
+  "source_name": "people",
+  "source_config_key": "people",
+  "source_title": "Chicago Traffic Crashes - People",
+  "dataset_id": "u6pd-qa9d",
+  "api_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.json",
+  "csv_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv",
+  "primary_key": "person_id",
+  "date_field": "crash_date",
+  "history_start": "2018-01-01T00:00:00.000",
+  "history_end_exclusive": "2026-01-01T00:00:00.000",
+  "where_clause": "crash_date >= '2018-01-01T00:00:00.000' AND crash_date < '2026-01-01T00:00:00.000'",
+  "selected_fields": [
+    "person_id",
+    "person_type",
+    "crash_record_id",
+    "vehicle_id",
+    "crash_date",
+    "sex",
+    "age",
+    "safety_equipment",
+    "injury_classification",
+    "pedpedal_action",
+    "pedpedal_visibility",
+    "pedpedal_location"
+  ],
+  "order_by": [
+    "crash_date",
+    "person_id"
+  ],
+  "batch_size": 50000,
+  "snapshot_directory": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z",
+  "started_at_utc": "2026-08-04T16:52:19.879183+00:00",
+  "completed_at_utc": "2026-08-04T16:58:59.213111+00:00",
+  "expected_rows_before_download": 1927655,
+  "expected_rows_after_download": 1927655,
+  "downloaded_rows": 1927655,
+  "part_count": 39,
+  "parts": [
+    {
+      "part_number": 1,
+      "offset": 0,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=0",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00001.csv.gz",
+      "compressed_bytes": 2433042,
+      "uncompressed_bytes": 12036899,
+      "sha256": "83214ca35c738f7a1c66569296d33d266c3f857d48ac055051bef306453897ac"
+    },
+    {
+      "part_number": 2,
+      "offset": 50000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=50000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00002.csv.gz",
+      "compressed_bytes": 2381812,
+      "uncompressed_bytes": 12039833,
+      "sha256": "8afed055545766b67508e9aeb31bd95302eb60794d5b13008154eeef5e413497"
+    },
+    {
+      "part_number": 3,
+      "offset": 100000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=100000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00003.csv.gz",
+      "compressed_bytes": 2401436,
+      "uncompressed_bytes": 12044047,
+      "sha256": "62d89c63a6cc6503d4289d6f286e2a826001f5e6fb4c2d695d998cccb7bf0efe"
+    },
+    {
+      "part_number": 4,
+      "offset": 150000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=150000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00004.csv.gz",
+      "compressed_bytes": 2412813,
+      "uncompressed_bytes": 12060534,
+      "sha256": "9ab048413e7f637ea1b4c9127582f87053e8b9f258a258c95f9dc2b5f29bf593"
+    },
+    {
+      "part_number": 5,
+      "offset": 200000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=200000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00005.csv.gz",
+      "compressed_bytes": 2411168,
+      "uncompressed_bytes": 12048318,
+      "sha256": "c1b8fbfbd9e0381a811cb06a4dd5ea9abb508135b464c1b28b0cf5004a771437"
+    },
+    {
+      "part_number": 6,
+      "offset": 250000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=250000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00006.csv.gz",
+      "compressed_bytes": 2425827,
+      "uncompressed_bytes": 12043223,
+      "sha256": "7eac3439d971602d208ba71b166151e1f0eaf10b3884b3a7fbb009400b7faf0e"
+    },
+    {
+      "part_number": 7,
+      "offset": 300000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=300000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00007.csv.gz",
+      "compressed_bytes": 2409767,
+      "uncompressed_bytes": 12045722,
+      "sha256": "07e41149745cedc47c5afca685b4797cc1baf0cfbccda2383d273566e7e8a56c"
+    },
+    {
+      "part_number": 8,
+      "offset": 350000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=350000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00008.csv.gz",
+      "compressed_bytes": 2405048,
+      "uncompressed_bytes": 12067422,
+      "sha256": "e4545e0f0b4103faa3625122935716c0252d95ed72d5c9711aa6286231a818cd"
+    },
+    {
+      "part_number": 9,
+      "offset": 400000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=400000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00009.csv.gz",
+      "compressed_bytes": 2405501,
+      "uncompressed_bytes": 12081285,
+      "sha256": "c3225154f4618673c8914cc5967c4d5600b1b5fdf294f02bb3a17fc2e51575af"
+    },
+    {
+      "part_number": 10,
+      "offset": 450000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=450000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00010.csv.gz",
+      "compressed_bytes": 2412894,
+      "uncompressed_bytes": 12079213,
+      "sha256": "2b15ac291a181a8859d487ceba16faf14709ab63fbf0904d5f94fe90e4c423a9"
+    },
+    {
+      "part_number": 11,
+      "offset": 500000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=500000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00011.csv.gz",
+      "compressed_bytes": 2414474,
+      "uncompressed_bytes": 12059102,
+      "sha256": "4ae3d7de27b4c9f237bb8dc76df1a10a772f53ce848fa8d389b48d9ca4f286ae"
+    },
+    {
+      "part_number": 12,
+      "offset": 550000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=550000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00012.csv.gz",
+      "compressed_bytes": 2442890,
+      "uncompressed_bytes": 12045786,
+      "sha256": "9b13f1471e23919f6b6be380f50aa72eb57a52e528d479e2de214684e46d9fa4"
+    },
+    {
+      "part_number": 13,
+      "offset": 600000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=600000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00013.csv.gz",
+      "compressed_bytes": 2469909,
+      "uncompressed_bytes": 12053793,
+      "sha256": "2be27cf3ef889c0f48a87ff8714eee810af4680362e494266c32db990f849aa3"
+    },
+    {
+      "part_number": 14,
+      "offset": 650000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=650000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00014.csv.gz",
+      "compressed_bytes": 2503907,
+      "uncompressed_bytes": 12054872,
+      "sha256": "e8a31ac22b6d22b95c85e3d008abb36c8602aa211b4dff8cbee089e565366361"
+    },
+    {
+      "part_number": 15,
+      "offset": 700000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=700000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00015.csv.gz",
+      "compressed_bytes": 2536537,
+      "uncompressed_bytes": 12059146,
+      "sha256": "8f517ad65dbd9b810ae63314b3c67b02d78e89f551d82c17747235ce320f7d9b"
+    },
+    {
+      "part_number": 16,
+      "offset": 750000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=750000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00016.csv.gz",
+      "compressed_bytes": 2541600,
+      "uncompressed_bytes": 12102378,
+      "sha256": "2db1f49ff76d3bfd00798b6e3c4ba8bad0dfd74b8697f8cdc9294bc63410fb0f"
+    },
+    {
+      "part_number": 17,
+      "offset": 800000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=800000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00017.csv.gz",
+      "compressed_bytes": 2464307,
+      "uncompressed_bytes": 12132823,
+      "sha256": "155bb4442944b35cb485b6441148e115d8cc628a44b7f4ed303cfa08df85eef4"
+    },
+    {
+      "part_number": 18,
+      "offset": 850000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=850000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00018.csv.gz",
+      "compressed_bytes": 2477923,
+      "uncompressed_bytes": 12138100,
+      "sha256": "a5595daa43c11260b66fa5ebae7343d30ed19a1829bedc074f79eaa11c40ba18"
+    },
+    {
+      "part_number": 19,
+      "offset": 900000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=900000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00019.csv.gz",
+      "compressed_bytes": 2469865,
+      "uncompressed_bytes": 12134724,
+      "sha256": "f32317391c2a588499580f67fb832b602c21268d269b76960bf501532fcbe392"
+    },
+    {
+      "part_number": 20,
+      "offset": 950000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=950000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00020.csv.gz",
+      "compressed_bytes": 2509848,
+      "uncompressed_bytes": 12116186,
+      "sha256": "7c6a0c4458223e99aba4ba6ce662974539c3d89413ce534b988f3446f32b2bc6"
+    },
+    {
+      "part_number": 21,
+      "offset": 1000000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1000000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00021.csv.gz",
+      "compressed_bytes": 2479669,
+      "uncompressed_bytes": 12126205,
+      "sha256": "e9c38cc8ba6146c3a6525ac9bd35061e22ac5f7fd888f204d680edf8bb583071"
+    },
+    {
+      "part_number": 22,
+      "offset": 1050000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1050000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00022.csv.gz",
+      "compressed_bytes": 2480983,
+      "uncompressed_bytes": 12142278,
+      "sha256": "f5e75aeca6e3ee992d448b0d406403b00cb8c0149b3a467966f10f8003c24cd0"
+    },
+    {
+      "part_number": 23,
+      "offset": 1100000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1100000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00023.csv.gz",
+      "compressed_bytes": 2486165,
+      "uncompressed_bytes": 12143379,
+      "sha256": "8eb50fe1be72d0a32d1af8a5769f5a5a267a31eccb10055e21981a5a5e47c941"
+    },
+    {
+      "part_number": 24,
+      "offset": 1150000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1150000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00024.csv.gz",
+      "compressed_bytes": 2494620,
+      "uncompressed_bytes": 12125356,
+      "sha256": "eb1b0e50f901d50ddb9b0ea1b67f00423fb97f6313573247551113a60fbf2d13"
+    },
+    {
+      "part_number": 25,
+      "offset": 1200000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1200000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00025.csv.gz",
+      "compressed_bytes": 2470966,
+      "uncompressed_bytes": 12117487,
+      "sha256": "6a093c48584a183eb88684764e1b7e8b942f18bb2f9c54caf6951ae8c38d40f4"
+    },
+    {
+      "part_number": 26,
+      "offset": 1250000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1250000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00026.csv.gz",
+      "compressed_bytes": 2432641,
+      "uncompressed_bytes": 12128877,
+      "sha256": "5b98634dc72db3e0b3b8d31029ba035dc1650e2c9311f03382be7eb9d971f9ea"
+    },
+    {
+      "part_number": 27,
+      "offset": 1300000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1300000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00027.csv.gz",
+      "compressed_bytes": 2419076,
+      "uncompressed_bytes": 12141744,
+      "sha256": "e9b7cec999f126e67fb62e0c16ad1b8f717794afda7e71eb200a200154c51852"
+    },
+    {
+      "part_number": 28,
+      "offset": 1350000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1350000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00028.csv.gz",
+      "compressed_bytes": 2440724,
+      "uncompressed_bytes": 12147862,
+      "sha256": "8c5a1f469d3bbc3e31f8bf849dd5ab28430e20c5db1435626be6775edb50c932"
+    },
+    {
+      "part_number": 29,
+      "offset": 1400000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1400000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00029.csv.gz",
+      "compressed_bytes": 2463531,
+      "uncompressed_bytes": 12128226,
+      "sha256": "e1e49148f99da82edfd4d6c8da3d40c1ccbc42eff80dfa329731debb27f9396e"
+    },
+    {
+      "part_number": 30,
+      "offset": 1450000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1450000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00030.csv.gz",
+      "compressed_bytes": 2479545,
+      "uncompressed_bytes": 12125532,
+      "sha256": "beb22fd4c6dc92c28083e96067b1de1a0314bd91e00f2e216e1c7a79908527fa"
+    },
+    {
+      "part_number": 31,
+      "offset": 1500000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1500000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00031.csv.gz",
+      "compressed_bytes": 2434696,
+      "uncompressed_bytes": 12139724,
+      "sha256": "0c853e09eb530ed235d449457257aef30294c981fc96f1477942051a937b7d07"
+    },
+    {
+      "part_number": 32,
+      "offset": 1550000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1550000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00032.csv.gz",
+      "compressed_bytes": 2469607,
+      "uncompressed_bytes": 12150768,
+      "sha256": "f6b48b5525de686ff9f71203ff7eae797e27367e432ac3df0a0233a034fa69b4"
+    },
+    {
+      "part_number": 33,
+      "offset": 1600000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1600000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00033.csv.gz",
+      "compressed_bytes": 2451595,
+      "uncompressed_bytes": 12160297,
+      "sha256": "46757aaa56b115dc994c29f0705ec76cdab7d005925e1fd948b0a9b6151114e2"
+    },
+    {
+      "part_number": 34,
+      "offset": 1650000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1650000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00034.csv.gz",
+      "compressed_bytes": 2462496,
+      "uncompressed_bytes": 12129014,
+      "sha256": "cb3743ebf13bcab8f84db50c3cb3ecfbf83a17aae11270a926d0ca5efd336c28"
+    },
+    {
+      "part_number": 35,
+      "offset": 1700000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1700000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00035.csv.gz",
+      "compressed_bytes": 2482959,
+      "uncompressed_bytes": 12126480,
+      "sha256": "97477885fae987720ef97b483b4ce63c2f77f34f02e3b2ff8b3f3c0ed702f88e"
+    },
+    {
+      "part_number": 36,
+      "offset": 1750000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1750000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00036.csv.gz",
+      "compressed_bytes": 2459432,
+      "uncompressed_bytes": 12141733,
+      "sha256": "04f47923db41a6315082e1a55d550f706a944079f89c29c18ead8f62d2046842"
+    },
+    {
+      "part_number": 37,
+      "offset": 1800000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1800000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00037.csv.gz",
+      "compressed_bytes": 2473304,
+      "uncompressed_bytes": 12155073,
+      "sha256": "9fc81159e9fd3334d5ecb1c018819119b75eab4d3c5f6a9a316b00da152472a2"
+    },
+    {
+      "part_number": 38,
+      "offset": 1850000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1850000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00038.csv.gz",
+      "compressed_bytes": 2469835,
+      "uncompressed_bytes": 12160387,
+      "sha256": "742e0e44623f38c895bf2d9630f32b44236c9b3e4a6c39e9a4b1470b375ec782"
+    },
+    {
+      "part_number": 39,
+      "offset": 1900000,
+      "row_count": 27655,
+      "request_url": "https://data.cityofchicago.org/resource/u6pd-qa9d.csv?%24select=person_id%2Cperson_type%2Ccrash_record_id%2Cvehicle_id%2Ccrash_date%2Csex%2Cage%2Csafety_equipment%2Cinjury_classification%2Cpedpedal_action%2Cpedpedal_visibility%2Cpedpedal_location&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Cperson_id+ASC&%24limit=50000&%24offset=1900000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00039.csv.gz",
+      "compressed_bytes": 1385371,
+      "uncompressed_bytes": 6702917,
+      "sha256": "e1169080c68959b53719549ce1c1f460ba9c9c8817a0d42e98804ee5dbf01b37"
+    }
+  ],
+  "status": "PASS",
+  "error": null
+}

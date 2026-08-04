@@ -1,0 +1,407 @@
+{
+  "run_id": "20260804T164141Z",
+  "source_name": "vehicles",
+  "source_config_key": "vehicles",
+  "source_title": "Chicago Traffic Crashes - Vehicles",
+  "dataset_id": "68nd-jvt3",
+  "api_url": "https://data.cityofchicago.org/resource/68nd-jvt3.json",
+  "csv_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv",
+  "primary_key": "crash_unit_id",
+  "date_field": "crash_date",
+  "history_start": "2018-01-01T00:00:00.000",
+  "history_end_exclusive": "2026-01-01T00:00:00.000",
+  "where_clause": "crash_date >= '2018-01-01T00:00:00.000' AND crash_date < '2026-01-01T00:00:00.000'",
+  "selected_fields": [
+    "crash_unit_id",
+    "crash_record_id",
+    "crash_date",
+    "unit_no",
+    "unit_type",
+    "num_passengers",
+    "vehicle_id",
+    "vehicle_defect",
+    "vehicle_type",
+    "vehicle_use",
+    "travel_direction",
+    "maneuver",
+    "first_contact_point",
+    "occupant_cnt",
+    "exceed_speed_limit_i"
+  ],
+  "order_by": [
+    "crash_date",
+    "crash_unit_id"
+  ],
+  "batch_size": 50000,
+  "snapshot_directory": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z",
+  "started_at_utc": "2026-08-04T16:41:41.772691+00:00",
+  "completed_at_utc": "2026-08-04T16:47:14.518760+00:00",
+  "expected_rows_before_download": 1792367,
+  "expected_rows_after_download": 1792367,
+  "downloaded_rows": 1792367,
+  "part_count": 36,
+  "parts": [
+    {
+      "part_number": 1,
+      "offset": 0,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=0",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00001.csv.gz",
+      "compressed_bytes": 2787910,
+      "uncompressed_bytes": 12978062,
+      "sha256": "5284286c9719cc2d07a70198bb567eacd87e2f8768a67ff997d68ecb799f4e06"
+    },
+    {
+      "part_number": 2,
+      "offset": 50000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=50000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00002.csv.gz",
+      "compressed_bytes": 2773006,
+      "uncompressed_bytes": 12978224,
+      "sha256": "079a46be9a26f59b554cbd619e1f4e71dd4e858a3433e2828b05e46281005da4"
+    },
+    {
+      "part_number": 3,
+      "offset": 100000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=100000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00003.csv.gz",
+      "compressed_bytes": 2772570,
+      "uncompressed_bytes": 12949432,
+      "sha256": "48f7e004d01794da457e4152f734a1da3966d1297862e0ccf8464ee500cd7009"
+    },
+    {
+      "part_number": 4,
+      "offset": 150000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=150000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00004.csv.gz",
+      "compressed_bytes": 2775031,
+      "uncompressed_bytes": 12955821,
+      "sha256": "9f88223ce8928682c0c2fb7dae5020910835be1ec1155574a5a7b55ddf394fb7"
+    },
+    {
+      "part_number": 5,
+      "offset": 200000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=200000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00005.csv.gz",
+      "compressed_bytes": 2780377,
+      "uncompressed_bytes": 12974399,
+      "sha256": "57272fe30f2d163b37925d76535565a1efa6142f43051a76c9943589969de468"
+    },
+    {
+      "part_number": 6,
+      "offset": 250000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=250000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00006.csv.gz",
+      "compressed_bytes": 2799383,
+      "uncompressed_bytes": 12991831,
+      "sha256": "328ed914de9eee6fbd94d77653f974bbedeb03a8fe6d4df087b2fcd567fa4992"
+    },
+    {
+      "part_number": 7,
+      "offset": 300000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=300000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00007.csv.gz",
+      "compressed_bytes": 2784815,
+      "uncompressed_bytes": 12989085,
+      "sha256": "02a669c4a977f93ecf7aa49804c52eff16a821cbfbc9cea2daa0ff34b80bd952"
+    },
+    {
+      "part_number": 8,
+      "offset": 350000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=350000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00008.csv.gz",
+      "compressed_bytes": 2771515,
+      "uncompressed_bytes": 12952065,
+      "sha256": "e8176d2c1b2432253a8933d7c9804f08a0c73dbaf06ee68896f44817c17ed62f"
+    },
+    {
+      "part_number": 9,
+      "offset": 400000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=400000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00009.csv.gz",
+      "compressed_bytes": 2761743,
+      "uncompressed_bytes": 12962940,
+      "sha256": "7e8d90e0a53449a647cfa1df36f9651e44fedc1c586db863da23f642b5837bd3"
+    },
+    {
+      "part_number": 10,
+      "offset": 450000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=450000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00010.csv.gz",
+      "compressed_bytes": 2754412,
+      "uncompressed_bytes": 13024355,
+      "sha256": "51149d9f7e3147f1490482878ffa388e83b614c3c8f5a6cdd404c74ac7625ea2"
+    },
+    {
+      "part_number": 11,
+      "offset": 500000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=500000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00011.csv.gz",
+      "compressed_bytes": 2755055,
+      "uncompressed_bytes": 13095028,
+      "sha256": "fb99fe3242d727e7db05d47fc7e13502990047fe3da88082d9042aabc6743ec4"
+    },
+    {
+      "part_number": 12,
+      "offset": 550000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=550000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00012.csv.gz",
+      "compressed_bytes": 2751549,
+      "uncompressed_bytes": 13047490,
+      "sha256": "195d17275e2de46e9ec9ef86c02b9d11e3869a30b5b1df8c9453ef42f8ca660e"
+    },
+    {
+      "part_number": 13,
+      "offset": 600000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=600000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00013.csv.gz",
+      "compressed_bytes": 2760479,
+      "uncompressed_bytes": 13064478,
+      "sha256": "87b7bed5c4216c7f036ee91c8ff35920a612a644a11bd317fb43024ab6f95cbc"
+    },
+    {
+      "part_number": 14,
+      "offset": 650000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=650000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00014.csv.gz",
+      "compressed_bytes": 2783517,
+      "uncompressed_bytes": 13147021,
+      "sha256": "b06b036764d2d13cfb7b3ede44f42388f7041942837e74ef0e7ef747dd4e1682"
+    },
+    {
+      "part_number": 15,
+      "offset": 700000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=700000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00015.csv.gz",
+      "compressed_bytes": 2775239,
+      "uncompressed_bytes": 13202681,
+      "sha256": "8de85a0144420f414118525492d538faa5ddbdbb5ceb0f5681076a63106d15e8"
+    },
+    {
+      "part_number": 16,
+      "offset": 750000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=750000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00016.csv.gz",
+      "compressed_bytes": 2773801,
+      "uncompressed_bytes": 13190522,
+      "sha256": "ab47b680608ca0ae8bd56d45e4f45fb9532ee85dc68d8c45a44f4c8dbde2115b"
+    },
+    {
+      "part_number": 17,
+      "offset": 800000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=800000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00017.csv.gz",
+      "compressed_bytes": 2771929,
+      "uncompressed_bytes": 13201671,
+      "sha256": "8b4215f423a60f749b5f50ec1236d8b97ed62c2114ca77b76b9faeac50d51e8e"
+    },
+    {
+      "part_number": 18,
+      "offset": 850000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=850000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00018.csv.gz",
+      "compressed_bytes": 2780757,
+      "uncompressed_bytes": 13212874,
+      "sha256": "beccae8f287e9b2fe17fc013893ef4b85aa004c6278a462333e15ffdaa4555b6"
+    },
+    {
+      "part_number": 19,
+      "offset": 900000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=900000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00019.csv.gz",
+      "compressed_bytes": 2795415,
+      "uncompressed_bytes": 13244460,
+      "sha256": "882bd00ebf74c6401fd84754576b436d4fe1000874df0a7fd5084b4ddbaf5c09"
+    },
+    {
+      "part_number": 20,
+      "offset": 950000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=950000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00020.csv.gz",
+      "compressed_bytes": 2786851,
+      "uncompressed_bytes": 13223316,
+      "sha256": "a7c07544eced28900c8c6369bb02a5c1d2c18a95893c46ff3dddac97e4766773"
+    },
+    {
+      "part_number": 21,
+      "offset": 1000000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1000000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00021.csv.gz",
+      "compressed_bytes": 2784001,
+      "uncompressed_bytes": 13202213,
+      "sha256": "9e4aff0f7f0cbcf95e22fe6863f02f018629f17fec0e35bd1b044e6cd53622c9"
+    },
+    {
+      "part_number": 22,
+      "offset": 1050000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1050000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00022.csv.gz",
+      "compressed_bytes": 2782342,
+      "uncompressed_bytes": 13213244,
+      "sha256": "630443d2b04d955a6608b40e396f19f4bc21be7a8a7b7952f790db46fa0cd93a"
+    },
+    {
+      "part_number": 23,
+      "offset": 1100000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1100000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00023.csv.gz",
+      "compressed_bytes": 2794704,
+      "uncompressed_bytes": 13227504,
+      "sha256": "e2ca29e6481ea45887a886488bae28eca4fe1fb44a897336648ea092a83d7e10"
+    },
+    {
+      "part_number": 24,
+      "offset": 1150000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1150000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00024.csv.gz",
+      "compressed_bytes": 2776621,
+      "uncompressed_bytes": 13226341,
+      "sha256": "f8265dad08d68463126341aa59acb121cc6d6b8eab61e35755e89d07b302faa5"
+    },
+    {
+      "part_number": 25,
+      "offset": 1200000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1200000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00025.csv.gz",
+      "compressed_bytes": 2743285,
+      "uncompressed_bytes": 13193890,
+      "sha256": "1ebf5dbca75c3a3e57527282a40064ce6040ff6c5fe276428b7dd2ff622b741f"
+    },
+    {
+      "part_number": 26,
+      "offset": 1250000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1250000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00026.csv.gz",
+      "compressed_bytes": 2761181,
+      "uncompressed_bytes": 13201743,
+      "sha256": "177a7213d2976dd5b71fe7970a5feeab75bd9e5a47f26c7626491d73e6e44fee"
+    },
+    {
+      "part_number": 27,
+      "offset": 1300000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1300000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00027.csv.gz",
+      "compressed_bytes": 2785148,
+      "uncompressed_bytes": 13219251,
+      "sha256": "099a610e89b9623ab6ef010914710d401608d9d30c2968944f51473bc49b6f3d"
+    },
+    {
+      "part_number": 28,
+      "offset": 1350000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1350000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00028.csv.gz",
+      "compressed_bytes": 2789227,
+      "uncompressed_bytes": 13227858,
+      "sha256": "58a690737ac7e6018220a5158af1568efa762fecd9c671d12e1fcc4b97a5174f"
+    },
+    {
+      "part_number": 29,
+      "offset": 1400000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1400000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00029.csv.gz",
+      "compressed_bytes": 2787996,
+      "uncompressed_bytes": 13217139,
+      "sha256": "56050fffbce8362e7432a986bada6534ecd4b23111d97c9f42d09bc9ce003018"
+    },
+    {
+      "part_number": 30,
+      "offset": 1450000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1450000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00030.csv.gz",
+      "compressed_bytes": 2786693,
+      "uncompressed_bytes": 13199044,
+      "sha256": "db811b32114066018834d36df62fab249740740a7a832c36147f58aad1381275"
+    },
+    {
+      "part_number": 31,
+      "offset": 1500000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1500000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00031.csv.gz",
+      "compressed_bytes": 2787165,
+      "uncompressed_bytes": 13218703,
+      "sha256": "82949d4941a749861fa1f9299b33c33d2efe6b8df40819cb536ddbc1231dc335"
+    },
+    {
+      "part_number": 32,
+      "offset": 1550000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1550000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00032.csv.gz",
+      "compressed_bytes": 2796014,
+      "uncompressed_bytes": 13242408,
+      "sha256": "1a5ddc2af79e5a3dcb43666679b6612e5a737004935cb52f64e40631c5cba27f"
+    },
+    {
+      "part_number": 33,
+      "offset": 1600000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1600000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00033.csv.gz",
+      "compressed_bytes": 2791487,
+      "uncompressed_bytes": 13244033,
+      "sha256": "01386f04d61401ed84a1e73c9dce0fe9ccb2892aa2ad36306c31c199f9a8d1a9"
+    },
+    {
+      "part_number": 34,
+      "offset": 1650000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1650000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00034.csv.gz",
+      "compressed_bytes": 2794729,
+      "uncompressed_bytes": 13213633,
+      "sha256": "a471725f7767e0ee36cc6f6b5a499390652a223db8e8afff06ac059e050b47ad"
+    },
+    {
+      "part_number": 35,
+      "offset": 1700000,
+      "row_count": 50000,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1700000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00035.csv.gz",
+      "compressed_bytes": 2789427,
+      "uncompressed_bytes": 13197221,
+      "sha256": "95bb9aa5bd31f43888ae6e2b1366402df2f45f224b55615a36dac42ce7e95247"
+    },
+    {
+      "part_number": 36,
+      "offset": 1750000,
+      "row_count": 42367,
+      "request_url": "https://data.cityofchicago.org/resource/68nd-jvt3.csv?%24select=crash_unit_id%2Ccrash_record_id%2Ccrash_date%2Cunit_no%2Cunit_type%2Cnum_passengers%2Cvehicle_id%2Cvehicle_defect%2Cvehicle_type%2Cvehicle_use%2Ctravel_direction%2Cmaneuver%2Cfirst_contact_point%2Coccupant_cnt%2Cexceed_speed_limit_i&%24where=crash_date+%3E%3D+%272018-01-01T00%3A00%3A00.000%27+AND+crash_date+%3C+%272026-01-01T00%3A00%3A00.000%27&%24order=crash_date+ASC%2Ccrash_unit_id+ASC&%24limit=50000&%24offset=1750000",
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\vehicles\\snapshot_20260804T164141Z\\part-00036.csv.gz",
+      "compressed_bytes": 2369558,
+      "uncompressed_bytes": 11215603,
+      "sha256": "7c89c42a6d6aa70cb4e07b0549ab665e79d3e951545fbb502c4b9fa8fe88b1dd"
+    }
+  ],
+  "status": "PASS",
+  "error": null
+}

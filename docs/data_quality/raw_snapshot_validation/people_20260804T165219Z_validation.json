@@ -1,0 +1,506 @@
+{
+  "validated_at_utc": "2026-08-04T17:01:10.342189+00:00",
+  "source_name": "people",
+  "run_id": "20260804T165219Z",
+  "manifest_path": "docs\\data_quality\\acquisition_manifests\\people_20260804T165219Z_manifest.json",
+  "snapshot_directory": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z",
+  "acquisition_integrity_status": "PASS",
+  "downstream_readiness": "PASS",
+  "expected_rows": 1927655,
+  "observed_rows": 1927655,
+  "manifest_part_count": 39,
+  "physical_part_count": 39,
+  "primary_key": "person_id",
+  "missing_primary_keys": 0,
+  "duplicate_primary_keys": 0,
+  "unique_primary_keys": 1927655,
+  "date_field": "crash_date",
+  "minimum_date": "2018-01-01T00:00:00",
+  "maximum_date": "2025-12-31T23:52:00",
+  "invalid_dates": 0,
+  "dates_outside_window": 0,
+  "coordinate_profile": null,
+  "null_profile": {
+    "person_id": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "person_type": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "crash_record_id": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "vehicle_id": {
+      "null_count": 42255,
+      "null_rate": 0.02192
+    },
+    "crash_date": {
+      "null_count": 0,
+      "null_rate": 0.0
+    },
+    "sex": {
+      "null_count": 34149,
+      "null_rate": 0.017715
+    },
+    "age": {
+      "null_count": 556315,
+      "null_rate": 0.288597
+    },
+    "safety_equipment": {
+      "null_count": 5443,
+      "null_rate": 0.002824
+    },
+    "injury_classification": {
+      "null_count": 556,
+      "null_rate": 0.000288
+    },
+    "pedpedal_action": {
+      "null_count": 1887097,
+      "null_rate": 0.97896
+    },
+    "pedpedal_visibility": {
+      "null_count": 1887161,
+      "null_rate": 0.978993
+    },
+    "pedpedal_location": {
+      "null_count": 1887099,
+      "null_rate": 0.978961
+    }
+  },
+  "hard_failures": [],
+  "limitations": [],
+  "parts": [
+    {
+      "part_number": 1,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00001.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2433042,
+      "observed_compressed_bytes": 2433042,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 2,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00002.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2381812,
+      "observed_compressed_bytes": 2381812,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 3,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00003.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2401436,
+      "observed_compressed_bytes": 2401436,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 4,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00004.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2412813,
+      "observed_compressed_bytes": 2412813,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 5,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00005.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2411168,
+      "observed_compressed_bytes": 2411168,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 6,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00006.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2425827,
+      "observed_compressed_bytes": 2425827,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 7,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00007.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2409767,
+      "observed_compressed_bytes": 2409767,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 8,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00008.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2405048,
+      "observed_compressed_bytes": 2405048,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 9,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00009.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2405501,
+      "observed_compressed_bytes": 2405501,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 10,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00010.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2412894,
+      "observed_compressed_bytes": 2412894,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 11,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00011.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2414474,
+      "observed_compressed_bytes": 2414474,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 12,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00012.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2442890,
+      "observed_compressed_bytes": 2442890,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 13,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00013.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2469909,
+      "observed_compressed_bytes": 2469909,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 14,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00014.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2503907,
+      "observed_compressed_bytes": 2503907,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 15,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00015.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2536537,
+      "observed_compressed_bytes": 2536537,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 16,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00016.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2541600,
+      "observed_compressed_bytes": 2541600,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 17,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00017.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2464307,
+      "observed_compressed_bytes": 2464307,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 18,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00018.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2477923,
+      "observed_compressed_bytes": 2477923,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 19,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00019.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2469865,
+      "observed_compressed_bytes": 2469865,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 20,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00020.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2509848,
+      "observed_compressed_bytes": 2509848,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 21,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00021.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2479669,
+      "observed_compressed_bytes": 2479669,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 22,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00022.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2480983,
+      "observed_compressed_bytes": 2480983,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 23,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00023.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2486165,
+      "observed_compressed_bytes": 2486165,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 24,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00024.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2494620,
+      "observed_compressed_bytes": 2494620,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 25,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00025.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2470966,
+      "observed_compressed_bytes": 2470966,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 26,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00026.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2432641,
+      "observed_compressed_bytes": 2432641,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 27,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00027.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2419076,
+      "observed_compressed_bytes": 2419076,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 28,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00028.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2440724,
+      "observed_compressed_bytes": 2440724,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 29,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00029.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2463531,
+      "observed_compressed_bytes": 2463531,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 30,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00030.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2479545,
+      "observed_compressed_bytes": 2479545,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 31,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00031.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2434696,
+      "observed_compressed_bytes": 2434696,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 32,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00032.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2469607,
+      "observed_compressed_bytes": 2469607,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 33,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00033.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2451595,
+      "observed_compressed_bytes": 2451595,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 34,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00034.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2462496,
+      "observed_compressed_bytes": 2462496,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 35,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00035.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2482959,
+      "observed_compressed_bytes": 2482959,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 36,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00036.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2459432,
+      "observed_compressed_bytes": 2459432,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 37,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00037.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2473304,
+      "observed_compressed_bytes": 2473304,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 38,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00038.csv.gz",
+      "expected_rows": 50000,
+      "observed_rows": 50000,
+      "expected_compressed_bytes": 2469835,
+      "observed_compressed_bytes": 2469835,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "part_number": 39,
+      "relative_path": "data\\raw\\chicago_traffic_crashes\\people\\snapshot_20260804T165219Z\\part-00039.csv.gz",
+      "expected_rows": 27655,
+      "observed_rows": 27655,
+      "expected_compressed_bytes": 1385371,
+      "observed_compressed_bytes": 1385371,
+      "sha256_matches": true,
+      "status": "PASS",
+      "issues": []
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "validated_at_utc": "2026-08-04T17:08:54.877513+00:00",
+  "manifests": {
+    "crashes": "docs\\data_quality\\acquisition_manifests\\crashes_20260804T161823Z_manifest.json",
+    "vehicles": "docs\\data_quality\\acquisition_manifests\\vehicles_20260804T164141Z_manifest.json",
+    "people": "docs\\data_quality\\acquisition_manifests\\people_20260804T165219Z_manifest.json"
+  },
+  "relationship_integrity_status": "FAIL",
+  "downstream_readiness": "PASS_WITH_LIMITATIONS",
+  "metrics": {
+    "crash_rows": 877919,
+    "vehicle_rows": 1792367,
+    "people_rows": 1927655,
+    "vehicle_orphan_rows": 0,
+    "vehicle_join_coverage_rate": 1.0,
+    "people_orphan_rows": 0,
+    "people_join_coverage_rate": 1.0,
+    "vehicle_crash_date_mismatches": 148,
+    "people_crash_date_mismatches": 161,
+    "crashes_with_vehicle_records": 877919,
+    "crashes_without_vehicle_records": 0,
+    "crash_vehicle_parent_coverage_rate": 1.0,
+    "crashes_with_people_records": 875932,
+    "crashes_without_people_records": 1987,
+    "crash_people_parent_coverage_rate": 0.99773669,
+    "maximum_vehicle_units_per_crash": 18,
+    "maximum_people_per_crash": 61
+  },
+  "failures": [
+    "Vehicle/crash date mismatches: 148",
+    "People/crash date mismatches: 161"
+  ],
+  "limitations": [
+    "Some crash records have no corresponding people record."
+  ]
+}
