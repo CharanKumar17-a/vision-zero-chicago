@@ -1,0 +1,70 @@
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+
+# VS Code and operating-system files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Project data
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+
+# Generated analytical outputs
+outputs/figures/*
+outputs/tables/*
+outputs/forecasts/*
+outputs/recommendations/*
+outputs/logs/*
+
+# Local dashboard files
+*.pbix
+
+# Temporary files
+*.tmp
+*.log
+~$*
+
+# Previous project-material folder
+zero-vision/
+
+
+
+
+
+
+
+
+# Preserve project folder structure
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+
+!outputs/figures/.gitkeep
+!outputs/tables/.gitkeep
+!outputs/forecasts/.gitkeep
+!outputs/recommendations/.gitkeep
+!outputs/logs/.gitkeep

@@ -1,0 +1,7 @@
+decision_id,date,decision,rationale,approved_by,affected_files
+D001,2026-08-04,Use corridor-month as the modelling grain,Supports time-based forecasting and corridor-level planning,project_owner,config/project.yml;docs/decision_contract.md
+D002,2026-08-04,Use 43 corridors as the initial candidate set,Maintains the confirmed project boundary while corridor geometry is verified,project_owner,config/project.yml;docs/decision_contract.md
+D003,2026-08-04,Use time-based model validation only,Random splitting would leak future information into model evaluation,project_owner,config/project.yml
+D004,2026-08-04,Treat budget and equity values as planning scenarios,No official City values have been verified for this project,project_owner,config/project.yml;docs/decision_contract.md
+D005,2026-08-04,Keep final authority with the City and engineering teams,The analytical system is decision support and cannot replace feasibility review,project_owner,docs/decision_contract.md
+D006,2026-08-04,Preserve raw source files without manual modification,Reproducibility requires cleaning to occur only in interim and processed layers,project_owner,data/raw;data/interim;data/processed

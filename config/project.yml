@@ -1,0 +1,79 @@
+project:
+  name: vision-zero-chicago
+  title: Vision Zero Chicago Road-Safety Investment Prioritization
+  version: "0.1.0"
+  status: development
+
+schedule:
+  target_completion_date: "2026-09-14"
+  total_focused_hours: 144
+  weekly_hours: 24
+  working_days_per_week: 6
+
+analysis:
+  candidate_unit: corridor
+  time_unit: month
+  corridor_count: 43
+  history_months: 96
+  forecast_months: 12
+  expected_panel_rows: 4128
+  expected_forecast_rows: 516
+
+  history_start: null
+  history_end: null
+  forecast_start: null
+  forecast_end: null
+
+outcome:
+  primary_target: total_recorded_crashes
+  secondary_target: fatal_and_serious_injury_crashes
+  target_definition_status: pending_data_dictionary_validation
+
+spatial_assignment:
+  source_crs: "EPSG:4326"
+  projected_crs: "EPSG:3435"
+  primary_buffer_feet: 75
+  sensitivity_buffers_feet:
+    - 50
+    - 100
+  preserve_unmatched_records: true
+  preserve_ambiguous_records: true
+
+modelling:
+  random_seed: 42
+  time_based_validation_only: true
+  baseline_model: historical_mean
+  candidate_models:
+    - poisson_regression
+    - negative_binomial_regression
+  production_model: null
+
+treatment_analysis:
+  base_discount_rate: 0.07
+  alternative_discount_rates:
+    - 0.03
+    - 0.05
+    - 0.10
+  price_year: 2024
+  require_applicability_evidence: true
+  require_cmf_source: true
+  require_cost_source: true
+
+optimization:
+  objective: maximize_expected_safety_benefit
+  budget_usd: null
+  equity_requirement: null
+  maximum_treatments_per_corridor: 1
+  allow_inapplicable_treatments: false
+
+validation:
+  fail_on_duplicate_crash_id: true
+  fail_on_duplicate_corridor_month: true
+  fail_on_negative_crash_count: true
+  require_complete_balanced_panel: true
+  require_forecast_row_count: true
+
+governance:
+  output_type: engineering_review_shortlist
+  final_decision_authority: city_and_engineering_team
+  automated_project_approval: false

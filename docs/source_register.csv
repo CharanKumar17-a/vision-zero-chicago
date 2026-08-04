@@ -1,0 +1,7 @@
+source_id,source_name,owner,url,expected_grain,planned_use,status,access_date,notes
+SRC001,Chicago Traffic Crashes - Crashes,City of Chicago Data Portal,,One row per recorded crash,Crash outcomes dates and locations,pending_verification,,
+SRC002,Chicago Traffic Crashes - Vehicles,City of Chicago Data Portal,,One row per involved vehicle,Vehicle and crash-level flags,pending_verification,,
+SRC003,High-Crash Corridor Geometry,City of Chicago or verified project source,,One row per corridor geometry,Candidate corridors and spatial assignment,pending_verification,,
+SRC004,Equity Geography,City of Chicago or US Census Bureau,,One row per equity geography,Portfolio equity measurement,pending_verification,,
+SRC005,Crash Modification Factor Evidence,USDOT CMF Clearinghouse,,One row per treatment study or CMF,Treatment effectiveness estimates,pending_verification,,
+SRC006,Road-Safety Treatment Cost Evidence,Official transportation sources,,One row per treatment cost estimate,Treatment cost scenarios,pending_verification,,

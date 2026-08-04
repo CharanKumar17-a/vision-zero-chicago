@@ -1,0 +1,35 @@
+# Data processing
+pandas
+numpy
+pyarrow
+openpyxl
+pyyaml
+
+# Data acquisition
+requests
+sodapy
+
+# Geospatial analysis
+geopandas
+shapely
+pyogrio
+
+# Statistics and machine learning
+scikit-learn
+statsmodels
+scipy
+joblib
+
+# Visualization and application
+matplotlib
+seaborn
+plotly
+folium
+streamlit
+
+# Notebooks
+jupyterlab
+ipykernel
+
+# Testing
+pytest
