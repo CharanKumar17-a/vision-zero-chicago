@@ -4,10 +4,20 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ACQUISITION_CONFIG_PATH = ROOT / "config" / "acquisition.yml"
-CLEANING_CONFIG_PATH = ROOT / "config" / "cleaning.yml"
+
+ACQUISITION_CONFIG_PATH = (
+    ROOT / "config" / "acquisition.yml"
+)
+
+CLEANING_CONFIG_PATH = (
+    ROOT / "config" / "cleaning.yml"
+)
+
 CLEANING_CONTRACT_PATH = (
-    ROOT / "docs" / "data_quality" / "cleaning_contract.md"
+    ROOT
+    / "docs"
+    / "data_quality"
+    / "cleaning_contract.md"
 )
 
 
@@ -88,6 +98,7 @@ def test_cleaning_contract_has_required_sections():
         "## Date and Time Rules",
         "## Coordinate Rules",
         "## Join Governance",
+        "## Numeric Plausibility Rules",
         "## Validation Levels",
         "## Required Validation Evidence",
         "## Known Limitations",
@@ -101,7 +112,8 @@ def test_cleaning_contract_has_required_sections():
     ]
 
     assert not missing_sections, (
-        f"Missing cleaning-contract sections: {missing_sections}"
+        "Missing cleaning-contract sections: "
+        f"{missing_sections}"
     )
 
 
@@ -127,3 +139,90 @@ def test_cleaning_contract_prohibits_silent_data_loss():
     assert "remove rows with missing coordinates" in contract_text
     assert "silently impute missing values" in contract_text
     assert "raw files are immutable" in contract_text
+
+
+def test_cleaning_failure_evidence_policy_is_configured():
+    cleaning = load_yaml(CLEANING_CONFIG_PATH)
+    evidence = cleaning["evidence"]
+
+    assert evidence["persist_run_reports"] is True
+    assert evidence["persist_failed_runs"] is True
+    assert evidence["publish_output_on_failure"] is False
+
+    assert (
+        evidence["run_report_directory"]
+        == "docs/data_quality/cleaning_runs"
+    )
+
+    assert (
+        evidence["latest_report_path"]
+        == "docs/data_quality/crash_cleaning_validation.json"
+    )
+
+    assert (
+        evidence["issue_register_path"]
+        == "docs/data_quality/data_quality_issue_register.csv"
+    )
+
+    assert (
+        evidence["runtime_log_directory"]
+        == "outputs/logs/cleaning"
+    )
+
+    assert set(evidence["issue_severities"]) == {
+        "INFO",
+        "WARNING",
+        "ERROR",
+    }
+
+    assert set(evidence["run_statuses"]) == {
+        "PASS",
+        "PASS_WITH_WARNINGS",
+        "FAIL",
+    }
+
+
+def test_numeric_quality_ranges_are_documented():
+    cleaning = load_yaml(CLEANING_CONFIG_PATH)
+    ranges = cleaning["numeric_quality_ranges"]
+
+    assert ranges["posted_speed_limit"] == {
+        "minimum": 1,
+        "maximum": 70,
+        "missing_allowed": True,
+        "action": "warn",
+    }
+
+    assert ranges["lane_cnt"] == {
+        "minimum": 1,
+        "maximum": 20,
+        "missing_allowed": True,
+        "action": "warn",
+    }
+
+    assert ranges["num_units"] == {
+        "minimum": 1,
+        "maximum": 20,
+        "missing_allowed": False,
+        "action": "warn",
+    }
+
+    contract_text = load_contract_text()
+    normalized_contract = contract_text.replace(chr(96), "")
+
+    assert "## Numeric Plausibility Rules" in contract_text
+
+    assert (
+        "| posted_speed_limit | 1 | 70 | Yes | Warn |"
+        in normalized_contract
+    )
+
+    assert (
+        "| lane_cnt | 1 | 20 | Yes | Warn |"
+        in normalized_contract
+    )
+
+    assert (
+        "| num_units | 1 | 20 | No | Warn |"
+        in normalized_contract
+    )

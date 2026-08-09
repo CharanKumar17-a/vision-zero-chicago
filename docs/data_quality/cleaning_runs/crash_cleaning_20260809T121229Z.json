@@ -1,0 +1,114 @@
+{
+  "pipeline": "crash_core_cleaning",
+  "run_id": "20260809T121229Z",
+  "started_at_utc": "2026-08-09T12:12:29+00:00",
+  "completed_at_utc": "2026-08-09T12:12:48+00:00",
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "PASS_WITH_WARNINGS",
+  "published_output": true,
+  "manifest": {
+    "path": "docs\\data_quality\\acquisition_manifests\\crashes_20260804T161823Z_manifest.json",
+    "status": "PASS",
+    "snapshot_directory": "data\\raw\\chicago_traffic_crashes\\crashes\\snapshot_20260804T161823Z",
+    "expected_rows": 877919,
+    "part_count": 18
+  },
+  "output": {
+    "path": "data\\interim\\crashes_clean.parquet",
+    "exists": true,
+    "size_bytes": 144262441
+  },
+  "metrics": {
+    "input_rows": 877919,
+    "output_rows": 877919,
+    "input_columns": 39,
+    "output_columns": 44,
+    "missing_primary_keys": 0,
+    "duplicate_primary_keys": 0,
+    "invalid_crash_dates": 0,
+    "dates_outside_historical_window": 0,
+    "minimum_crash_date": "2018-01-01T00:00:00",
+    "maximum_crash_date": "2025-12-31T23:52:00",
+    "blank_severity_rows": 1994,
+    "unmapped_severity_rows": 0,
+    "severity_kabco_counts": {
+      "O": 743380,
+      "B": 74659,
+      "C": 41869,
+      "A": 15037,
+      "U": 1994,
+      "K": 980
+    },
+    "coordinate_status_counts": {
+      "valid": 870769,
+      "missing_pair": 7150
+    },
+    "valid_coordinate_rows": 870769,
+    "valid_coordinate_coverage": 0.9918557406776707,
+    "invalid_indicator_values": {
+      "intersection_related_i": 0,
+      "dooring_i": 0,
+      "work_zone_i": 0,
+      "hit_and_run_i": 0
+    },
+    "invalid_numeric_values": {
+      "posted_speed_limit": 0,
+      "lane_cnt": 0,
+      "street_no": 0,
+      "num_units": 0,
+      "injuries_total": 0,
+      "injuries_fatal": 0,
+      "injuries_incapacitating": 0,
+      "injuries_non_incapacitating": 0,
+      "injuries_reported_not_evident": 0,
+      "injuries_no_indication": 0,
+      "injuries_unknown": 0,
+      "crash_hour": 0,
+      "crash_day_of_week": 0,
+      "crash_month": 0
+    },
+    "numeric_range_warnings": {
+      "posted_speed_limit_outside_range": 4272,
+      "lane_cnt_outside_range": 3064,
+      "num_units_outside_range": 0,
+      "num_units_missing": 0
+    }
+  },
+  "issues": [
+    {
+      "issue_code": "blank_severity",
+      "severity": "WARNING",
+      "affected_rows": 1994,
+      "description": "Blank severity was mapped to U.",
+      "governance_reference": "severity contract"
+    },
+    {
+      "issue_code": "invalid_coordinate",
+      "severity": "WARNING",
+      "affected_rows": 7150,
+      "description": "Coordinate is unavailable or invalid for corridor assignment.",
+      "governance_reference": "A009"
+    },
+    {
+      "issue_code": "numeric_range_warning:posted_speed_limit_outside_range",
+      "severity": "WARNING",
+      "affected_rows": 4272,
+      "description": "Configured quality warning for posted_speed_limit_outside_range.",
+      "governance_reference": ""
+    },
+    {
+      "issue_code": "numeric_range_warning:lane_cnt_outside_range",
+      "severity": "WARNING",
+      "affected_rows": 3064,
+      "description": "Configured quality warning for lane_cnt_outside_range.",
+      "governance_reference": ""
+    }
+  ],
+  "error": null,
+  "governance": {
+    "raw_files_modified": false,
+    "rows_dropped_by_policy": false,
+    "imputation_used": false,
+    "final_decision_authority": "city_and_engineering_team"
+  }
+}

@@ -284,6 +284,31 @@ The output therefore contains the 39 retained source fields plus these five
 required derived fields. Any additional derived field requires a documented
 contract update.
 
+## Numeric Plausibility Rules
+
+Numeric plausibility checks produce warnings and do not remove source records.
+
+| Field | Minimum | Maximum | Missing allowed | Action |
+|---|---:|---:|---|---|
+| `posted_speed_limit` | 1 | 70 | Yes | Warn |
+| `lane_cnt` | 1 | 20 | Yes | Warn |
+| `num_units` | 1 | 20 | No | Warn |
+
+A zero `posted_speed_limit` is retained but flagged because it does not
+represent a usable posted speed. The reference snapshot contains 4,272 such
+rows.
+
+A missing `lane_cnt` is allowed because lane count has limited source coverage.
+A recorded value of zero or greater than 20 is retained and flagged. The
+reference snapshot contains 3,040 zero values and 24 values above 20.
+
+`num_units` must normally be between 1 and 20. The reference snapshot contains
+no values outside this range, and the raw relationship validation observed a
+maximum of 18 vehicle units per crash.
+
+These thresholds are data-quality screening rules, not engineering
+applicability rules.
+
 ## Validation Levels
 
 ### Failure conditions
