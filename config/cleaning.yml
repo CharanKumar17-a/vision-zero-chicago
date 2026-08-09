@@ -260,3 +260,12 @@ numeric_quality_ranges:
     maximum: 20
     missing_allowed: false
     action: warn
+
+deep_validation:
+  batch_size: 100000
+  report_directory: docs/data_quality/deep_validation_runs
+  latest_report_path: docs/data_quality/crash_core_deep_validation.json
+  compare_to_cleaning_report: true
+  append_to_issue_register: true
+  fail_on_schema_mismatch: true
+  fail_on_derived_field_mismatch: true

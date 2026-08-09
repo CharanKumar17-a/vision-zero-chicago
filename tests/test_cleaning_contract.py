@@ -226,3 +226,24 @@ def test_numeric_quality_ranges_are_documented():
         "| num_units | 1 | 20 | No | Warn |"
         in normalized_contract
     )
+
+def test_deep_validation_policy_is_configured():
+    cleaning = load_yaml(CLEANING_CONFIG_PATH)
+    validation = cleaning["deep_validation"]
+
+    assert validation["batch_size"] == 100000
+
+    assert (
+        validation["report_directory"]
+        == "docs/data_quality/deep_validation_runs"
+    )
+
+    assert (
+        validation["latest_report_path"]
+        == "docs/data_quality/crash_core_deep_validation.json"
+    )
+
+    assert validation["compare_to_cleaning_report"] is True
+    assert validation["append_to_issue_register"] is True
+    assert validation["fail_on_schema_mismatch"] is True
+    assert validation["fail_on_derived_field_mismatch"] is True
