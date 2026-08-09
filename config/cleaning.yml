@@ -1,0 +1,223 @@
+version: 1
+
+dataset:
+  name: crashes_clean
+  source_config_key: crashes
+
+  input:
+    raw_root: data/raw/chicago_traffic_crashes/crashes
+    manifest_directory: docs/data_quality/acquisition_manifests
+    manifest_pattern: crashes_*_manifest.json
+    expected_rows_source: latest_successful_manifest
+
+  output:
+    path: data/interim/crashes_clean.parquet
+    format: parquet
+    grain: one row per recorded crash
+    primary_key: crash_record_id
+
+processing:
+  preserve_all_source_rows: true
+  allow_manual_source_edits: false
+  drop_invalid_rows: false
+  imputation_strategy: none
+  trim_string_whitespace: true
+  convert_empty_strings_to_null: true
+  authoritative_timestamp: crash_date
+
+date_window:
+  source: config/project.yml
+  start_key: analysis.history_start
+  end_key: analysis.history_end
+
+schema:
+  datetime_columns:
+    - crash_date
+
+  string_columns:
+    - crash_record_id
+    - traffic_control_device
+    - device_condition
+    - weather_condition
+    - lighting_condition
+    - first_crash_type
+    - trafficway_type
+    - alignment
+    - roadway_surface_cond
+    - road_defect
+    - crash_type
+    - intersection_related_i
+    - dooring_i
+    - work_zone_i
+    - hit_and_run_i
+    - damage
+    - prim_contributory_cause
+    - sec_contributory_cause
+    - street_direction
+    - street_name
+    - beat_of_occurrence
+    - most_severe_injury
+
+  nullable_integer_columns:
+    - posted_speed_limit
+    - lane_cnt
+    - street_no
+    - num_units
+    - injuries_total
+    - injuries_fatal
+    - injuries_incapacitating
+    - injuries_non_incapacitating
+    - injuries_reported_not_evident
+    - injuries_no_indication
+    - injuries_unknown
+    - crash_hour
+    - crash_day_of_week
+    - crash_month
+
+  nullable_float_columns:
+    - latitude
+    - longitude
+
+text_normalization:
+  preserve_primary_key_case: true
+
+  uppercase_columns:
+    - traffic_control_device
+    - device_condition
+    - weather_condition
+    - lighting_condition
+    - first_crash_type
+    - trafficway_type
+    - alignment
+    - roadway_surface_cond
+    - road_defect
+    - crash_type
+    - intersection_related_i
+    - dooring_i
+    - work_zone_i
+    - hit_and_run_i
+    - damage
+    - prim_contributory_cause
+    - sec_contributory_cause
+    - street_direction
+    - street_name
+    - most_severe_injury
+
+indicator_fields:
+  columns:
+    - intersection_related_i
+    - dooring_i
+    - work_zone_i
+    - hit_and_run_i
+
+  allowed_non_null_values:
+    - "Y"
+    - "N"
+
+  fill_missing_with_false: false
+  invalid_value_action: preserve_and_flag
+
+severity:
+  source_field: most_severe_injury
+  output_field: severity_kabco
+  unknown_code: "U"
+
+  mapping:
+    FATAL: "K"
+    INCAPACITATING INJURY: "A"
+    NONINCAPACITATING INJURY: "B"
+    "REPORTED, NOT EVIDENT": "C"
+    NO INDICATION OF INJURY: "O"
+
+  blank_value_action: map_to_unknown_and_flag
+  unmapped_value_action: map_to_unknown_and_flag
+
+coordinates:
+  latitude_field: latitude
+  longitude_field: longitude
+
+  status_field: coordinate_status
+  valid_flag_field: has_valid_coordinates
+
+  valid_status: valid
+  missing_pair_status: missing_pair
+  incomplete_pair_status: incomplete_pair
+  non_numeric_status: non_numeric
+  out_of_range_status: out_of_range
+
+  latitude_minimum: -90.0
+  latitude_maximum: 90.0
+  longitude_minimum: -180.0
+  longitude_maximum: 180.0
+
+  preserve_rows_without_valid_coordinates: true
+  allow_unverified_location_recovery: false
+  spatial_assignment_requires_valid_coordinates: true
+
+derived_columns:
+  crash_year:
+    source: crash_date
+    type: nullable_integer
+
+  crash_month_start:
+    source: crash_date
+    type: datetime
+
+  severity_kabco:
+    source: most_severe_injury
+    type: string
+
+  coordinate_status:
+    source:
+      - latitude
+      - longitude
+    type: string
+
+  has_valid_coordinates:
+    source:
+      - latitude
+      - longitude
+    type: boolean
+
+join_governance:
+  parent_table: crashes
+  join_key: crash_record_id
+  child_join_type: left
+  authoritative_timestamp_table: crashes
+  authoritative_timestamp_field: crash_date
+  preserve_crashes_without_people_records: true
+
+validation:
+  fail_conditions:
+    - missing_required_input_column
+    - output_row_count_does_not_match_manifest
+    - missing_primary_key
+    - duplicate_primary_key
+    - invalid_crash_date
+    - crash_date_outside_historical_window
+    - unexpected_row_deletion
+    - unexpected_row_addition
+
+  warning_conditions:
+    - blank_or_unmapped_severity
+    - invalid_indicator_value
+    - negative_injury_count
+    - injury_components_do_not_reconcile
+    - crash_hour_outside_0_to_23
+    - crash_day_of_week_outside_1_to_7
+    - crash_month_outside_1_to_12
+    - crash_time_components_do_not_match_crash_date
+    - missing_coordinate_pair
+    - incomplete_coordinate_pair
+    - non_numeric_coordinate
+    - coordinate_outside_global_range
+    - implausible_posted_speed_limit
+    - implausible_lane_count
+    - implausible_num_units
+
+reference_quality:
+  snapshot_name: snapshot_20260804T161823Z
+  snapshot_rows: 877919
+  missing_coordinate_pairs: 7150
+  valid_coordinate_coverage: 0.9919
+  blank_most_severe_injury_rows: 1994
