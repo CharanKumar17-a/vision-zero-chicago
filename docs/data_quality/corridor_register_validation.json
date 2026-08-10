@@ -1,0 +1,263 @@
+{
+  "pipeline": "corridor_register_validation",
+  "run_id": "20260810T103635Z",
+  "started_at_utc": "2026-08-10T10:36:35+00:00",
+  "completed_at_utc": "2026-08-10T10:36:35+00:00",
+  "status": "PASS",
+  "downstream_readiness": "READY_FOR_GEOMETRY_CONSTRUCTION",
+  "register": {
+    "path": "data\\interim\\high_crash_corridor_register.csv",
+    "rows": 43
+  },
+  "summary": {
+    "total_checks": 30,
+    "passed": 30,
+    "failed": 0,
+    "critical_failures": 0,
+    "warnings": 0
+  },
+  "checks": [
+    {
+      "check": "row_count",
+      "expected": 43,
+      "actual": 43,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "required_columns",
+      "expected": [
+        "corridor_id",
+        "corridor_name",
+        "street_name",
+        "from_street",
+        "to_street",
+        "source_group",
+        "source_corridor_number",
+        "source_name",
+        "source_page",
+        "cross_reference_page",
+        "confidence",
+        "extraction_status",
+        "geometry_status"
+      ],
+      "missing": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "corridor_id_unique",
+      "total": 43,
+      "distinct": 43,
+      "duplicates": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "corridor_id_range",
+      "expected_first": "HCC001",
+      "expected_last": "HCC043",
+      "missing": [],
+      "extra": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "neighborhood_count",
+      "expected": 31,
+      "actual": 31,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "downtown_count",
+      "expected": 12,
+      "actual": 12,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "valid_source_groups",
+      "invalid": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "neighborhood_source_number_range",
+      "expected_min": 1,
+      "expected_max": 31,
+      "missing": [],
+      "extra": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "neighborhood_source_number_unique",
+      "duplicates": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "downtown_source_number_range",
+      "expected_min": 1,
+      "expected_max": 12,
+      "missing": [],
+      "extra": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "downtown_source_number_unique",
+      "duplicates": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_corridor_id",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_corridor_name",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_street_name",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_from_street",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_to_street",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_source_name",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_source_page",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_cross_reference_page",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_extraction_status",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_geometry_status",
+      "missing_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "source_page_is_9",
+      "non_conforming": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "cross_reference_pages_valid",
+      "valid_pages": [
+        27,
+        28,
+        29
+      ],
+      "invalid_corridors": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "extraction_status_valid",
+      "valid_values": [
+        "unverified",
+        "verified_first_pass",
+        "verified_second_pass"
+      ],
+      "invalid_corridors": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "geometry_status_valid",
+      "valid_values": [
+        "constructed",
+        "failed",
+        "pending_construction",
+        "validated"
+      ],
+      "invalid_corridors": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "all_geometry_pending_construction",
+      "non_conforming": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "config_register_consistency",
+      "mismatches": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "alias_documented",
+      "canonical_name": "Lake Shore Drive",
+      "matching_alias": "Lake Shore",
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "alias_documented",
+      "canonical_name": "Western Ave/Blvd",
+      "matching_alias": "Western",
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "confidence_valid",
+      "valid_values": [
+        "HIGH",
+        "MEDIUM"
+      ],
+      "invalid_corridors": [],
+      "passed": true,
+      "severity": "critical"
+    }
+  ],
+  "governance": {
+    "canonical_source_page": 9,
+    "cross_reference_pages": [
+      27,
+      28,
+      29
+    ],
+    "raw_files_modified": false,
+    "geometry_constructed": false,
+    "crashes_assigned": false
+  }
+}

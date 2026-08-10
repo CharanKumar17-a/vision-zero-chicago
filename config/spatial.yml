@@ -46,10 +46,24 @@ corridor_register:
     - street_name
     - from_street
     - to_street
+    - source_group
+    - source_corridor_number
     - source_name
     - source_page
+    - cross_reference_page
+    - confidence
     - extraction_status
     - geometry_status
+
+  source_groups:
+    neighborhood:
+      count: 31
+      source_number_range: 1-31
+      id_range: HCC001-HCC031
+    downtown:
+      count: 12
+      source_number_range: 1-12
+      id_range: HCC032-HCC043
 
   corridor_id:
     prefix: HCC
@@ -191,7 +205,7 @@ evidence:
   publish_assignment_on_failure: false
 
   corridor_register_validation:
-    report_directory: docs/data_quality/corridor_register_runs
+    report_directory: docs/data_quality/corridor_register_validation_runs
     latest_report_path: docs/data_quality/corridor_register_validation.json
 
   geometry_validation:

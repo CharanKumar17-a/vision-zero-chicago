@@ -111,6 +111,10 @@ def test_corridor_register_contract_is_complete():
         "to_street",
         "source_name",
         "source_page",
+        "source_group",
+        "source_corridor_number",
+        "cross_reference_page",
+        "confidence",
         "extraction_status",
         "geometry_status",
     }

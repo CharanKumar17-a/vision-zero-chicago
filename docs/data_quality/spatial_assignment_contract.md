@@ -79,6 +79,16 @@ Published source wording must be preserved.
 
 Normalized versions may be added for matching, but they must not replace the original values.
 
+### Canonical authority
+
+Page 9 of the High Crash Corridors Framework Plan is the canonical source for corridor names and published FROM/TO boundaries.
+
+Pages 27 through 29 are cross-reference evidence. They are used only to validate endpoints and sub-segment continuity.
+
+Where pages 27 through 29 reverse the FROM/TO direction, page 9 governs. Cross-reference of all 43 corridors found 20 same-direction matches, 23 reversed-direction matches, zero endpoint disagreements, 16 continuous multi-segment chains, and zero chain breaks.
+
+Where pages 27 through 29 introduce intermediate cross-street split points, these are project-delivery sub-segments and do not extend or redefine the corridor boundaries.
+
 ### Street-geometry source
 
 Chicago Street Center Lines supplies the road-segment geometry used to construct each corridor.
@@ -119,19 +129,47 @@ Once assigned, a corridor ID must remain stable.
 
 IDs must not be regenerated based on row order after downstream outputs exist.
 
+### Project ID versus source numbering
+
+The project assigns stable corridor IDs (`corridor_id`) that are independent of the source numbering printed on page 9.
+
+Each corridor retains its original source group and source number:
+
+| Source group | Source numbers | Project IDs |
+|---|---|---|
+| `neighborhood` | 1 through 31 | HCC001 through HCC031 |
+| `downtown` | 1 through 12 | HCC032 through HCC043 |
+
+The source number must never replace the project corridor ID. Both must be preserved.
+
 ### Required fields
 
 | Field | Purpose |
 |---|---|
 | `corridor_id` | Stable project identifier |
-| `corridor_name` | Published or review-friendly corridor label |
+| `corridor_name` | Published corridor label from page 9 |
 | `street_name` | Main corridor street |
-| `from_street` | Published starting boundary |
-| `to_street` | Published ending boundary |
-| `source_name` | Corridor-definition source |
+| `from_street` | Published starting boundary from page 9 |
+| `to_street` | Published ending boundary from page 9 |
+| `source_group` | Neighborhood or downtown |
+| `source_corridor_number` | Number within the source group |
+| `source_name` | Corridor-definition source document |
 | `source_page` | Page supporting the definition |
+| `cross_reference_page` | Project-list page used for verification |
+| `confidence` | Transcription confidence level |
 | `extraction_status` | Whether transcription has been verified |
 | `geometry_status` | Current geometry-construction status |
+
+### Corridor name aliases
+
+Two corridors have name variants between page 9 and the project-list pages:
+
+| Canonical name (page 9) | Matching alias (pages 27-29) |
+|---|---|
+| Lake Shore Drive | Lake Shore |
+| Western Ave/Blvd | Western |
+
+The canonical page 9 name must be preserved in the register. Matching aliases may be used for street-centerline lookup but must not replace the canonical name.
 
 ### Extraction rules
 

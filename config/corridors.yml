@@ -1,0 +1,581 @@
+version: 1
+
+source:
+  document: high_crash_corridor_framework_plan.pdf
+  canonical_page: 9
+  cross_reference_pages:
+    - 27
+    - 28
+    - 29
+  canonical_policy: >
+    Page 9 of the High Crash Corridors Framework Plan (June 2018) is the
+    authoritative source for corridor names and published FROM/TO boundaries.
+    Pages 27 through 29 are cross-reference evidence used to validate
+    endpoints and sub-segment continuity. Where pages 27-29 reverse the
+    FROM/TO direction, page 9 governs. Where pages 27-29 introduce
+    intermediate split points, these are project-delivery sub-segments and
+    do not extend or redefine the corridor boundaries.
+  extraction_method: structured_transcription_from_verified_plan
+  require_second_pass_verification: true
+  allow_silent_boundary_inference: false
+
+cross_reference_summary:
+  total_corridors: 43
+  same_direction_matches: 20
+  reversed_direction_matches: 23
+  endpoint_disagreements: 0
+  multi_segment_chains: 16
+  chain_breaks: 0
+
+id_mapping:
+  neighborhood_id_offset: 0
+  downtown_id_offset: 31
+  id_prefix: HCC
+  id_width: 3
+  first_id: HCC001
+  last_id: HCC043
+  rule: >
+    neighborhood source number N maps to HCC with zero-padded (N).
+    downtown source number D maps to HCC with zero-padded (D + 31).
+
+aliases:
+  - canonical_name: "Lake Shore Drive"
+    matching_alias: "Lake Shore"
+    reason: "pages 27-29 use shortened form"
+  - canonical_name: "Western Ave/Blvd"
+    matching_alias: "Western"
+    reason: "pages 27-29 omit street-type suffix for corridor 20"
+
+extraction_statuses:
+  - verified_first_pass
+  - verified_second_pass
+  - unverified
+
+geometry_statuses:
+  - pending_construction
+  - constructed
+  - validated
+  - failed
+
+corridors:
+  # ----------------------------------------------------------------
+  # NEIGHBORHOOD HIGH CRASH CORRIDORS (numbered 1-31 on page 9)
+  # ----------------------------------------------------------------
+  - source_group: neighborhood
+    source_corridor_number: 1
+    corridor_name: Devon
+    street_name: Devon
+    from_street: California
+    to_street: Clark
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 2
+    corridor_name: Broadway
+    street_name: Broadway
+    from_street: Foster
+    to_street: Grace
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 3
+    corridor_name: Western
+    street_name: Western
+    from_street: Lawrence
+    to_street: Irving Park
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 4
+    corridor_name: Belmont
+    street_name: Belmont
+    from_street: Pulaski
+    to_street: Kedzie
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 5
+    corridor_name: Clark
+    street_name: Clark
+    from_street: Irving Park
+    to_street: LaSalle
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 6
+    corridor_name: Fullerton
+    street_name: Fullerton
+    from_street: Meade
+    to_street: California
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 7
+    corridor_name: Western
+    street_name: Western
+    from_street: George
+    to_street: Chicago
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 8
+    corridor_name: Milwaukee
+    street_name: Milwaukee
+    from_street: Kedzie
+    to_street: Ogden
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 9
+    corridor_name: Damen
+    street_name: Damen
+    from_street: Fullerton
+    to_street: Superior
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 10
+    corridor_name: Ashland
+    street_name: Ashland
+    from_street: Fullerton
+    to_street: Van Buren
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 11
+    corridor_name: North
+    street_name: North
+    from_street: Austin
+    to_street: Laramie
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 12
+    corridor_name: Chicago
+    street_name: Chicago
+    from_street: Central
+    to_street: Cicero
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 13
+    corridor_name: Chicago
+    street_name: Chicago
+    from_street: Pulaski
+    to_street: Kedzie
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 14
+    corridor_name: Chicago
+    street_name: Chicago
+    from_street: Paulina
+    to_street: State
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 15
+    corridor_name: Lake
+    street_name: Lake
+    from_street: Lockwood
+    to_street: Hamlin
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 16
+    corridor_name: Cicero
+    street_name: Cicero
+    from_street: Chicago
+    to_street: Arthington
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 17
+    corridor_name: Pulaski
+    street_name: Pulaski
+    from_street: Division
+    to_street: Roosevelt
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 18
+    corridor_name: Roosevelt
+    street_name: Roosevelt
+    from_street: Halsted
+    to_street: Michigan
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 19
+    corridor_name: Lake Shore Drive
+    street_name: Lake Shore Drive
+    from_street: Division
+    to_street: Roosevelt
+    source_page: 9
+    cross_reference_page: 29
+    confidence: MEDIUM
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 20
+    corridor_name: Western Ave/Blvd
+    street_name: Western
+    from_street: 35th
+    to_street: Garfield
+    source_page: 9
+    cross_reference_page: 29
+    confidence: MEDIUM
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 21
+    corridor_name: Pulaski
+    street_name: Pulaski
+    from_street: Archer
+    to_street: 71st
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 22
+    corridor_name: Garfield
+    street_name: Garfield
+    from_street: Halsted
+    to_street: King
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 23
+    corridor_name: Ashland
+    street_name: Ashland
+    from_street: 59th
+    to_street: 69th
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 24
+    corridor_name: Western
+    street_name: Western
+    from_street: 63rd
+    to_street: 74th
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 25
+    corridor_name: Stony Island
+    street_name: Stony Island
+    from_street: 63rd
+    to_street: 79th
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 26
+    corridor_name: Halsted
+    street_name: Halsted
+    from_street: Marquette
+    to_street: 79th
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 27
+    corridor_name: Cottage Grove
+    street_name: Cottage Grove
+    from_street: 75th
+    to_street: 87th
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 28
+    corridor_name: Ashland
+    street_name: Ashland
+    from_street: 78th
+    to_street: 87th
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 29
+    corridor_name: 79th
+    street_name: 79th
+    from_street: State
+    to_street: Drexel
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 30
+    corridor_name: 87th
+    street_name: 87th
+    from_street: Damen
+    to_street: Halsted
+    source_page: 9
+    cross_reference_page: 28
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: neighborhood
+    source_corridor_number: 31
+    corridor_name: Stony Island
+    street_name: Stony Island
+    from_street: 87th
+    to_street: 95th
+    source_page: 9
+    cross_reference_page: 29
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  # ----------------------------------------------------------------
+  # DOWNTOWN HIGH CRASH CORRIDORS (numbered 1-12 on page 9)
+  # ----------------------------------------------------------------
+  - source_group: downtown
+    source_corridor_number: 1
+    corridor_name: Michigan
+    street_name: Michigan
+    from_street: Oak
+    to_street: Roosevelt
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 2
+    corridor_name: Orleans
+    street_name: Orleans
+    from_street: Chicago
+    to_street: Ohio
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 3
+    corridor_name: Ontario
+    street_name: Ontario
+    from_street: Orleans
+    to_street: Fairbanks
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 4
+    corridor_name: Ohio
+    street_name: Ohio
+    from_street: Orleans
+    to_street: Fairbanks
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 5
+    corridor_name: LaSalle
+    street_name: LaSalle
+    from_street: Ontario
+    to_street: Wacker
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 6
+    corridor_name: State
+    street_name: State
+    from_street: Chicago
+    to_street: Harrison
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 7
+    corridor_name: Fairbanks
+    street_name: Fairbanks
+    from_street: Huron
+    to_street: North Water
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 8
+    corridor_name: Wacker
+    street_name: Wacker
+    from_street: Jackson
+    to_street: Columbus
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 9
+    corridor_name: Washington
+    street_name: Washington
+    from_street: Wacker
+    to_street: Michigan
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 10
+    corridor_name: Randolph
+    street_name: Randolph
+    from_street: Clark
+    to_street: Michigan
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 11
+    corridor_name: Dearborn
+    street_name: Dearborn
+    from_street: Lake
+    to_street: Monroe
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
+
+  - source_group: downtown
+    source_corridor_number: 12
+    corridor_name: Congress
+    street_name: Congress
+    from_street: Wells
+    to_street: Michigan
+    source_page: 9
+    cross_reference_page: 27
+    confidence: HIGH
+    extraction_status: verified_second_pass
+    geometry_status: pending_construction
