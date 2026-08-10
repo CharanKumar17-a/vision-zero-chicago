@@ -1,0 +1,52 @@
+{
+  "acquisition_name": "Vision Zero Chicago spatial-source acquisition",
+  "run_id": "20260809T170413Z",
+  "started_at_utc": "2026-08-09T17:04:13.377423+00:00",
+  "completed_at_utc": "2026-08-09T17:04:17.674040+00:00",
+  "duration_seconds": 4.296617,
+  "status": "FAIL",
+  "snapshot_directory": "data/raw/spatial/snapshot_20260809T170413Z",
+  "source_count": 2,
+  "passed_source_count": 1,
+  "failed_source_count": 1,
+  "sources": [
+    {
+      "source_name": "high_crash_corridor_plan",
+      "source_config_key": "high_crash_corridor_plan",
+      "source_title": "Chicago Vision Zero High Crash Corridors Framework Plan",
+      "publisher": "City of Chicago",
+      "status": "PASS",
+      "raw_path": "data/raw/spatial/snapshot_20260809T170413Z/high_crash_corridor_framework_plan.pdf",
+      "sha256": "52111550f0b45cd525ffdca3898530527794b3b504780a7058761a7a47754bf9",
+      "download": {
+        "requested_url": "https://www.chicago.gov/content/dam/city/sites/complete-streets/pdfs/06-28-18%20VZ_HCC_FrameworkPlan_reduced%20size.pdf",
+        "final_url": "https://www.chicago.gov/content/dam/city/sites/complete-streets/pdfs/06-28-18%20VZ_HCC_FrameworkPlan_reduced%20size.pdf",
+        "status_code": 200,
+        "content_type": "application/pdf",
+        "content_length_header": null,
+        "bytes_written": 2083768
+      },
+      "validation": {
+        "validation_type": "pdf_signature",
+        "required_signature": "%PDF",
+        "observed_signature": "%PDF",
+        "signature_valid": true
+      },
+      "error_type": null,
+      "error": null
+    },
+    {
+      "source_name": "street_center_lines",
+      "source_config_key": "street_center_lines",
+      "status": "FAIL",
+      "raw_path": null,
+      "sha256": null,
+      "download": null,
+      "validation": null,
+      "error_type": "JSONDecodeError",
+      "error": "Expecting value: line 4 column 5 (char 53)"
+    }
+  ],
+  "raw_files_are_immutable": true,
+  "manual_raw_file_edits_allowed": false
+}

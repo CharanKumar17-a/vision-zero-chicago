@@ -1,0 +1,293 @@
+version: 1
+
+dataset:
+  name: vision_zero_high_crash_corridors
+  description: Reproducible geometry and crash assignment for Chicago high-crash corridors
+  expected_corridor_count: 43
+  primary_key: corridor_id
+  expected_grain: one row per official high-crash corridor
+
+  outputs:
+    corridor_register:
+      path: data/interim/high_crash_corridor_register.csv
+      format: csv
+
+    corridor_geometry:
+      path: data/interim/high_crash_corridors.parquet
+      format: parquet
+
+    geometry_review:
+      path: data/interim/high_crash_corridors_review.geojson
+      format: geojson
+
+source_contract:
+  corridor_definition:
+    source_config_key: high_crash_corridor_plan
+    role: official corridor names and published boundary descriptions
+    expected_corridor_count: 43
+    allow_unverified_corridors: false
+    require_source_page_reference: true
+
+  street_geometry:
+    source_config_key: street_center_lines
+    role: official base street-network geometry
+    dataset_id: 6imu-meau
+    backing_dataset_id: pr57-gg9e
+    allow_manual_geometry_drawing: false
+    require_official_centerline_match: true
+
+corridor_register:
+  path: data/interim/high_crash_corridor_register.csv
+  expected_corridor_count: 43
+
+  required_columns:
+    - corridor_id
+    - corridor_name
+    - street_name
+    - from_street
+    - to_street
+    - source_name
+    - source_page
+    - extraction_status
+    - geometry_status
+
+  corridor_id:
+    prefix: HCC
+    width: 3
+    first_id: HCC001
+    last_id: HCC043
+    preserve_after_assignment: true
+
+  extraction:
+    method: structured_transcription_from_verified_plan
+    require_source_page: true
+    require_second_pass_verification: true
+    allow_silent_boundary_inference: false
+
+coordinate_reference_system:
+  source_crs: EPSG:4326
+  analysis_crs: EPSG:3435
+  publication_crs: EPSG:4326
+  analysis_units: US_survey_feet
+
+  rules:
+    - never_measure_distance_in_EPSG_4326
+    - reproject_before_distance_calculation
+    - preserve_source_crs_metadata
+    - publish_review_geometry_in_EPSG_4326
+
+corridor_geometry:
+  corridor_register_path: data/interim/high_crash_corridor_register.csv
+  street_network_source: street_center_lines
+  output_path: data/interim/high_crash_corridors.parquet
+  review_output_path: data/interim/high_crash_corridors_review.geojson
+
+  construction_rules:
+    use_official_street_center_lines: true
+    follow_published_from_and_to_boundaries: true
+    dissolve_matched_segments_by_corridor: true
+    preserve_multipart_geometry_for_review: true
+    allow_manual_geometry_drawing: false
+    unresolved_boundary_action: fail
+
+crash_assignment:
+  crash_input_path: data/interim/crashes_clean.parquet
+  corridor_input_path: data/interim/high_crash_corridors.parquet
+  candidate_output_path: data/interim/crash_corridor_candidates.parquet
+  primary_output_path: data/interim/crash_corridor_assignments.parquet
+
+  candidate_distance_thresholds_feet:
+    - 50
+    - 100
+    - 150
+    - 200
+
+  selected_distance_threshold_feet: null
+  threshold_status: pending_sensitivity_analysis
+
+  assignment_rules:
+    require_valid_coordinates: true
+    retain_all_candidate_matches: true
+    one_primary_corridor_per_crash: true
+    nearest_candidate_is_primary: true
+    allow_double_counting_in_model_panel: false
+
+  ambiguity:
+    tie_tolerance_feet: 10
+    multiple_candidate_action: assign_nearest_and_flag
+    unresolved_tie_action: exclude_from_primary_model_and_review
+
+  unmatched_crashes:
+    preserve_in_citywide_quality_totals: true
+    include_in_corridor_model: false
+    delete_from_clean_crash_core: false
+
+  assignment_statuses:
+    - assigned_primary
+    - assigned_primary_with_multiple_candidates
+    - no_valid_coordinates
+    - outside_selected_threshold
+    - unresolved_tie
+    - missing_corridor_geometry
+
+threshold_sensitivity:
+  required: true
+
+  compare_thresholds_feet:
+    - 50
+    - 100
+    - 150
+    - 200
+
+  metrics:
+    - assigned_crash_count
+    - assigned_crash_rate
+    - fatal_and_serious_injury_crash_count
+    - multiple_candidate_crash_count
+    - median_assignment_distance_feet
+    - p95_assignment_distance_feet
+    - corridor_count_with_assigned_crashes
+
+  selection_rule: choose the smallest defensible threshold after coverage and ambiguity review
+  automatic_threshold_approval: false
+
+validation:
+  fail_conditions:
+    - corridor_count_not_43
+    - missing_corridor_id
+    - duplicate_corridor_id
+    - missing_geometry
+    - empty_geometry
+    - invalid_geometry
+    - geometry_crs_missing
+    - geometry_crs_incorrect
+    - unresolved_corridor_boundary
+    - unverified_corridor_added
+    - duplicate_primary_crash_assignment
+    - assigned_crash_without_valid_coordinates
+    - assignment_distance_exceeds_selected_threshold
+    - selected_threshold_not_approved
+
+  warning_conditions:
+    - multipart_corridor_geometry
+    - disconnected_corridor_geometry
+    - ambiguous_street_name_match
+    - multiple_boundary_candidates
+    - candidate_threshold_not_selected
+    - crash_assignment_ambiguity
+    - unmatched_valid_coordinate_crash
+    - corridor_has_no_assigned_crashes
+    - threshold_materially_changes_corridor_ranking
+
+  geometry_length_review_feet:
+    minimum: 500
+    maximum: 60000
+    action: warn
+
+evidence:
+  persist_run_reports: true
+  persist_failed_runs: true
+  publish_geometry_on_failure: false
+  publish_assignment_on_failure: false
+
+  corridor_register_validation:
+    report_directory: docs/data_quality/corridor_register_runs
+    latest_report_path: docs/data_quality/corridor_register_validation.json
+
+  geometry_validation:
+    report_directory: docs/data_quality/corridor_geometry_runs
+    latest_report_path: docs/data_quality/corridor_geometry_validation.json
+
+  assignment_validation:
+    report_directory: docs/data_quality/crash_corridor_assignment_runs
+    latest_report_path: docs/data_quality/crash_corridor_assignment_validation.json
+
+  issue_register_path: docs/data_quality/data_quality_issue_register.csv
+  runtime_log_directory: outputs/logs/spatial
+
+  run_statuses:
+    - PASS
+    - PASS_WITH_WARNINGS
+    - FAIL
+
+governance:
+  current_geometry_status: pending_construction
+  current_assignment_status: blocked_until_geometry_passes
+  selected_distance_threshold_is_official_city_policy: false
+  automated_corridor_approval: false
+  final_review_authority: city_and_engineering_team
+  final_decision_authority: city_and_engineering_team
+  prohibit_manual_raw_geometry_edits: true
+  document_all_boundary_interpretations: true
+
+acquisition:
+  raw_root: data/raw/spatial
+  manifest_directory: docs/data_quality/spatial_acquisition_manifests
+  latest_manifest_path: docs/data_quality/spatial_acquisition_manifest.json
+  request_timeout_seconds: 180
+  maximum_retries: 5
+  retry_backoff_seconds: 2
+
+  preservation:
+    preserve_existing_snapshots: true
+    overwrite_existing_files: false
+    compute_sha256: true
+    use_atomic_manifest_writes: true
+
+  evidence:
+    persist_successful_manifests: true
+    persist_failed_manifests: true
+    publish_snapshot_only_when_all_sources_pass: true
+
+  sources:
+    high_crash_corridor_plan:
+      source_config_key: high_crash_corridor_plan
+      download_mode: single_file
+      url_field: document_url
+      output_filename: high_crash_corridor_framework_plan.pdf
+
+      expected_content_types:
+        - application/pdf
+
+      required_file_signature: "%PDF"
+
+    street_center_lines:
+      source_config_key: street_center_lines
+      download_mode: paginated_geojson
+      url_field: geojson_url
+      count_url_field: count_url
+
+      output_directory: chicago_street_center_lines_pages
+      page_filename_pattern: part-{part_number:05d}.geojson
+
+      page_size: 5000
+      order_by: objectid
+
+      expected_content_types:
+        - application/vnd.geo+json
+        - application/geo+json
+        - application/json
+
+      required_geojson_type: FeatureCollection
+
+      expected_geometry_types:
+        - MultiLineString
+        - LineString
+
+      required_property_fields:
+        - objectid
+        - trans_id
+        - fnode_id
+        - tnode_id
+        - street_nam
+        - street_typ
+        - f_cross
+        - t_cross
+        - status
+        - length
+
+      geometry_quality:
+        preserve_invalid_geometry_features: true
+        invalid_geometry_action: preserve_and_warn
+        minimum_valid_geometry_coverage: 0.999
+        exclude_invalid_geometry_from_corridor_construction: true
