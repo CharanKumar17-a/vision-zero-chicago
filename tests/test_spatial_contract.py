@@ -310,12 +310,12 @@ def test_spatial_governance_boundary_is_configured():
 
     assert (
         governance["current_geometry_status"]
-        == "pending_construction"
+        == "validated_with_limitations"
     )
 
     assert (
         governance["current_assignment_status"]
-        == "blocked_until_geometry_passes"
+        == "ready_for_threshold_sensitivity_analysis"
     )
 
     assert (

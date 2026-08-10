@@ -262,6 +262,24 @@ Disconnected geometry does not automatically prove failure because source center
 
 However, disconnected geometry must be reported and reviewed before crash assignment.
 
+### Approved Exception Routing Policies (Decision D016)
+
+The project approves three specific routing exception policies to resolve source-network geometry characteristics:
+
+1. **Policy B: Two-Carriageway Proximity (HCC019 — Lake Shore Drive, Division to Roosevelt)**:
+   - Built as a two-carriageway `MultiLineString` geometry (Northbound `NB` and Southbound `SB` routes selected independently).
+   - Division boundary resolved within an approved 200-foot proximity tolerance (NB: 162.973 ft, SB: 99.012 ft). Roosevelt boundary distance is 0.0 ft.
+   - Connector geometry is not drawn or invented; 14-mile network detours are rejected.
+   - **Crucial Rule**: The 200-foot boundary proximity tolerance is used strictly for resolving centerline geometry endpoints to cross-streets in the source network. It is **not** the crash-assignment distance threshold.
+
+2. **Policy C: Verified Source Continuation (HCC038 — Fairbanks, Huron to North Water)**:
+   - Route uses allowed source family `FAIRBANKS` and `COLUMBUS` (4 `FAIRBANKS` segments and 2 `COLUMBUS` segments).
+   - Total route length is ~1,987.2 feet.
+
+3. **Policy D: Verified Multilevel Source Family (HCC039 — Wacker, Jackson to Columbus)**:
+   - Route uses allowed multilevel source family (`WACKER`, `WACKER LOWER`, `WACKER RAMP`, `WACKER RAMP LOWER`, `WACKER SUB`, `WACKER DR LOWER`).
+   - Total route length is ~9,308.7 feet across 25 segments (3 `WACKER` and 22 `WACKER LOWER`).
+
 ## Crash Eligibility Contract
 
 A crash can enter spatial assignment only when:

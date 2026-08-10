@@ -104,6 +104,43 @@ corridor_geometry:
     allow_manual_geometry_drawing: false
     unresolved_boundary_action: fail
 
+  street_name_aliases:
+    KING: DR MARTIN LUTHER KING JR
+    LAKE SHORE DRIVE: LAKE SHORE
+    LASALLE: LA SALLE
+
+  boundary_proximity:
+    maximum_feet: 200
+    approved_corridors:
+      - HCC019
+    is_crash_assignment_threshold: false
+
+  exception_policies:
+    HCC019:
+      method: verified_two_carriageway_proximity
+      source_names:
+        - LAKE SHORE
+      carriageway_suffixes:
+        - NB
+        - SB
+      expected_parts: 2
+
+    HCC038:
+      method: verified_source_continuation
+      allowed_source_names:
+        - FAIRBANKS
+        - COLUMBUS
+
+    HCC039:
+      method: verified_multilevel_source_family
+      allowed_source_names:
+        - WACKER
+        - WACKER LOWER
+        - WACKER RAMP
+        - WACKER RAMP LOWER
+        - WACKER SUB
+        - WACKER DR LOWER
+
 crash_assignment:
   crash_input_path: data/interim/crashes_clean.parquet
   corridor_input_path: data/interim/high_crash_corridors.parquet
@@ -225,8 +262,8 @@ evidence:
     - FAIL
 
 governance:
-  current_geometry_status: pending_construction
-  current_assignment_status: blocked_until_geometry_passes
+  current_geometry_status: validated_with_limitations
+  current_assignment_status: ready_for_threshold_sensitivity_analysis
   selected_distance_threshold_is_official_city_policy: false
   automated_corridor_approval: false
   final_review_authority: city_and_engineering_team

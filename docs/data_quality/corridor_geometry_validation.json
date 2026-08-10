@@ -1,0 +1,151 @@
+{
+  "pipeline": "corridor_geometry_validation",
+  "run_id": "20260810T120855Z",
+  "started_at_utc": "2026-08-10T12:08:55+00:00",
+  "completed_at_utc": "2026-08-10T12:08:55+00:00",
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "READY_WITH_LIMITATIONS",
+  "summary": {
+    "total_corridors": 43,
+    "total_checks": 13,
+    "critical_failures": 0,
+    "warning_count": 4
+  },
+  "checks": [
+    {
+      "check": "corridor_count_43",
+      "expected": 43,
+      "actual_parquet": 43,
+      "actual_geojson": 43,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "corridor_ids_reconciliation",
+      "expected_ids_count": 43,
+      "actual_unique_count": 43,
+      "missing_ids": [],
+      "extra_ids": [],
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "no_missing_or_duplicate_corridor_ids",
+      "total_rows": 43,
+      "unique_rows": 43,
+      "has_nulls": false,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "geometry_presence",
+      "empty_geometry_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "geometry_validity",
+      "invalid_geometry_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "crs_verification",
+      "expected_parquet_crs": "EPSG:3435",
+      "actual_parquet_crs": "{\"$schema\": \"https://proj.org/schemas/v0.7/projjson.schema.json\", \"type\": \"ProjectedCRS\", \"name\": \"NAD83 / Illinois East (ftUS)\", \"base_crs\": {\"name\": \"NAD83\", \"datum\": {\"type\": \"GeodeticReferenceFrame\", \"name\": \"North American Datum 1983\", \"ellipsoid\": {\"name\": \"GRS 1980\", \"semi_major_axis\": 6378137, \"inverse_flattening\": 298.257222101}}, \"coordinate_system\": {\"subtype\": \"ellipsoidal\", \"axis\": [{\"name\": \"Geodetic latitude\", \"abbreviation\": \"Lat\", \"direction\": \"north\", \"unit\": \"degree\"}, {\"name\": \"Geodetic longitude\", \"abbreviation\": \"Lon\", \"direction\": \"east\", \"unit\": \"degree\"}]}, \"id\": {\"authority\": \"EPSG\", \"code\": 4269}}, \"conversion\": {\"name\": \"SPCS83 Illinois East zone (US survey foot)\", \"method\": {\"name\": \"Transverse Mercator\", \"id\": {\"authority\": \"EPSG\", \"code\": 9807}}, \"parameters\": [{\"name\": \"Latitude of natural origin\", \"value\": 36.6666666666667, \"unit\": \"degree\", \"id\": {\"authority\": \"EPSG\", \"code\": 8801}}, {\"name\": \"Longitude of natural origin\", \"value\": -88.3333333333333, \"unit\": \"degree\", \"id\": {\"authority\": \"EPSG\", \"code\": 8802}}, {\"name\": \"Scale factor at natural origin\", \"value\": 0.999975, \"unit\": \"unity\", \"id\": {\"authority\": \"EPSG\", \"code\": 8805}}, {\"name\": \"False easting\", \"value\": 984250, \"unit\": {\"type\": \"LinearUnit\", \"name\": \"US survey foot\", \"conversion_factor\": 0.304800609601219}, \"id\": {\"authority\": \"EPSG\", \"code\": 8806}}, {\"name\": \"False northing\", \"value\": 0, \"unit\": {\"type\": \"LinearUnit\", \"name\": \"US survey foot\", \"conversion_factor\": 0.304800609601219}, \"id\": {\"authority\": \"EPSG\", \"code\": 8807}}]}, \"coordinate_system\": {\"subtype\": \"Cartesian\", \"axis\": [{\"name\": \"Easting\", \"abbreviation\": \"X\", \"direction\": \"east\", \"unit\": {\"type\": \"LinearUnit\", \"name\": \"US survey foot\", \"conversion_factor\": 0.304800609601219}}, {\"name\": \"Northing\", \"abbreviation\": \"Y\", \"direction\": \"north\", \"unit\": {\"type\": \"LinearUnit\", \"name\": \"US survey foot\", \"conversion_factor\": 0.304800609601219}}]}, \"scope\": \"Engineering survey, topographic mapping.\", \"area\": \"United States (USA) - Illinois - counties of Boone; Champaign; Clark; Clay; Coles; Cook; Crawford; Cumberland; De Kalb; De Witt; Douglas; Du Page; Edgar; Edwards; Effingham; Fayette; Ford; Franklin; Gallatin; Grundy; Hamilton; Hardin; Iroquois; Jasper; Jefferson; Johnson; Kane; Kankakee; Kendall; La Salle; Lake; Lawrence; Livingston; Macon; Marion; Massac; McHenry; McLean; Moultrie; Piatt; Pope; Richland; Saline; Shelby; Vermilion; Wabash; Wayne; White; Will; Williamson.\", \"bbox\": {\"south_latitude\": 37.06, \"west_longitude\": -89.27, \"north_latitude\": 42.5, \"east_longitude\": -87.02}, \"id\": {\"authority\": \"EPSG\", \"code\": 3435}}",
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "approved_source_name_policy",
+      "unapproved_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "invalid_source_objectid_exclusion",
+      "forbidden_used_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "boundary_resolution_within_tolerance",
+      "exceeds_tolerance_count": 0,
+      "max_tolerance_feet": 200.0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "source_objectid_traceability",
+      "untraceable_count": 0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "geometry_type_and_multipart_policy",
+      "linestring_count": 42,
+      "multilinestring_count": 1,
+      "expected_linestring_count": 42,
+      "expected_multilinestring_count": 1,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "length_semantics_and_plausibility",
+      "unplausible_length_count": 0,
+      "min_review_feet": 500.0,
+      "max_review_feet": 60000.0,
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "check": "publication_guard",
+      "critical_failure_count": 0,
+      "passed": true,
+      "severity": "critical"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "multipart_corridor_geometry",
+      "severity": "WARNING",
+      "affected_rows": 1,
+      "message": "Approved multipart geometry detected for corridor(s): ['HCC019'].",
+      "governance_reference": "D016",
+      "resolution": "Preserved two-carriageway MultiLineString geometry as approved Policy B."
+    },
+    {
+      "code": "boundary_resolved_by_proximity",
+      "severity": "WARNING",
+      "affected_rows": 1,
+      "message": "Approved boundary proximity tolerance applied for corridor(s): ['HCC019'].",
+      "governance_reference": "D016",
+      "resolution": "Resolved Division boundary for HCC019 within 200-foot approved proximity limit."
+    },
+    {
+      "code": "approved_source_continuation",
+      "severity": "WARNING",
+      "affected_rows": 1,
+      "message": "Approved source-name continuation applied for corridor(s): ['HCC038'].",
+      "governance_reference": "D016",
+      "resolution": "Routed across Fairbanks and Columbus source centerlines as approved Policy C."
+    },
+    {
+      "code": "approved_multilevel_source_family",
+      "severity": "WARNING",
+      "affected_rows": 1,
+      "message": "Approved multilevel source family applied for corridor(s): ['HCC039'].",
+      "governance_reference": "D016",
+      "resolution": "Routed across Wacker upper/lower/ramp/sub source family as approved Policy D."
+    }
+  ],
+  "governance": {
+    "analysis_crs": "EPSG:3435",
+    "review_crs": "EPSG:4326",
+    "max_proximity_tolerance_feet": 200.0,
+    "boundary_tolerance_is_crash_assignment_threshold": false,
+    "approved_policy_d016": true,
+    "raw_files_modified": false,
+    "crashes_assigned": false
+  }
+}
