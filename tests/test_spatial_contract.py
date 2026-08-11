@@ -166,7 +166,7 @@ def test_coordinate_reference_system_is_safe():
     )
 
 
-def test_threshold_requires_sensitivity_analysis():
+def test_threshold_is_approved_for_modeling():
     spatial = load_yaml(SPATIAL_CONFIG_PATH)
     assignment = spatial["crash_assignment"]
 
@@ -176,12 +176,12 @@ def test_threshold_requires_sensitivity_analysis():
 
     assert (
         assignment["selected_distance_threshold_feet"]
-        is None
+        == 100
     )
 
     assert (
         assignment["threshold_status"]
-        == "pending_sensitivity_analysis"
+        == "approved_for_modeling"
     )
 
 

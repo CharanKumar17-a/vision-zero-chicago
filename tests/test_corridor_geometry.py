@@ -205,8 +205,8 @@ def test_governance_assignment_status_and_null_threshold():
     assert gov["current_assignment_status"] == "ready_for_threshold_sensitivity_analysis"
 
     assignment = config["crash_assignment"]
-    assert assignment["threshold_status"] == "pending_sensitivity_analysis"
-    assert assignment["selected_distance_threshold_feet"] is None
+    assert assignment["threshold_status"] == "approved_for_modeling"
+    assert assignment["selected_distance_threshold_feet"] == 100
 
 
 def test_clean_clone_output_rebuilding():

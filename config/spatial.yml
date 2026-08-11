@@ -153,8 +153,8 @@ crash_assignment:
     - 150
     - 200
 
-  selected_distance_threshold_feet: null
-  threshold_status: pending_sensitivity_analysis
+  selected_distance_threshold_feet: 100
+  threshold_status: approved_for_modeling
 
   assignment_rules:
     require_valid_coordinates: true

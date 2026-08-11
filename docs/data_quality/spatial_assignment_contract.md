@@ -2,8 +2,10 @@
 
 ## Contract Status
 
-- Status: approved for corridor-geometry implementation
-- Crash-assignment status: blocked until corridor geometry passes validation
+- Status: approved for 100-foot internal modeling crash assignment (Decision D017)
+- Crash-assignment threshold: 100 feet (`selected_distance_threshold_feet: 100`)
+- Threshold status: `approved_for_modeling`
+- Official City policy: `false` (internal analytical decision, not official policy)
 - Candidate corridor count: 43
 - Corridor grain: one row per official high-crash corridor
 - Crash assignment grain: at most one primary corridor per crash
@@ -297,20 +299,46 @@ This implements assumption A009.
 
 ## Candidate Distance Thresholds
 
-The project will evaluate:
+The project evaluated four candidate distance thresholds:
 
-| Scenario | Maximum corridor distance |
-|---|---:|
-| T1 | 50 feet |
-| T2 | 100 feet |
-| T3 | 150 feet |
-| T4 | 200 feet |
+| Scenario | Maximum corridor distance | Evaluated Status |
+|---|---:|---|
+| T1 | 50 feet | Evaluated (Sensitivity baseline) |
+| T2 | 100 feet | **Approved Operational Threshold (Decision D017)** |
+| T3 | 150 feet | Evaluated (Rejected for blanket threshold) |
+| T4 | 200 feet | Evaluated (Rejected due to off-corridor noise) |
 
-No threshold is currently approved.
+The operational modeling threshold is locked at 100 feet:
 
 ```text
-selected_distance_threshold_feet: null
+selected_distance_threshold_feet: 100
+threshold_status: approved_for_modeling
 ```
+
+### Approved Operational Assignment Policy (Decision D017)
+
+1. **Nearest Candidate Selection**: Nearest candidate corridor wins when there is no tie (`nearest_candidate_is_primary: true`).
+2. **Tie Tolerance & Exclusion**: Candidate-distance difference $\le 10\text{ ft}$ ($\Delta d \le 10\text{ ft}$) is classified as an `unresolved_tie`. Unresolved ties are preserved and reported in candidate audit layers but excluded from primary corridor-month modeling (`unresolved_tie_action: exclude_from_primary_model_and_review`).
+3. **Preservation of Quality Totals**: Invalid-coordinate crashes ($7,150$) and outside-threshold crashes ($756,545$) are preserved in citywide quality totals and reported, but excluded from corridor modeling.
+4. **Primary Cardinality**: Maximum of one primary corridor per crash (`one_primary_corridor_per_crash: true`).
+5. **No Distance Exceptions**: No 150-foot or 200-foot corridor exceptions are approved for modeling.
+6. **Governance Scope**: This threshold is an internal project modeling choice, not official City policy (`selected_distance_threshold_is_official_city_policy: false`).
+
+### Sensitivity Report Metrics (Run `20260811T115641Z`)
+
+Authoritative metrics read directly from `docs/data_quality/threshold_sensitivity_report.json` for the approved 100-foot threshold:
+
+| Metric | Metric Value | JSON Path in `threshold_sensitivity_report.json` |
+|---|---:|---|
+| Matched Unique Crashes | `114224` | `threshold_results[1].matched_unique_crashes` |
+| Match Rate | `0.131176` ($13.12\%$) | `threshold_results[1].match_rate` |
+| Multiple Candidate Crashes | `8132` | `threshold_results[1].multiple_candidate_crashes` |
+| Tie Crashes ($\Delta d \le 10\text{ ft}$) | `1803` | `threshold_results[1].tie_crashes` |
+
+### Expected Future Primary Assignment Count
+
+- **Expected Primary Modeling Assignments**: $114,224\text{ matched unique crashes} - 1,803\text{ unresolved tie crashes} = 112,421$.
+- **Reconciliation Note**: `112,421` primary assignments is an expected future modeling count, not a validated output, until the primary assignment pipeline (`src/data/assign_crashes_to_corridors.py`) independently generates and reproduces the primary assignment layer.
 
 ## Threshold Selection Protocol
 
