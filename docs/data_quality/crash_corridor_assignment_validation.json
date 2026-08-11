@@ -1,0 +1,129 @@
+{
+  "pipeline": "primary_crash_corridor_assignment",
+  "run_id": "20260811T175902Z",
+  "completed_at_utc": "2026-08-11T17:59:59.037871+00:00",
+  "source_crs": "EPSG:4326",
+  "analysis_crs": "EPSG:3435",
+  "selected_distance_threshold_feet": 100.0,
+  "threshold_status": "approved_for_modeling",
+  "is_sample": false,
+  "total_crashes": 877919,
+  "eligible_crashes": 870769,
+  "invalid_coordinate_crashes": 7150,
+  "assignment_counts": {
+    "primary_assigned": 112421,
+    "unresolved_tie": 1803,
+    "outside_selected_threshold": 756545,
+    "no_valid_coordinates": 7150
+  },
+  "reconciliation": {
+    "total_crashes": 877919,
+    "primary_assigned": 112421,
+    "unresolved_tie": 1803,
+    "outside_selected_threshold": 756545,
+    "no_valid_coordinates": 7150,
+    "reconciliation_diff": 0
+  },
+  "status": "PASS",
+  "downstream_readiness": "READY_FOR_MODELING_PANEL",
+  "critical_failure_count": 0,
+  "warning_count": 0,
+  "checks": [
+    {
+      "check": "total_crash_row_count_is_877919",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Assignment row count: 877,919 (expected 877,919)"
+    },
+    {
+      "check": "crash_record_id_unique_and_non_null",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Null crash IDs: 0, Duplicate crash IDs: 0"
+    },
+    {
+      "check": "valid_assignment_statuses_only",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Invalid assignment statuses found: none"
+    },
+    {
+      "check": "primary_assigned_count_matches_expected",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "primary_assigned count: 112,421 (expected 112,421)"
+    },
+    {
+      "check": "unresolved_tie_count_matches_expected",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "unresolved_tie count: 1,803 (expected 1,803)"
+    },
+    {
+      "check": "outside_threshold_count_matches_expected",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "outside_selected_threshold count: 756,545 (expected 756,545)"
+    },
+    {
+      "check": "no_valid_coordinates_count_matches_expected",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "no_valid_coordinates count: 7,150 (expected 7,150)"
+    },
+    {
+      "check": "four_category_reconciliation_zero_diff",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Reconciliation sum 877,919 == total rows 877,919 (diff: 0)"
+    },
+    {
+      "check": "corridor_id_null_for_non_primary_statuses",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Non-primary rows with non-null corridor_id: 0"
+    },
+    {
+      "check": "corridor_id_non_null_for_primary_assigned",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Primary assigned rows with null corridor_id: 0"
+    },
+    {
+      "check": "assigned_corridors_valid_register_subset",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Unknown assigned corridor IDs: none"
+    },
+    {
+      "check": "no_duplicate_primary_assignments",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate primary crash assignments: 0"
+    },
+    {
+      "check": "assigned_distances_within_selected_threshold",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Assigned distance range: [0.003, 99.983] ft (max allowed: 100.0 ft)"
+    },
+    {
+      "check": "selected_threshold_is_100",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "selected_distance_threshold_feet: 100.0 (expected 100)"
+    },
+    {
+      "check": "threshold_status_is_approved",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "threshold_status: 'approved_for_modeling' (expected 'approved_for_modeling')"
+    },
+    {
+      "check": "corridor_coverage_all_43_corridors",
+      "severity": "WARNING",
+      "passed": true,
+      "evidence": "Corridors with primary assignments: 43 of 43"
+    }
+  ]
+}
