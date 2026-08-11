@@ -1,0 +1,209 @@
+{
+  "pipeline": "sql_analytics_mart",
+  "run_id": "20260811T192826Z",
+  "completed_at_utc": "2026-08-11T19:28:26.018688+00:00",
+  "duckdb_version": "1.5.5",
+  "is_sample": false,
+  "sql_reconciliation": {
+    "total_rows": 4128,
+    "distinct_keys": 4128,
+    "duplicate_keys": 0,
+    "corridor_count": 43,
+    "min_months_per_corridor": 96,
+    "max_months_per_corridor": 96,
+    "min_month": "2018-01-01 00:00:00",
+    "max_month": "2025-12-01 00:00:00",
+    "total_crashes_sum": 112421,
+    "ksi_crashes_sum": 2297,
+    "zero_crash_rows": 7,
+    "warmup_rows": 516,
+    "train_rows": 2580,
+    "validation_rows": 516,
+    "test_rows": 516,
+    "model_ready_rows": 3612,
+    "negative_counts": 0,
+    "null_keys": 0,
+    "unexpected_splits": 0,
+    "ksi_reconciliation_diff": 0,
+    "severity_reconciliation_diff": 0
+  },
+  "feature_parity": {
+    "matching_rows": 4128,
+    "mismatched_lags": 0,
+    "mismatched_sums": 0,
+    "max_mean_diff": 0.0,
+    "null_mismatches": 0
+  },
+  "power_bi_mart": {
+    "row_count": 4128,
+    "unique_key_count": 4128
+  },
+  "status": "PASS",
+  "downstream_readiness": "READY_FOR_MODEL_TRAINING",
+  "critical_failure_count": 0,
+  "warning_count": 0,
+  "checks": [
+    {
+      "check": "sql_total_rows_4128",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL total rows: 4,128 (expected 4,128)"
+    },
+    {
+      "check": "sql_distinct_keys_4128",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL distinct corridor-month keys: 4,128 (expected 4,128)"
+    },
+    {
+      "check": "sql_duplicate_keys_zero",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL duplicate keys: 0"
+    },
+    {
+      "check": "sql_corridor_count_43",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL corridor count: 43 (expected 43)"
+    },
+    {
+      "check": "sql_months_per_corridor_96",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL months per corridor: min=96, max=96 (expected 96)"
+    },
+    {
+      "check": "sql_min_month_2018_01_01",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL min month: '2018-01-01 00:00:00' (expected '2018-01-01')"
+    },
+    {
+      "check": "sql_max_month_2025_12_01",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL max month: '2025-12-01 00:00:00' (expected '2025-12-01')"
+    },
+    {
+      "check": "sql_total_crashes_sum_112421",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL total_crashes sum: 112,421 (expected 112,421)"
+    },
+    {
+      "check": "sql_ksi_crashes_sum_2297",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL ksi_crashes sum: 2,297 (expected 2,297)"
+    },
+    {
+      "check": "sql_zero_crash_rows_7",
+      "severity": "WARNING",
+      "passed": true,
+      "evidence": "SQL zero-crash corridor-months: 7 (expected 7)"
+    },
+    {
+      "check": "sql_warmup_rows_516",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL warmup split rows: 516 (expected 516)"
+    },
+    {
+      "check": "sql_train_rows_2580",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL train split rows: 2580 (expected 2,580)"
+    },
+    {
+      "check": "sql_validation_rows_516",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL validation split rows: 516 (expected 516)"
+    },
+    {
+      "check": "sql_test_rows_516",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL test split rows: 516 (expected 516)"
+    },
+    {
+      "check": "sql_model_ready_rows_3612",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL model-ready rows: 3,612 (expected 3,612)"
+    },
+    {
+      "check": "sql_negative_counts_zero",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL negative counts: 0"
+    },
+    {
+      "check": "sql_null_keys_zero",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL null keys: 0"
+    },
+    {
+      "check": "sql_unexpected_splits_zero",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL unexpected split values: 0"
+    },
+    {
+      "check": "sql_ksi_reconciliation_diff_zero",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL KSI reconciliation diff: 0"
+    },
+    {
+      "check": "sql_severity_reconciliation_diff_zero",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "SQL severity reconciliation diff: 0"
+    },
+    {
+      "check": "sql_python_feature_matching_rows_4128",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Feature parity audit matching rows: 4,128 (expected 4,128)"
+    },
+    {
+      "check": "sql_python_lag_parity_zero_mismatch",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Mismatched non-null lag values between SQL and Python: 0"
+    },
+    {
+      "check": "sql_python_rolling_sum_parity_zero_mismatch",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Mismatched non-null rolling sum values: 0"
+    },
+    {
+      "check": "sql_python_rolling_mean_parity_max_diff_1e9",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Rolling mean max absolute difference: 0.000000000000e+00 (max allowed: 1e-9)"
+    },
+    {
+      "check": "sql_python_null_position_parity_zero_mismatch",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Null-position mismatches between SQL and Python: 0"
+    },
+    {
+      "check": "power_bi_mart_rows_4128",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Exported Power BI mart rows: 4,128 (expected 4,128)"
+    },
+    {
+      "check": "power_bi_mart_unique_keys_4128",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Exported Power BI mart unique keys: 4,128 (expected 4,128)"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+-- 04_power_bi_corridor_history_mart.sql
+-- Construct and export the Power BI historical corridor-month analytics mart
+
+CREATE OR REPLACE VIEW vw_power_bi_corridor_history AS
+SELECT
+    corridor_id,
+    corridor_name,
+    source_group,
+    crash_month_start,
+    calendar_year,
+    calendar_month,
+    calendar_quarter,
+    corridor_length_feet,
+    corridor_length_miles,
+    total_crashes,
+    fatal_crashes,
+    serious_injury_crashes,
+    ksi_crashes,
+    moderate_injury_crashes,
+    minor_injury_crashes,
+    property_damage_only_crashes,
+    unknown_severity_crashes,
+    model_split,
+    model_ready,
+    history_months_available,
+    total_crashes_lag1,
+    total_crashes_lag3,
+    total_crashes_lag6,
+    total_crashes_lag12,
+    total_crashes_roll_mean3,
+    total_crashes_roll_mean6,
+    total_crashes_roll_mean12,
+    total_crashes_roll_sum3,
+    total_crashes_roll_sum6,
+    total_crashes_roll_sum12,
+    ksi_crashes_lag1,
+    ksi_crashes_lag3,
+    ksi_crashes_lag6,
+    ksi_crashes_lag12,
+    ksi_crashes_roll_mean3,
+    ksi_crashes_roll_mean6,
+    ksi_crashes_roll_mean12,
+    ksi_crashes_roll_sum3,
+    ksi_crashes_roll_sum6,
+    ksi_crashes_roll_sum12,
+    calendar_year_trend,
+    month_sin,
+    month_cos
+FROM vw_corridor_month_features;
+
+COPY vw_power_bi_corridor_history TO 'data/processed/power_bi_corridor_history.parquet' (FORMAT PARQUET);
