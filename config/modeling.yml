@@ -1,0 +1,81 @@
+version: 1
+
+dataset:
+  name: corridor_month_features
+  input_path: data/processed/corridor_month_panel.parquet
+  output_path: data/processed/corridor_month_features.parquet
+  validation_report_path: docs/data_quality/corridor_month_features_validation.json
+  runs_directory: docs/data_quality/corridor_month_features_runs
+
+targets:
+  primary_target: total_crashes
+  secondary_target: ksi_crashes
+  all_target_columns:
+    - total_crashes
+    - ksi_crashes
+
+features:
+  targets_evaluated:
+    - total_crashes
+    - ksi_crashes
+
+  lag_months:
+    - 1
+    - 3
+    - 6
+    - 12
+
+  rolling_windows:
+    - 3
+    - 6
+    - 12
+
+  minimum_history_months: 12
+
+  static_metadata_predictors:
+    - corridor_length_feet
+    - corridor_length_miles
+
+  temporal_predictors:
+    - calendar_month
+    - calendar_quarter
+    - calendar_year_trend
+    - month_sin
+    - month_cos
+
+chronological_split:
+  split_policy: time_based_only
+  allow_random_split: false
+  allow_future_observations_in_predictors: false
+
+  periods:
+    warmup:
+      start: "2018-01-01"
+      end: "2018-12-01"
+      months: 12
+      expected_rows: 516
+      model_ready: false
+
+    train:
+      start: "2019-01-01"
+      end: "2023-12-01"
+      months: 60
+      expected_rows: 2580
+      model_ready: true
+
+    validation:
+      start: "2024-01-01"
+      end: "2024-12-01"
+      months: 12
+      expected_rows: 516
+      model_ready: true
+
+    test:
+      start: "2025-01-01"
+      end: "2025-12-01"
+      months: 12
+      expected_rows: 516
+      model_ready: true
+
+  expected_total_rows: 4128
+  expected_model_ready_rows: 3612
