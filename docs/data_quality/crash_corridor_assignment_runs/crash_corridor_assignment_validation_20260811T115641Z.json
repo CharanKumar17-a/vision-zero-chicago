@@ -1,0 +1,362 @@
+{
+  "pipeline": "threshold_sensitivity_analysis",
+  "run_id": "20260811T115641Z",
+  "completed_at_utc": "2026-08-11T11:56:46.262082+00:00",
+  "source_crs": "EPSG:4326",
+  "analysis_crs": "EPSG:3435",
+  "thresholds_evaluated_feet": [
+    50,
+    100,
+    150,
+    200
+  ],
+  "tie_tolerance_feet": 10.0,
+  "selected_distance_threshold_feet": null,
+  "threshold_status": "pending_sensitivity_analysis",
+  "is_sample": false,
+  "sample_size": null,
+  "selection_rule": "choose the smallest defensible threshold after coverage and ambiguity review",
+  "governance": {
+    "selected_threshold_is_official_city_policy": false,
+    "final_decision_authority": "city_and_engineering_team",
+    "boundary_tolerance_is_crash_assignment_threshold": false,
+    "configured_tie_tolerance_feet": 10.0
+  },
+  "performance_benchmark": {
+    "eligible_crash_count": 870769,
+    "corridor_count": 43,
+    "candidate_pair_count": 144082,
+    "candidate_generation_runtime_seconds": 1.9766,
+    "total_runtime_seconds": 3.0535
+  },
+  "total_crashes": 877919,
+  "eligible_crashes": 870769,
+  "invalid_coordinate_crashes": 7150,
+  "threshold_results": [
+    {
+      "threshold_feet": 50,
+      "eligible_crash_count": 870769,
+      "candidate_pair_count": 110519,
+      "matched_unique_crashes": 104750,
+      "match_rate": 0.120296,
+      "unmatched_crashes": 766019,
+      "single_candidate_crashes": 98981,
+      "multiple_candidate_crashes": 5769,
+      "ambiguity_rate": 0.055074,
+      "tie_crashes": 1648,
+      "distance_median_feet": 40.0,
+      "distance_p95_feet": 40.0,
+      "distance_max_feet": 50.0,
+      "marginal_matches_gained": null,
+      "corridor_coverage": 43,
+      "reconciliation": {
+        "total_crashes": 877919,
+        "valid_coordinate_crashes": 870769,
+        "invalid_coordinate_crashes": 7150,
+        "source_reconciliation_diff": 0,
+        "matched_unique_crashes": 104750,
+        "unmatched_crashes": 766019,
+        "threshold_reconciliation_diff": 0,
+        "single_candidate_crashes": 98981,
+        "multiple_candidate_crashes": 5769,
+        "matched_breakdown_diff": 0,
+        "tie_crashes_subset_flag": 1648
+      }
+    },
+    {
+      "threshold_feet": 100,
+      "eligible_crash_count": 870769,
+      "candidate_pair_count": 122356,
+      "matched_unique_crashes": 114224,
+      "match_rate": 0.131176,
+      "unmatched_crashes": 756545,
+      "single_candidate_crashes": 106092,
+      "multiple_candidate_crashes": 8132,
+      "ambiguity_rate": 0.071193,
+      "tie_crashes": 1803,
+      "distance_median_feet": 40.0,
+      "distance_p95_feet": 63.458,
+      "distance_max_feet": 99.983,
+      "marginal_matches_gained": 9474,
+      "corridor_coverage": 43,
+      "reconciliation": {
+        "total_crashes": 877919,
+        "valid_coordinate_crashes": 870769,
+        "invalid_coordinate_crashes": 7150,
+        "source_reconciliation_diff": 0,
+        "matched_unique_crashes": 114224,
+        "unmatched_crashes": 756545,
+        "threshold_reconciliation_diff": 0,
+        "single_candidate_crashes": 106092,
+        "multiple_candidate_crashes": 8132,
+        "matched_breakdown_diff": 0,
+        "tie_crashes_subset_flag": 1803
+      }
+    },
+    {
+      "threshold_feet": 150,
+      "eligible_crash_count": 870769,
+      "candidate_pair_count": 132100,
+      "matched_unique_crashes": 122155,
+      "match_rate": 0.140284,
+      "unmatched_crashes": 748614,
+      "single_candidate_crashes": 112217,
+      "multiple_candidate_crashes": 9938,
+      "ambiguity_rate": 0.081356,
+      "tie_crashes": 1984,
+      "distance_median_feet": 40.0,
+      "distance_p95_feet": 112.409,
+      "distance_max_feet": 149.972,
+      "marginal_matches_gained": 7931,
+      "corridor_coverage": 43,
+      "reconciliation": {
+        "total_crashes": 877919,
+        "valid_coordinate_crashes": 870769,
+        "invalid_coordinate_crashes": 7150,
+        "source_reconciliation_diff": 0,
+        "matched_unique_crashes": 122155,
+        "unmatched_crashes": 748614,
+        "threshold_reconciliation_diff": 0,
+        "single_candidate_crashes": 112217,
+        "multiple_candidate_crashes": 9938,
+        "matched_breakdown_diff": 0,
+        "tie_crashes_subset_flag": 1984
+      }
+    },
+    {
+      "threshold_feet": 200,
+      "eligible_crash_count": 870769,
+      "candidate_pair_count": 144082,
+      "matched_unique_crashes": 132326,
+      "match_rate": 0.151965,
+      "unmatched_crashes": 738443,
+      "single_candidate_crashes": 120606,
+      "multiple_candidate_crashes": 11720,
+      "ambiguity_rate": 0.088569,
+      "tie_crashes": 2135,
+      "distance_median_feet": 40.0,
+      "distance_p95_feet": 169.573,
+      "distance_max_feet": 199.949,
+      "marginal_matches_gained": 10171,
+      "corridor_coverage": 43,
+      "reconciliation": {
+        "total_crashes": 877919,
+        "valid_coordinate_crashes": 870769,
+        "invalid_coordinate_crashes": 7150,
+        "source_reconciliation_diff": 0,
+        "matched_unique_crashes": 132326,
+        "unmatched_crashes": 738443,
+        "threshold_reconciliation_diff": 0,
+        "single_candidate_crashes": 120606,
+        "multiple_candidate_crashes": 11720,
+        "matched_breakdown_diff": 0,
+        "tie_crashes_subset_flag": 2135
+      }
+    }
+  ],
+  "distance_diagnostics": {
+    "top_10_rounded_distances_rank1": [
+      {
+        "distance_feet_round1": 40.0,
+        "count": 77521
+      },
+      {
+        "distance_feet_round1": 43.3,
+        "count": 907
+      },
+      {
+        "distance_feet_round1": 43.5,
+        "count": 681
+      },
+      {
+        "distance_feet_round1": 30.0,
+        "count": 657
+      },
+      {
+        "distance_feet_round1": 52.0,
+        "count": 479
+      },
+      {
+        "distance_feet_round1": 50.4,
+        "count": 469
+      },
+      {
+        "distance_feet_round1": 33.0,
+        "count": 410
+      },
+      {
+        "distance_feet_round1": 16.7,
+        "count": 398
+      },
+      {
+        "distance_feet_round1": 16.6,
+        "count": 365
+      },
+      {
+        "distance_feet_round1": 33.2,
+        "count": 349
+      }
+    ],
+    "exact_zero_distance_candidates_rank1": 0,
+    "exact_zero_distance_candidates_all": 0,
+    "near_40ft_candidates_rank1_39_5_to_40_5": 78142,
+    "near_40ft_candidates_all_39_5_to_40_5": 82105,
+    "finding_explanation": "A substantial observed cluster occurs near 40 feet. Its precise geocoding or right-of-way cause has not been independently verified."
+  },
+  "incremental_distance_bands": [
+    {
+      "distance_band": "0-50 ft",
+      "upper_eval_threshold_feet": 50.0,
+      "min_distance_feet": 0.0,
+      "max_distance_feet": 50.0,
+      "candidate_pair_count": 110519,
+      "unique_matched_crashes": 104750,
+      "ambiguity_count": 5769,
+      "ambiguity_rate": 0.055074,
+      "tie_count": 1648,
+      "tie_rate": 0.015733
+    },
+    {
+      "distance_band": ">50-100 ft",
+      "upper_eval_threshold_feet": 100.0,
+      "min_distance_feet": 50.000001,
+      "max_distance_feet": 100.0,
+      "candidate_pair_count": 11837,
+      "unique_matched_crashes": 9474,
+      "ambiguity_count": 238,
+      "ambiguity_rate": 0.025121,
+      "tie_count": 140,
+      "tie_rate": 0.014777
+    },
+    {
+      "distance_band": ">100-150 ft",
+      "upper_eval_threshold_feet": 150.0,
+      "min_distance_feet": 100.000001,
+      "max_distance_feet": 150.0,
+      "candidate_pair_count": 9744,
+      "unique_matched_crashes": 7931,
+      "ambiguity_count": 185,
+      "ambiguity_rate": 0.023326,
+      "tie_count": 162,
+      "tie_rate": 0.020426
+    },
+    {
+      "distance_band": ">150-200 ft",
+      "upper_eval_threshold_feet": 200.0,
+      "min_distance_feet": 150.000001,
+      "max_distance_feet": 200.0,
+      "candidate_pair_count": 11982,
+      "unique_matched_crashes": 10171,
+      "ambiguity_count": 61,
+      "ambiguity_rate": 0.005997,
+      "tie_count": 57,
+      "tie_rate": 0.005604
+    }
+  ],
+  "provisional_recommendation": {
+    "recommended_threshold_feet": 100,
+    "status": "PROVISIONAL_ANALYTICAL_RECOMMENDATION_ONLY",
+    "justification": "A substantial observed cluster occurs near 40 feet. Its precise geocoding or right-of-way cause has not been independently verified. The 100-foot candidate threshold captures 9,474 additional crashes beyond 50 feet, with 2.5% ambiguity and 1.5% tie rates among that incremental group. Associations beyond 100 feet carry greater spatial uncertainty and require manual review before inclusion."
+  },
+  "limitations": [
+    "7,150 crashes are spatially ineligible because coordinates are invalid.",
+    "The 100-row borderline sample has been generated but not yet manually adjudicated.",
+    "Therefore 100 feet remains provisional and pending owner review."
+  ],
+  "status": "PASS",
+  "downstream_readiness": "READY_FOR_THRESHOLD_REVIEW",
+  "critical_failure_count": 0,
+  "warning_count": 0,
+  "checks": [
+    {
+      "check": "corridor_register_count_is_43",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Authoritative register corridor count: 43 (expected 43)"
+    },
+    {
+      "check": "geometry_corridors_match_register",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Geometry IDs match register: True (diff: none)"
+    },
+    {
+      "check": "candidate_corridors_subset_of_register",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Unknown candidate corridor IDs: none"
+    },
+    {
+      "check": "source_crs_is_epsg4326",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Source CRS: 'EPSG:4326' (expected 'EPSG:4326')"
+    },
+    {
+      "check": "analysis_crs_is_epsg3435",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Analysis CRS: 'EPSG:3435' (expected 'EPSG:3435')"
+    },
+    {
+      "check": "thresholds_match_configured",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Executed thresholds: [50, 100, 150, 200] (expected [50, 100, 150, 200])"
+    },
+    {
+      "check": "selected_threshold_is_null",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "selected_distance_threshold_feet: None (expected null)"
+    },
+    {
+      "check": "source_reconciliation_zero_diff",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total crashes 877919 == eligible 870769 + invalid 7150 (diff: 0)"
+    },
+    {
+      "check": "no_null_candidate_keys_or_distances",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Null crash_ids: 0, null corridor_ids: 0, null distances: 0"
+    },
+    {
+      "check": "candidate_keys_unique",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate (crash_record_id, corridor_id) pairs: 0"
+    },
+    {
+      "check": "candidate_distances_in_range",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Distance range: [0.003, 199.949] (allowed [0.0, 200])"
+    },
+    {
+      "check": "threshold_matched_counts_monotonic",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Matched unique crash counts by threshold: [104750, 114224, 122155, 132326]"
+    },
+    {
+      "check": "threshold_candidate_pairs_monotonic",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Candidate pair counts by threshold: [110519, 122356, 132100, 144082]"
+    },
+    {
+      "check": "threshold_reconciliations_zero_diff",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Reconciliation deltas zero: True (failures: none)"
+    },
+    {
+      "check": "corridor_coverage_all_received_candidates",
+      "severity": "WARNING",
+      "passed": true,
+      "evidence": "Corridor coverage: 43 of 43 corridors received candidates"
+    }
+  ]
+}
