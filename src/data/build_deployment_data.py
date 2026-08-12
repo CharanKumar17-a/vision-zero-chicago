@@ -39,12 +39,11 @@ MART_VAL_JSON = ROOT / "docs" / "data_quality" / "decision_output_mart_validatio
 
 
 def compute_sha256(file_path: Path) -> str:
-    """Compute SHA-256 checksum of a file."""
-    hasher = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        while chunk := f.read(65536):
-            hasher.update(chunk)
-    return hasher.hexdigest()
+    """Compute SHA-256 checksum of a file, canonicalizing CRLF to LF for CSV files."""
+    data = file_path.read_bytes()
+    if file_path.suffix.lower() == ".csv":
+        data = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def get_source_run_id() -> str:

@@ -34,6 +34,7 @@ from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
     DEPLOYMENT_DIR,
     MANIFEST_PATH,
+    compute_file_sha256,
     get_selected_corridors_geodataframe,
     get_selected_portfolio_benefits,
     get_single_portfolio_selections,
@@ -241,3 +242,25 @@ class TestStreamlitDeployment:
         at = AppTest.from_file(str(app_file), default_timeout=30)
         at.run()
         assert not at.exception
+
+    def test_crlf_lf_cross_platform_checksum_equivalence(self, tmp_path):
+        """Cross-platform checksum test: LF and CRLF CSVs produce identical SHA-256 digests in builder and data access."""
+        from src.data.build_deployment_data import compute_sha256 as builder_compute_sha256
+
+        content = "col1,col2,col3\nval1,val2,val3\n10,20,30\n"
+        lf_csv = tmp_path / "test_lf.csv"
+        crlf_csv = tmp_path / "test_crlf.csv"
+
+        lf_csv.write_bytes(content.encode("utf-8"))
+        crlf_csv.write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
+
+        # Assert builder checksum returns identical hash for LF and CRLF
+        builder_lf_hash = builder_compute_sha256(lf_csv)
+        builder_crlf_hash = builder_compute_sha256(crlf_csv)
+        assert builder_lf_hash == builder_crlf_hash
+
+        # Assert data access checksum returns identical hash for LF and CRLF
+        access_lf_hash = compute_file_sha256(lf_csv)
+        access_crlf_hash = compute_file_sha256(crlf_csv)
+        assert access_lf_hash == access_crlf_hash
+        assert builder_lf_hash == access_lf_hash

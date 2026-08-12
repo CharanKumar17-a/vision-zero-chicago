@@ -72,12 +72,11 @@ def is_cloud_deployment_mode() -> bool:
 
 
 def compute_file_sha256(filepath: Path) -> str:
-    """Compute SHA-256 checksum of a target file."""
-    hasher = hashlib.sha256()
-    with open(filepath, "rb") as f:
-        while chunk := f.read(65536):
-            hasher.update(chunk)
-    return hasher.hexdigest()
+    """Compute SHA-256 checksum of a target file, canonicalizing CRLF to LF for CSV files."""
+    data = filepath.read_bytes()
+    if filepath.suffix.lower() == ".csv":
+        data = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def verify_and_load_deployment_file(

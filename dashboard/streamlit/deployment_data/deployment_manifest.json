@@ -1,7 +1,7 @@
 {
   "manifest_version": "1.0",
   "pipeline": "streamlit_public_community_cloud_deployment",
-  "generated_at_utc": "2026-08-12T18:20:37Z",
+  "generated_at_utc": "2026-08-12T19:18:51Z",
   "source_validation_run_id": "20260812T111723Z",
   "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
   "prohibited_data_included": false,
@@ -49,8 +49,8 @@
         "required_governance_labels"
       ],
       "analytical_grain": "portfolio_id x 1 row (36 planning scenarios)",
-      "sha256_checksum": "47a99d338235015da351d88dac47eb4a71636faca1ccdb14e554f7991a3cff7e",
-      "generated_at_utc": "2026-08-12T18:20:37Z",
+      "sha256_checksum": "94dd4c8f7073798b0bb84577c21abdc943b6011f36c67fe8c7b2e3a778e5c8bc",
+      "generated_at_utc": "2026-08-12T19:18:51Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Analyst-defined decision support scenarios under nonbinding planning budgets."
     },
@@ -85,8 +85,8 @@
         "required_governance_labels"
       ],
       "analytical_grain": "portfolio_id x corridor_id (1,410 selected treatment details)",
-      "sha256_checksum": "8468eea86ba051adfb9fa72a678b401b14a839338d5d33ba4dab009dc16e6575",
-      "generated_at_utc": "2026-08-12T18:20:37Z",
+      "sha256_checksum": "1dbeb4d5dc28295c6959a0a684437ca3e3c599a8a105d5e30852a5e990ab08a1",
+      "generated_at_utc": "2026-08-12T19:18:51Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Provisional treatment selections subject to mandatory engineering field review."
     },
@@ -122,8 +122,8 @@
         "geometry_crs"
       ],
       "analytical_grain": "corridor_id x 1 row (43 high-crash corridors with WGS84 WKT linework)",
-      "sha256_checksum": "b439abd18d15cc58ef18c534bdf30c92e277bb148df43019a4df57ff00c4c81f",
-      "generated_at_utc": "2026-08-12T18:20:37Z",
+      "sha256_checksum": "99888f5fdd91c846f318eaf16d9ebbfae31737feb089fe8e5bca091001a5bd53",
+      "generated_at_utc": "2026-08-12T19:18:51Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Top 43 High-Crash Corridor boundaries with EPSG:4326 linework WKT."
     },
@@ -163,8 +163,8 @@
         "required_governance_labels"
       ],
       "analytical_grain": "corridor_id x treatment_id x scenario_level (387 candidate treatment benefit rows)",
-      "sha256_checksum": "3cefbb14317633a2991c4d59a066fbbaa322aa5bbd5a877af976fe585fc71fa5",
-      "generated_at_utc": "2026-08-12T18:20:37Z",
+      "sha256_checksum": "e1f37e9ea05edc3a61b17a073cf70aaeacc9bbcb047acbc1bdc84de29d7852cb",
+      "generated_at_utc": "2026-08-12T19:18:51Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "CMF-based safety benefits and capital project cost estimates."
     }
