@@ -1,0 +1,100 @@
+"""Governance and Methodology Page - Vision Zero Chicago Decision Support App.
+
+Contract: docs/data_quality/decision_output_mart_contract.md
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+import streamlit as st
+
+from dashboard.streamlit.components import (
+    render_engineering_review_banner,
+    render_sidebar_controls,
+)
+from dashboard.streamlit.data_access import (
+    load_portfolio_summary,
+    load_validation_evidence,
+)
+
+st.set_page_config(page_title="Governance & Methodology - Vision Zero Chicago", layout="wide")
+
+st.title("Vision Zero Chicago - Governance & Methodology")
+st.markdown("Dynamic audit of governance warning registers, source evidence lineage, and decision-support contracts.")
+
+# Load serving datasets & validation evidence
+df_summary = load_portfolio_summary()
+evidence = load_validation_evidence()
+
+# Render sidebar controls & get active portfolio
+portfolio_id = render_sidebar_controls(df_summary)
+
+st.markdown("---")
+st.subheader("Source Pipeline Lineage & Evidence Run IDs")
+
+geom_ev = evidence.get("geometry", {})
+opt_ev = evidence.get("optimization", {})
+mart_ev = evidence.get("decision_mart", {})
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric("Geometry Validation Run ID", geom_ev.get("run_id", "N/A"))
+
+with col2:
+    st.metric("Optimization Run ID", opt_ev.get("run_id", "N/A"))
+
+with col3:
+    st.metric("Decision Mart Run ID", mart_ev.get("run_id", "N/A"))
+
+with col4:
+    st.metric("Decision Mart Status", mart_ev.get("status", "N/A"))
+
+st.markdown("---")
+st.subheader("Governance Warning Register (Dynamic Evidence Audit)")
+
+# 1. Portfolio Optimization Governance Warnings
+st.markdown("#### Portfolio Optimization Warnings (Phase 4C Validation Evidence)")
+opt_warnings = opt_ev.get("governance_warnings", [])
+if opt_warnings:
+    df_opt_w = pd.DataFrame(opt_warnings)
+    cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_opt_w.columns]
+    st.dataframe(df_opt_w[cols_to_show], use_container_width=True, height=220)
+else:
+    st.info("No portfolio optimization warnings loaded.")
+
+# 2. Decision Mart Governance Warnings
+st.markdown("#### Decision Mart Serving Warnings (Phase 5A Validation Evidence)")
+mart_warnings = mart_ev.get("governance_warnings", [])
+if mart_warnings:
+    df_mart_w = pd.DataFrame(mart_warnings)
+    cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_mart_w.columns]
+    st.dataframe(df_mart_w[cols_to_show], use_container_width=True, height=150)
+else:
+    st.info("No decision mart warnings loaded.")
+
+st.markdown("---")
+st.subheader("Decision Support Contracts & Methodological Boundaries")
+
+st.markdown("""
+### Final Decision Authority
+> **City staff and engineering reviewers preserve final authority.**
+> The Vision Zero Chicago decision-support system provides transparent, reproducible analytical findings to inform planning. It does not automatically approve or program projects.
+
+### Analytical Grains & Lineage
+- **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 runs total: 27 Official, 9 Stress).
+- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,410 detail rows).
+- **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
+- **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
+
+### Scenario Definitions
+- **OFFICIAL (27 runs)**: Scenarios evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official budgets and equity floors are nonbinding (`NONBINDING_CORRIDOR_CEILING` and `SLACK`).
+- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating $2M, $4M, and $6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
+
+### Model Horizon & Threshold Policy
+- **Risk Horizon**: 2026 Annual Crash Forecast (Beta-Binomial conjugate shrinkage, Empirical Bayes KSI calibration).
+- **Corridor Inclusion**: Top 43 High-Crash Corridors (Tier 1 & Tier 2).
+- **Capital Discounting**: Real discount rate 3.0%, 20-year useful life for Road Diet (`TRT_002`) and Location Treatments (`TRT_001`, `TRT_004`).
+""")
+
+render_engineering_review_banner()

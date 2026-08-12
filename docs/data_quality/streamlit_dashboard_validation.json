@@ -1,0 +1,68 @@
+{
+  "pipeline": "streamlit_decision_support_app",
+  "run_id": "20260812T174151Z",
+  "completed_at_utc": "2026-08-12T17:41:51.444033+00:00",
+  "is_sample": false,
+  "app_summary": {
+    "pages_count": 3,
+    "default_portfolio_id": "PORT_OFF_BASE_B15M_EQ20",
+    "selected_project_count": 43,
+    "selected_capital_cost_usd": 6704033.805,
+    "achieved_equity_share": 0.41867080725437955,
+    "spatial_crs": "EPSG:4326"
+  },
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "READY_FOR_LOCAL_SERVED_DEMO",
+  "critical_failure_count": 0,
+  "warning_count": 2,
+  "governance_warnings": [
+    {
+      "code": "WARNING_PROVISIONAL_DECISION_SUPPORT_APP",
+      "warning_id": "WARNING_PROVISIONAL_DECISION_SUPPORT_APP",
+      "affected_pages": 3,
+      "explanation": "Streamlit application serves analyst-defined decision-support scenarios only.",
+      "limitation_or_resolution": "Requires CDOT/IDOT staff engineering review before project programming.",
+      "governance_reference": "D004, D005"
+    },
+    {
+      "code": "WARNING_PHYSICAL_APPLICABILITY_UNKNOWN",
+      "warning_id": "WARNING_PHYSICAL_APPLICABILITY_UNKNOWN",
+      "affected_corridors": 43,
+      "explanation": "Physical applicability status is UNKNOWN across all displayed project candidates.",
+      "limitation_or_resolution": "Field survey required prior to project programming.",
+      "governance_reference": "A004, D005"
+    }
+  ],
+  "checks": [
+    {
+      "check": "streamlit_app_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "All 6 Streamlit application files exist: True"
+    },
+    {
+      "check": "default_portfolio_unique",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Default portfolio 'PORT_OFF_BASE_B15M_EQ20' is uniquely marked: True"
+    },
+    {
+      "check": "single_portfolio_filtering_and_reconciliation",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Single portfolio selection filtering exact: True (Cost diff: $0.0000)"
+    },
+    {
+      "check": "spatial_geodataframe_epsg4326_transformation",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Spatial linework and centroids transformed to EPSG:4326 without row loss: True"
+    },
+    {
+      "check": "dynamic_validation_evidence_loading",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Validation evidence JSONs loaded dynamically (Optimization warnings: 7, Mart warnings: 2)"
+    }
+  ]
+}

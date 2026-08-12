@@ -1,0 +1,119 @@
+"""UI components and sidebar control panel for Vision Zero Chicago Streamlit decision support app.
+
+Contract: docs/data_quality/decision_output_mart_contract.md
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+import streamlit as st
+
+from dashboard.streamlit.data_access import DEFAULT_PORTFOLIO_ID
+
+
+def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
+    """Render sidebar scenario controls and return exactly one selected portfolio_id."""
+    st.sidebar.image("https://raw.githubusercontent.com/chicago/vision-zero/master/logo.png", width=180, use_column_width=False)
+    st.sidebar.title("Portfolio Scenario Control")
+    st.sidebar.markdown("---")
+
+    # 1. Run Group Selector
+    run_groups = sorted(df_summary["run_group"].unique().tolist())
+    # Default to OFFICIAL
+    default_rg_idx = run_groups.index("OFFICIAL") if "OFFICIAL" in run_groups else 0
+    selected_rg = st.sidebar.selectbox("Run Group", options=run_groups, index=default_rg_idx)
+
+    df_filtered_rg = df_summary[df_summary["run_group"] == selected_rg]
+
+    # 2. CMF Uncertainty Scenario
+    scenarios = sorted(df_filtered_rg["uncertainty_scenario"].unique().tolist())
+    default_scen_idx = scenarios.index("BASE") if "BASE" in scenarios else 0
+    selected_scen = st.sidebar.radio("CMF Uncertainty Level", options=scenarios, index=default_scen_idx)
+
+    df_filtered_scen = df_filtered_rg[df_filtered_rg["uncertainty_scenario"] == selected_scen]
+
+    # 3. Budget Level
+    budgets = sorted(df_filtered_scen["budget_usd"].unique().tolist())
+    formatted_budgets = [f"${int(b / 1e6)}M" for b in budgets]
+    # Default to $15M if present, else first
+    default_b_idx = 0
+    for idx, b in enumerate(budgets):
+        if b == 15000000.0:
+            default_b_idx = idx
+            break
+    selected_b_str = st.sidebar.select_slider("Planning Budget Ceiling", options=formatted_budgets, value=formatted_budgets[default_b_idx])
+    selected_b_val = budgets[formatted_budgets.index(selected_b_str)]
+
+    df_filtered_b = df_filtered_scen[df_filtered_scen["budget_usd"] == selected_b_val]
+
+    # 4. Equity Spending Floor
+    equity_floors = sorted(df_filtered_b["equity_floor"].unique().tolist())
+    formatted_floors = [f"{int(ef * 100)}%" for ef in equity_floors]
+    default_ef_idx = 0
+    for idx, ef in enumerate(equity_floors):
+        if ef == 0.20:
+            default_ef_idx = idx
+            break
+    selected_ef_str = st.sidebar.selectbox("Minimum Equity Spending Floor", options=formatted_floors, index=default_ef_idx)
+    selected_ef_val = equity_floors[formatted_floors.index(selected_ef_str)]
+
+    df_final_match = df_filtered_b[df_filtered_b["equity_floor"] == selected_ef_val]
+
+    if df_final_match.empty:
+        st.sidebar.warning("Selected combination unavailable. Reverting to default canonical portfolio.")
+        selected_pid = DEFAULT_PORTFOLIO_ID
+    else:
+        selected_pid = df_final_match.iloc[0]["portfolio_id"]
+
+    st.sidebar.markdown("---")
+    st.sidebar.caption(f"Active Portfolio ID: **{selected_pid}**")
+
+    # Display Canonical / Equivalence Badge
+    pid_row = df_summary[df_summary["portfolio_id"] == selected_pid].iloc[0]
+    if pid_row["is_canonical_portfolio"]:
+        st.sidebar.success(f"Canonical Portfolio (1 of {pid_row['equivalent_portfolio_count']} equivalent runs)")
+    else:
+        st.sidebar.info(f"Equivalent Portfolio ({pid_row['equivalent_portfolio_count']} identical runs)")
+
+    return selected_pid
+
+
+def render_governance_header_banner(run_group: str, is_official: bool):
+    """Render mandatory governance banner based on run group."""
+    if is_official:
+        st.info(
+            "**OFFICIAL CITY PLANNING SCENARIO**: Official planning budgets ($15M, $25M, $40M) "
+            "exceed provisional portfolio costs ($9.31M CONSERVATIVE, $6.70M BASE, $2.98M OPTIMISTIC) "
+            "and are **NONBINDING**. Equity floors (20%, 30%, 40%) are also nonbinding (41.87% achieved)."
+        )
+    else:
+        st.warning(
+            "**ANALYST-DEFINED BINDING-BUDGET DIAGNOSTICS**: This stress scenario represents an analyst-defined "
+            "diagnostic scenario under constrained budgets ($2M, $4M, $6M) to evaluate binding constraint mechanics. "
+            "Does not constitute official City policy."
+        )
+
+
+def render_engineering_review_banner():
+    """Render mandatory engineering field review warning banner."""
+    st.error(
+        "**Engineering review required. Lane counts, median widths and crossing inventories are not yet available.** "
+        "Physical applicability status is UNKNOWN across all candidate corridors. Field survey required prior to project programming."
+    )
+
+
+def render_economic_caveat_banner():
+    """Render mandatory economic cost-benefit disclaimer banner."""
+    st.warning(
+        "**Analyst-defined planning costs and crash-cost assumptions — not an approved City benefit-cost estimate.**"
+    )
+
+
+def format_currency(val: float) -> str:
+    """Format float as USD currency string."""
+    return f"${val:,.0f}"
+
+
+def format_percent(val: float) -> str:
+    """Format decimal float as percentage string."""
+    return f"{val * 100:.2f}%"
