@@ -79,3 +79,39 @@ chronological_split:
 
   expected_total_rows: 4128
   expected_model_ready_rows: 3612
+
+modeling:
+  candidate_models:
+    - seasonal_naive_lag12
+    - historical_rolling_mean_12
+    - poisson_regression
+    - negative_binomial_glm
+
+  selection_metric: mean_poisson_deviance
+
+  evaluation_metrics:
+    - mae
+    - rmse
+    - mean_poisson_deviance
+    - mean_bias
+    - calibration_ratio
+    - spearman_rank_correlation
+
+  prediction_floor: 1e-6
+  random_seed: 42
+
+  outputs:
+    models_dir: outputs/models
+    total_crashes_model_path: outputs/models/total_crashes_selected_model.joblib
+    ksi_crashes_model_path: outputs/models/ksi_crashes_selected_model.joblib
+    validation_predictions_path: outputs/forecasts/model_validation_predictions.parquet
+    test_predictions_path: outputs/forecasts/model_test_predictions.parquet
+    model_comparison_path: outputs/tables/model_comparison.csv
+    validation_report_path: docs/data_quality/crash_risk_model_validation.json
+    runs_directory: docs/data_quality/crash_risk_model_runs
+
+evaluation:
+  forecast_horizon_months: 1
+  protocol: rolling_origin_observed_history
+  fixed_origin_annual_forecast_status: not_yet_built
+  calibration_warning_relative_error: 0.10

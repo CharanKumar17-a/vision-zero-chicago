@@ -1,0 +1,129 @@
+{
+  "pipeline": "crash_risk_models",
+  "run_id": "20260811T195319Z",
+  "completed_at_utc": "2026-08-12T04:06:30.888723+00:00",
+  "is_sample": false,
+  "evaluation_metadata": {
+    "forecast_horizon_months": 1,
+    "protocol": "rolling_origin_observed_history",
+    "fixed_origin_annual_forecast_status": "not_yet_built"
+  },
+  "selected_winners": {
+    "total_crashes": "historical_rolling_mean_12",
+    "ksi_crashes": "negative_binomial_glm"
+  },
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "READY_FOR_FORECAST_GENERATION_WITH_LIMITATIONS",
+  "critical_failure_count": 0,
+  "warning_count": 1,
+  "model_evaluation_notes": [
+    "Model selection was performed using 1-month-ahead rolling-origin evaluation on the 2024 validation split.",
+    "Test metrics reflect 1-month-ahead rolling-origin evaluation on the 2025 test split using observed prior-month history.",
+    "The Negative Binomial KSI model achieved the lowest validation Poisson deviance but overpredicted aggregate KSI burden by 25.84% on validation and 15.39% on test. It is retained as the selected candidate but requires calibration or Empirical Bayes stabilization before economic benefit calculations.",
+    "Fixed-origin 12-month-ahead future forecasts for 2026 are not yet built and must be constructed in Phase 3B."
+  ],
+  "checks": [
+    {
+      "check": "forecast_horizon_months_equals_1",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Forecast horizon months: 1 (expected 1)"
+    },
+    {
+      "check": "evaluation_protocol_rolling_origin",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Evaluation protocol: 'rolling_origin_observed_history'"
+    },
+    {
+      "check": "fixed_origin_annual_forecast_status_verified",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Fixed origin annual forecast status: 'not_yet_built'"
+    },
+    {
+      "check": "train_rows_2580",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Training split rows: 2,580 (expected 2,580)"
+    },
+    {
+      "check": "validation_rows_516",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Validation split rows: 516 (expected 516)"
+    },
+    {
+      "check": "test_rows_516",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Test split rows: 516 (expected 516)"
+    },
+    {
+      "check": "validation_prediction_rows_4128",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Validation predictions row count: 4,128 (expected 4,128)"
+    },
+    {
+      "check": "validation_prediction_keys_unique",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate keys in validation predictions: 0"
+    },
+    {
+      "check": "test_prediction_rows_1032",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Test predictions row count: 1,032 (expected 1,032)"
+    },
+    {
+      "check": "test_prediction_keys_unique",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate keys in test predictions: 0"
+    },
+    {
+      "check": "predictions_non_negative_and_finite",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Invalid/negative/infinite predictions: val=0, test=0"
+    },
+    {
+      "check": "actual_values_reconcile_to_feature_table",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Actual values reconcile: total_crashes val=14496.0 (exp 14496), ksi=256.0 (exp 256)"
+    },
+    {
+      "check": "calibration_bias_warning_total_crashes",
+      "severity": "WARNING",
+      "passed": true,
+      "evidence": "Target 'total_crashes' winner 'historical_rolling_mean_12' calibration ratio is within +/-10% threshold (Validation: 0.9844, Test: 1.0304)."
+    },
+    {
+      "check": "calibration_bias_warning_ksi_crashes",
+      "severity": "WARNING",
+      "passed": false,
+      "evidence": "Target 'ksi_crashes' winner 'negative_binomial_glm' has calibration bias outside +/-10% threshold. Validation calibration: 1.2584 (+25.84% overprediction), Test calibration: 1.1539 (+15.39% overprediction). Affected rows: 1,032 corridor-months. Explanation: Uncalibrated KSI forecasts may inflate CMF-based economic benefits. Required resolution: Calibration and/or Empirical Bayes stabilization before treatment-benefit estimation. Governance references: D003 and D005."
+    },
+    {
+      "check": "selected_winners_match_validation_min_deviance",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Selected winners match minimum validation deviance: {'total_crashes': 'historical_rolling_mean_12', 'ksi_crashes': 'negative_binomial_glm'}"
+    },
+    {
+      "check": "serialized_model_joblib_reload_prediction_parity",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Reloaded joblib models match saved test predictions: True"
+    },
+    {
+      "check": "no_leakage_current_targets_in_predictors",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Current month targets in predictor list: 0"
+    }
+  ]
+}

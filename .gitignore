@@ -39,6 +39,7 @@ outputs/tables/*
 outputs/forecasts/*
 outputs/recommendations/*
 outputs/logs/*
+outputs/models/*
 
 # Local dashboard files
 *.pbix
@@ -69,3 +70,4 @@ zero-vision/
 !outputs/forecasts/.gitkeep
 !outputs/recommendations/.gitkeep
 !outputs/logs/.gitkeep
+!outputs/models/.gitkeep
