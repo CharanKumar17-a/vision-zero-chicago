@@ -1,0 +1,128 @@
+{
+  "pipeline": "decision_output_mart",
+  "run_id": "20260812T111723Z",
+  "completed_at_utc": "2026-08-12T11:17:23.915881+00:00",
+  "is_sample": false,
+  "scenario_summary": {
+    "portfolio_summary_rows": 36,
+    "project_selections_rows": 1410,
+    "corridor_master_rows": 43,
+    "treatment_benefits_rows": 387,
+    "reconciliation_exact": true,
+    "lineage_exact": true
+  },
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "READY_FOR_POWER_BI_AND_STREAMLIT_INTEGRATION",
+  "critical_failure_count": 0,
+  "warning_count": 2,
+  "governance_warnings": [
+    {
+      "code": "WARNING_PROVISIONAL_DECISION_MART_ONLY",
+      "warning_id": "WARNING_PROVISIONAL_DECISION_MART_ONLY",
+      "affected_tables": 4,
+      "explanation": "All output tables represent analyst-defined planning scenarios for decision support only.",
+      "limitation_or_resolution": "Does not constitute official City policy or engineering site selection. Requires CDOT/IDOT staff review.",
+      "governance_reference": "D004, D005"
+    },
+    {
+      "code": "WARNING_PHYSICAL_APPLICABILITY_UNKNOWN",
+      "warning_id": "WARNING_PHYSICAL_APPLICABILITY_UNKNOWN",
+      "affected_corridors": 43,
+      "explanation": "Physical applicability status is UNKNOWN due to missing corridor lane counts, median widths, and crossing inventories.",
+      "limitation_or_resolution": "Every selected corridor project requires CDOT/IDOT engineering field survey.",
+      "governance_reference": "A004, D005"
+    }
+  ],
+  "checks": [
+    {
+      "check": "summary_mart_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Portfolio summary parquet and CSV exist: True"
+    },
+    {
+      "check": "selections_mart_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Project selections parquet and CSV exist: True"
+    },
+    {
+      "check": "master_mart_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Corridor master parquet and CSV exist: True"
+    },
+    {
+      "check": "benefits_mart_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Treatment benefits parquet and CSV exist: True"
+    },
+    {
+      "check": "portfolio_summary_count_36",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Portfolio summary rows: 36, unique portfolio_ids: 36 (expected 36)"
+    },
+    {
+      "check": "project_selections_count_1410",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Project selection detail rows: 1410 (expected 1,410)"
+    },
+    {
+      "check": "corridor_master_count_43",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Corridor master rows: 43, unique corridor_ids: 43 (expected 43)"
+    },
+    {
+      "check": "treatment_benefits_count_387",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Treatment benefits panel rows: 387 (expected 387)"
+    },
+    {
+      "check": "no_duplicate_master_corridor_ids",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate corridor_id keys in master dimension: 0 (expected 0)"
+    },
+    {
+      "check": "no_duplicate_portfolio_corridor_keys",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate (portfolio_id, corridor_id) detail keys: 0 (expected 0)"
+    },
+    {
+      "check": "summary_detail_reconciliation_exact",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Summary and detail cost/benefit reconciliation exact across all 36 portfolios: True"
+    },
+    {
+      "check": "source_selections_lineage_exact",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "100% 1-to-1 match between detail selections and Phase 4B source panel: True (Max Cost Diff: 0.0, Max PV Diff: 0.0)"
+    },
+    {
+      "check": "governance_labels_complete",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Required governance labels complete on all summary and detail rows: True"
+    },
+    {
+      "check": "governed_equivalence_and_canonical_uniqueness",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Canonical official portfolios unique per scenario: 3 (expected 3), default dashboard portfolio count: 1 (expected 1)"
+    },
+    {
+      "check": "spatial_serving_readiness_verified",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Master corridor dimension contains WGS84 centroids, WKT linework, EPSG:3435 CRS, and corridor_id join key: True"
+    }
+  ]
+}
