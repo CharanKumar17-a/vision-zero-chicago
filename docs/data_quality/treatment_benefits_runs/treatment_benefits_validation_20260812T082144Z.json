@@ -1,0 +1,141 @@
+{
+  "pipeline": "corridor_treatment_benefits",
+  "run_id": "20260812T082144Z",
+  "completed_at_utc": "2026-08-12T08:21:44.646150+00:00",
+  "is_sample": false,
+  "scenario_summary": {
+    "total_scenario_rows": 387,
+    "unique_corridors": 43,
+    "unique_treatments": 3,
+    "base_total_pv_benefit_usd": 5837669943.321,
+    "base_total_capital_cost_usd": 17380433.805,
+    "base_total_net_pv_benefit_usd": 5820289509.516
+  },
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "READY_FOR_PORTFOLIO_SCENARIO_REVIEW",
+  "critical_failure_count": 0,
+  "warning_count": 5,
+  "governance_warnings": [
+    {
+      "code": "WARNING_PROVISIONAL_SCENARIOS_ONLY",
+      "warning_id": "WARNING_PROVISIONAL_SCENARIOS_ONLY",
+      "affected_rows": 387,
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_004"
+      ],
+      "explanation": "All treatment benefit estimates represent analyst-defined planning scenarios for decision support only.",
+      "limitation_or_resolution": "Estimates do not constitute official City policy or engineering site selection. Require CDOT/IDOT staff review.",
+      "governance_reference": "D004, D005"
+    },
+    {
+      "code": "WARNING_PHYSICAL_APPLICABILITY_UNKNOWN",
+      "warning_id": "WARNING_PHYSICAL_APPLICABILITY_UNKNOWN",
+      "affected_rows": 387,
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_004"
+      ],
+      "explanation": "Physical applicability status is UNKNOWN due to missing corridor lane counts, median widths, and crossing location inventories.",
+      "limitation_or_resolution": "Physical feasibility must be confirmed via spatial attribute overlays or engineering field surveys before capital programming.",
+      "governance_reference": "A004, D005"
+    },
+    {
+      "code": "WARNING_ANALYST_DEFINED_COST_AND_ECONOMIC_SCENARIOS",
+      "warning_id": "WARNING_ANALYST_DEFINED_COST_AND_ECONOMIC_SCENARIOS",
+      "affected_rows": 387,
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_004"
+      ],
+      "explanation": "Project unit costs, installation densities, and discount factors are analyst-defined scenario parameters.",
+      "limitation_or_resolution": "Costs must be updated with local Chicago engineering unit price books prior to project commitment.",
+      "governance_reference": "A005, D005"
+    },
+    {
+      "code": "WARNING_PORTFOLIO_OPTIMIZATION_OUT_OF_SCOPE",
+      "warning_id": "WARNING_PORTFOLIO_OPTIMIZATION_OUT_OF_SCOPE",
+      "affected_rows": 387,
+      "affected_corridor_count": 43,
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_004"
+      ],
+      "explanation": "Portfolio optimization remains explicitly out of scope for Phase 4B.",
+      "limitation_or_resolution": "Scenarios feed Phase 4C portfolio optimization under $15M, $25M, $40M budgets and equity spending floors.",
+      "governance_reference": "D004, D005"
+    },
+    {
+      "code": "WARNING_EXTREME_BCR_ANALYST_COST_SCENARIOS",
+      "warning_id": "WARNING_EXTREME_BCR_ANALYST_COST_SCENARIOS",
+      "analyst_defined_review_threshold_bcr": 1000.0,
+      "affected_rows": 53,
+      "affected_corridor_count": 43,
+      "affected_treatment_ids": [
+        "TRT_002"
+      ],
+      "affected_scenario_levels": [
+        "BASE",
+        "OPTIMISTIC"
+      ],
+      "maximum_bcr": 4816.0321,
+      "explanation": "53 scenario rows exceed BCR 1000 due to analyst-defined planning costs, unknown physical applicability, and high modeled corridor crash burdens.",
+      "limitation_or_resolution": "Extreme BCRs result from analyst-defined planning costs, unknown physical applicability, and high modeled corridor crash burdens. These values cannot be interpreted as expected City project returns.",
+      "governance_reference": "A005, D005"
+    }
+  ],
+  "checks": [
+    {
+      "check": "benefits_output_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Treatment benefits parquet and CSV files exist: True"
+    },
+    {
+      "check": "benefits_scenario_rows_387",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Treatment benefits scenario row count: 387 (expected 387)"
+    },
+    {
+      "check": "unique_composite_key_corridor_treatment_scenario",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Unique composite key (corridor_id, treatment_id, scenario_level) present for all 387 rows: True"
+    },
+    {
+      "check": "pedestrian_forecast_bounds_valid",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Relevant forecast crash baselines non-negative across all rows: True"
+    },
+    {
+      "check": "cmf_confidence_bounds_ordering_valid",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "CMF ordering (Conservative >= Base >= Optimistic) valid across all corridors: True"
+    },
+    {
+      "check": "severity_averted_reconciliation_exact",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Severity averted crash breakdown sums exactly to total averted crashes: True"
+    },
+    {
+      "check": "location_treatment_quantities_integer_ge_1",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Location treatment installation quantities are integers >= 1: True"
+    },
+    {
+      "check": "lifecycle_economics_calculations_valid",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Present value benefit, net present benefit, and BCR reconcile accurately: True"
+    }
+  ]
+}
