@@ -115,3 +115,25 @@ evaluation:
   protocol: rolling_origin_observed_history
   fixed_origin_annual_forecast_status: not_yet_built
   calibration_warning_relative_error: 0.10
+
+forecast_2026:
+  forecast_origin: "2025-12-01"
+  forecast_year: 2026
+  forecast_horizon_months: 12
+  protocol: fixed_origin_recursive
+  recursion_policy: calibrated_prediction_feedback
+  calibration_method: validation_ratio
+  calibration_source_split: validation
+  calibration_target: ksi_crashes
+  calibration_model: negative_binomial_glm
+  eb_history_start: "2019-01-01"
+  eb_history_end: "2025-12-01"
+  eb_history_years: 7.0
+  eb_exposure_definition: years_times_length_miles
+  outputs:
+    production_model_path: outputs/models/ksi_crashes_production_model_2026.joblib
+    monthly_forecast_parquet: outputs/forecasts/corridor_risk_forecast_2026.parquet
+    monthly_forecast_csv: outputs/forecasts/corridor_risk_forecast_2026.csv
+    annual_forecast_csv: outputs/forecasts/corridor_risk_forecast_2026_annual.csv
+    validation_report_path: docs/data_quality/corridor_risk_forecast_2026_validation.json
+    runs_directory: docs/data_quality/corridor_risk_forecast_2026_runs

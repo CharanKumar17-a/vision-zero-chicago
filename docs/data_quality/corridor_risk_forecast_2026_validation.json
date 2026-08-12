@@ -1,0 +1,162 @@
+{
+  "pipeline": "corridor_risk_forecast_2026",
+  "run_id": "20260812T043207Z",
+  "completed_at_utc": "2026-08-12T04:45:25.881195+00:00",
+  "is_sample": false,
+  "forecast_metadata": {
+    "forecast_origin": "2025-12-01",
+    "forecast_year": 2026,
+    "forecast_horizon_months": 12,
+    "protocol": "fixed_origin_recursive",
+    "recursion_policy": "calibrated_prediction_feedback",
+    "validation_raw_calibration_ratio": 1.258411,
+    "ksi_calibration_factor": 0.794653
+  },
+  "forecast_totals": {
+    "total_crashes_forecast_2026": 14029.8,
+    "raw_ksi_forecast_2026": 246.6,
+    "calibrated_ksi_forecast_2026": 196.0,
+    "eb_annual_historical_ksi_benchmark": 283.1
+  },
+  "ranking_comparison": {
+    "spearman_rank_correlation": 0.994,
+    "max_corridor_rank_difference": 4
+  },
+  "test_split_diagnostic": {
+    "validation_raw_calibration_ratio": 1.258411,
+    "validation_multiplicative_calibration_factor": 0.794653,
+    "test_row_count": 516,
+    "test_actual_total_ksi": 236.0,
+    "raw_test_predicted_total_ksi": 272.3,
+    "calibrated_test_predicted_total_ksi": 216.4,
+    "raw_test_calibration_ratio": 1.1539,
+    "calibrated_test_calibration_ratio": 0.9169,
+    "raw_test_mae": 0.5262,
+    "calibrated_test_mae": 0.5016,
+    "raw_test_rmse": 0.6664,
+    "calibrated_test_rmse": 0.6581,
+    "raw_test_poisson_deviance": 0.893439,
+    "calibrated_test_poisson_deviance": 0.88695,
+    "note": "Test split diagnostic is informational only; test data did not influence calibration factor derivation or model selection."
+  },
+  "status": "PASS",
+  "downstream_readiness": "READY_FOR_FORECAST_REVIEW",
+  "critical_failure_count": 0,
+  "warning_count": 0,
+  "checks": [
+    {
+      "check": "forecast_output_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Monthly parquet, annual CSV, and production model joblib exist: True"
+    },
+    {
+      "check": "monthly_forecast_rows_516",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Monthly forecast row count: 516 (expected 516)"
+    },
+    {
+      "check": "annual_forecast_rows_43",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Annual forecast row count: 43 (expected 43)"
+    },
+    {
+      "check": "monthly_forecast_keys_unique",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate keys in monthly forecast: 0"
+    },
+    {
+      "check": "annual_forecast_keys_unique",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Duplicate corridor IDs in annual forecast: 0"
+    },
+    {
+      "check": "forecast_origin_is_2025_12_01",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Forecast origin: '2025-12-01' (expected '2025-12-01')"
+    },
+    {
+      "check": "forecast_months_jan_to_dec_2026",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Forecast months span 2026-01-01 to 2026-12-01: True"
+    },
+    {
+      "check": "corridor_horizons_1_to_12_exact",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "All 43 corridors have horizons 1 through 12 exactly once: True"
+    },
+    {
+      "check": "annual_corridor_length_equals_source_physical_length",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Annual output corridor length equals panel source physical length: True"
+    },
+    {
+      "check": "eb_exposure_equals_seven_times_physical_length",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "EB exposure equals 7.0 * physical length: True"
+    },
+    {
+      "check": "zero_observed_2026_data_used",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Is observed flag is False for all rows: True"
+    },
+    {
+      "check": "predictions_non_negative_and_finite",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Invalid/negative/infinite predictions in monthly forecast: 0"
+    },
+    {
+      "check": "calibrated_ksi_less_equal_total_crashes",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Monthly rows where calibrated KSI exceeds total crashes: 0"
+    },
+    {
+      "check": "annual_totals_equal_monthly_sums",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Annual totals reconcile to monthly sums: True"
+    },
+    {
+      "check": "calibration_metrics_distinct_and_derived_from_validation",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Raw ratio (1.258411) and factor (0.794653) match validation derivations: True"
+    },
+    {
+      "check": "calibration_factor_constant_across_rows",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Unique calibration factor values across rows: 1"
+    },
+    {
+      "check": "model_winners_unchanged",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Model winners: total='historical_rolling_mean_12', ksi='negative_binomial_glm'"
+    },
+    {
+      "check": "production_model_artifact_separate",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Production model joblib exists at separate path: True"
+    },
+    {
+      "check": "rank_agreement_between_forecast_and_eb",
+      "severity": "WARNING",
+      "passed": true,
+      "evidence": "Spearman rank correlation between calibrated forecast and EB benchmark: 0.9940 (Max rank diff: 4)"
+    }
+  ]
+}
