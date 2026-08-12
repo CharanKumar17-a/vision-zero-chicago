@@ -264,3 +264,24 @@ class TestStreamlitDeployment:
         access_crlf_hash = compute_file_sha256(crlf_csv)
         assert access_lf_hash == access_crlf_hash
         assert builder_lf_hash == access_lf_hash
+
+    def test_sidebar_logo_and_pinned_requirements_regression(self):
+        """Regression test: components.py has no deprecated logo/use_column_width and requirements.txt is pinned."""
+        components_path = ROOT / "dashboard" / "streamlit" / "components.py"
+        components_text = components_path.read_text(encoding="utf-8")
+
+        assert "use_column_width" not in components_text
+        assert "raw.githubusercontent.com" not in components_text
+
+        req_path = ROOT / "dashboard" / "streamlit" / "requirements.txt"
+        req_lines = [line.strip() for line in req_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+        expected_reqs = [
+            "streamlit==1.60.0",
+            "pandas==3.0.5",
+            "geopandas==1.1.4",
+            "shapely==2.1.2",
+            "plotly==6.9.0",
+            "pydeck==0.9.3",
+        ]
+        assert req_lines == expected_reqs

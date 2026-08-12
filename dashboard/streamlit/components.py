@@ -13,7 +13,8 @@ from dashboard.streamlit.data_access import DEFAULT_PORTFOLIO_ID
 
 def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
     """Render sidebar scenario controls and return exactly one selected portfolio_id."""
-    st.sidebar.image("https://raw.githubusercontent.com/chicago/vision-zero/master/logo.png", width=180, use_column_width=False)
+    st.sidebar.markdown("### Vision Zero Chicago")
+    st.sidebar.caption("Safety Capital Investment Prioritization")
     st.sidebar.title("Portfolio Scenario Control")
     st.sidebar.markdown("---")
 
