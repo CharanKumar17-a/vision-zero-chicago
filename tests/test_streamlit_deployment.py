@@ -226,3 +226,18 @@ class TestStreamlitDeployment:
         at = AppTest.from_file(str(app_file), default_timeout=30)
         at.run()
         assert not at.exception
+
+    def test_streamlit_cloud_working_dir_regression(self, monkeypatch, tmp_path):
+        """Regression test: running app.py from a different working directory in deployment mode resolves imports and raises zero exceptions."""
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("VISION_ZERO_DATA_MODE", "deployment")
+        load_portfolio_summary.clear()
+        load_project_selections.clear()
+        load_corridor_master.clear()
+        load_treatment_benefits.clear()
+        load_corridor_geodataframe.clear()
+
+        app_file = ROOT / "dashboard" / "streamlit" / "app.py"
+        at = AppTest.from_file(str(app_file), default_timeout=30)
+        at.run()
+        assert not at.exception
