@@ -1,0 +1,168 @@
+{
+  "pipeline": "corridor_treatment_readiness",
+  "run_id": "20260812T062044Z",
+  "completed_at_utc": "2026-08-12T06:20:44.603427+00:00",
+  "is_sample": false,
+  "reconciliation_summary": {
+    "total_assigned_crashes": 112421,
+    "k_fatal_crashes": 139,
+    "a_serious_injury_crashes": 2158,
+    "b_minor_injury_crashes": 10850,
+    "c_possible_injury_crashes": 6124,
+    "o_property_damage_crashes": 93053,
+    "u_unknown_severity_crashes": 97,
+    "ksi_crashes": 2297
+  },
+  "equity_summary": {
+    "total_corridors_evaluated": 43,
+    "min_linework_coverage_percent": 100.0,
+    "class_a_weighted_svi_ge_0_75_count": 18,
+    "class_b_high_svi_share_ge_0_50_count": 19
+  },
+  "status": "PASS_WITH_WARNINGS",
+  "downstream_readiness": "READY_FOR_TREATMENT_EVIDENCE_REVIEW",
+  "critical_failure_count": 0,
+  "warning_count": 5,
+  "governance_warnings": [
+    {
+      "warning_id": "WARNING_PROVISIONAL_TREATMENTS",
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_004"
+      ],
+      "explanation": "Provisional candidate treatments require engineering review and corridor physical attribute overlays before final project approval.",
+      "governance_reference": "D005, D020"
+    },
+    {
+      "warning_id": "WARNING_BLOCKED_TREATMENTS",
+      "affected_treatment_ids": [
+        "TRT_003",
+        "TRT_005",
+        "TRT_006"
+      ],
+      "explanation": "Blocked candidate treatments lack verified CMFs or local physical geometry/friction condition data.",
+      "governance_reference": "D005, D020"
+    },
+    {
+      "warning_id": "WARNING_MISSING_PHYSICAL_ATTRIBUTES",
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_003",
+        "TRT_004",
+        "TRT_005",
+        "TRT_006"
+      ],
+      "explanation": "Lane counts, ADT, speed limits, median widths, crossing counts, and friction ratings are missing from current spatial tables.",
+      "governance_reference": "D001, D005"
+    },
+    {
+      "warning_id": "WARNING_MISSING_INSTALLATION_QUANTITIES_AND_COSTS",
+      "affected_treatment_ids": [
+        "TRT_001",
+        "TRT_002",
+        "TRT_003",
+        "TRT_004",
+        "TRT_005",
+        "TRT_006"
+      ],
+      "explanation": "Corridor installation location counts and local Chicago engineering cost multipliers are unverified.",
+      "governance_reference": "D006, D021"
+    },
+    {
+      "warning_id": "WARNING_PORTFOLIO_OPTIMIZATION_BLOCKED",
+      "affected_treatment_ids": [
+        "ALL_CORRIDORS"
+      ],
+      "explanation": "Portfolio optimization remains blocked until treatment applicability and benefit baselines are approved.",
+      "governance_reference": "D005, D022"
+    }
+  ],
+  "checks": [
+    {
+      "check": "readiness_output_files_exist",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Treatment readiness parquet and CSV files exist: True"
+    },
+    {
+      "check": "readiness_corridor_rows_43",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Corridor row count: 43 (expected 43)"
+    },
+    {
+      "check": "reconcile_total_assigned_crashes_112421",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total assigned crashes: 112,421 (expected 112,421)"
+    },
+    {
+      "check": "reconcile_k_fatal_crashes_139",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total Fatal crashes (K): 139 (expected 139)"
+    },
+    {
+      "check": "reconcile_a_serious_injury_2158",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total Serious Injury crashes (A): 2,158 (expected 2,158)"
+    },
+    {
+      "check": "reconcile_b_minor_injury_10850",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total Minor Injury crashes (B): 10,850 (expected 10,850)"
+    },
+    {
+      "check": "reconcile_c_possible_injury_6124",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total Possible Injury crashes (C): 6,124 (expected 6,124)"
+    },
+    {
+      "check": "reconcile_o_property_damage_93053",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total Property Damage crashes (O): 93,053 (expected 93,053)"
+    },
+    {
+      "check": "reconcile_unknown_severity_97_preserved",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total Unknown severity crashes (U): 97 (expected 97 preserved without silent mapping)"
+    },
+    {
+      "check": "reconcile_ksi_crashes_2297",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Total KSI crashes (K+A): 2,297 (expected 2,297)"
+    },
+    {
+      "check": "pooled_prior_severity_shrinkage_shares_sum_to_unity",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Pooled-prior severity shrinkage shares sum to 1.0 across all corridors: True"
+    },
+    {
+      "check": "full_resolution_spatial_linework_coverage_ge_99_pct",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Min spatial linework coverage across 43 corridors: 100.0000% (max error: 0.0000 ft; required >= 99.0%)"
+    },
+    {
+      "check": "spatial_equity_classifications_built",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Equity Classifications built: Class A (Weighted SVI >= 0.75) = 18, Class B (Share >= 0.50) = 19"
+    },
+    {
+      "check": "physical_attribute_availability_flagged_as_blocked",
+      "severity": "CRITICAL",
+      "passed": true,
+      "evidence": "Missing physical attributes correctly flagged as unavailable/blocked: True"
+    }
+  ]
+}

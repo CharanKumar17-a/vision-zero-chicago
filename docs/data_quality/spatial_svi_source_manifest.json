@@ -1,0 +1,46 @@
+{
+  "manifest_name": "CDC ATSDR SVI 2022 & US Census TIGER 2022 Spatial Source Manifest",
+  "created_at_utc": "2026-08-12T06:17:50Z",
+  "sources": {
+    "svi_2022_illinois_csv": {
+      "authoritative_source_name": "CDC/ATSDR Social Vulnerability Index 2022 Illinois Census Tracts",
+      "url": "https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=csv&category=states&name=ILLINOIS",
+      "retrieval_timestamp_utc": "2026-08-12T05:44:25Z",
+      "sha256": "a6cbe361ac3c89d534ed5cfe07cbbcbf24d1073f98be0144b3111f2ff9b55650",
+      "file_size_bytes": 2345811,
+      "source_row_count": 3263,
+      "filtered_cook_county_row_count": 1331,
+      "county_filter": "COUNTY == 'Cook County' (STCNTY == 17031)",
+      "svi_join_coverage_percent": 99.9249,
+      "missing_unranked_tract_count": 0
+    },
+    "tiger_2022_illinois_tract_shapefile": {
+      "authoritative_source_name": "U.S. Census Bureau TIGER/Line 2022 Illinois Census Tracts (Full-Resolution)",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2022/TRACT/tl_2022_17_tract.zip",
+      "retrieval_timestamp_utc": "2026-08-12T06:05:10Z",
+      "sha256": "ec3011e6ef485151620e3e4d17f052101f819bd5f6c36dd7da855dcb0d5c8348",
+      "file_size_bytes": 10005539,
+      "source_row_count": 3265,
+      "filtered_cook_county_row_count": 1332,
+      "state_filter": "STATEFP == '17'",
+      "county_filter": "COUNTYFP == '031'",
+      "source_crs": "EPSG:4269 (NAD83)",
+      "projected_crs": "EPSG:3435 (State Plane Illinois East, feet)"
+    }
+  },
+  "reconciliation_metrics": {
+    "joined_tract_count": 1331,
+    "unmatched_tiger_count": 1,
+    "unmatched_tiger_geoids": [
+      "17031990000"
+    ],
+    "unmatched_svi_count": 0,
+    "unmatched_svi_fips": [],
+    "unmatched_geometry_intersects_corridor": false,
+    "valid_ranked_svi_tract_count": 1331,
+    "tract_record_join_coverage_percent": 99.9249,
+    "corridor_linework_coverage_percent": 100.0000,
+    "uncovered_corridor_linework_feet": 0.0000,
+    "reconciliation_status": "PASS"
+  }
+}

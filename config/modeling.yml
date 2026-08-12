@@ -137,3 +137,8 @@ forecast_2026:
     annual_forecast_csv: outputs/forecasts/corridor_risk_forecast_2026_annual.csv
     validation_report_path: docs/data_quality/corridor_risk_forecast_2026_validation.json
     runs_directory: docs/data_quality/corridor_risk_forecast_2026_runs
+
+severity_disaggregation:
+  shrinkage_protocol: pooled_prior_severity_shrinkage
+  shrinkage_prior_strength_ksi: 10
+  shrinkage_prior_strength_non_ksi: 50
