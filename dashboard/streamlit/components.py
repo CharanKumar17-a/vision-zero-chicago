@@ -68,12 +68,13 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
     st.sidebar.markdown("---")
     st.sidebar.caption(f"Active Portfolio ID: **{selected_pid}**")
 
-    # Display Canonical / Equivalence Badge
-    pid_row = df_summary[df_summary["portfolio_id"] == selected_pid].iloc[0]
-    if pid_row["is_canonical_portfolio"]:
-        st.sidebar.success(f"Canonical Portfolio (1 of {pid_row['equivalent_portfolio_count']} equivalent runs)")
-    else:
-        st.sidebar.info(f"Equivalent Portfolio ({pid_row['equivalent_portfolio_count']} identical runs)")
+    from dashboard.streamlit.data_access import is_cloud_deployment_mode, load_validation_evidence
+
+    if is_cloud_deployment_mode():
+        evidence = load_validation_evidence()
+        manifest_meta = evidence.get("deployment_manifest", {})
+        gen_time = manifest_meta.get("generated_at_utc", "N/A")
+        st.sidebar.info(f"🌐 **Published Analytical Snapshot**\nGenerated: `{gen_time}`")
 
     return selected_pid
 

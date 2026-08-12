@@ -136,6 +136,27 @@ def validate_streamlit_dashboard(
         "evidence": f"Validation evidence JSONs loaded dynamically (Optimization warnings: {opt_w_count}, Mart warnings: {mart_w_count})",
     })
 
+    # 6. Public Deployment Dataset & Manifest Verification
+    deploy_manifest_path = ROOT / "dashboard" / "streamlit" / "deployment_data" / "deployment_manifest.json"
+    deploy_valid = False
+    if deploy_manifest_path.exists():
+        with open(deploy_manifest_path, "r", encoding="utf-8") as f:
+            m_data = json.load(f)
+        files_dict = m_data.get("files", {})
+        counts_ok = (
+            files_dict.get("portfolio_summary.csv", {}).get("row_count") == 36
+            and files_dict.get("project_selections.csv", {}).get("row_count") == 1410
+            and files_dict.get("corridor_master.csv", {}).get("row_count") == 43
+            and files_dict.get("treatment_benefits.csv", {}).get("row_count") == 387
+        )
+        deploy_valid = bool(counts_ok and not m_data.get("prohibited_data_included"))
+    checks.append({
+        "check": "public_deployment_dataset_and_manifest_integrity",
+        "severity": "CRITICAL",
+        "passed": bool(deploy_valid),
+        "evidence": f"Deployment snapshot CSV files and manifest verified without prohibited data: {deploy_valid}",
+    })
+
     # Governance Warnings
     warnings.append({
         "code": "WARNING_PROVISIONAL_DECISION_SUPPORT_APP",
