@@ -72,9 +72,9 @@ TREATMENT_METADATA = {
         "cmf_se": 0.035,
         "useful_life_years": 20,
         "scenarios": {
-            "CONSERVATIVE": {"exposure_share": 0.25, "density": 1, "unit_cost": 81400.0},
-            "BASE":         {"exposure_share": 0.50, "density": 2, "unit_cost": 38000.0},
-            "OPTIMISTIC":   {"exposure_share": 0.75, "density": 3, "unit_cost": 16300.0},
+            "CONSERVATIVE": {"exposure_share": 0.25, "density": 1, "unit_cost": 18000.0},
+            "BASE":         {"exposure_share": 0.50, "density": 2, "unit_cost": 15000.0},
+            "OPTIMISTIC":   {"exposure_share": 0.75, "density": 3, "unit_cost": 12000.0},
         },
     },
     "TRT_002": {
@@ -85,9 +85,9 @@ TREATMENT_METADATA = {
         "cmf_se": 0.026,
         "useful_life_years": 20,
         "scenarios": {
-            "CONSERVATIVE": {"exposure_share": 0.50, "density": 1.0, "unit_cost": 271250.0},
-            "BASE":         {"exposure_share": 0.75, "density": 1.0, "unit_cost": 130200.0},
-            "OPTIMISTIC":   {"exposure_share": 1.00, "density": 1.0, "unit_cost": 43400.0},
+            "CONSERVATIVE": {"exposure_share": 0.50, "density": 1.0, "unit_cost": 480000.0},
+            "BASE":         {"exposure_share": 0.75, "density": 1.0, "unit_cost": 400000.0},
+            "OPTIMISTIC":   {"exposure_share": 1.00, "density": 1.0, "unit_cost": 320000.0},
         },
     },
     "TRT_004": {
@@ -98,9 +98,9 @@ TREATMENT_METADATA = {
         "cmf_se": 0.031,
         "useful_life_years": 10,
         "scenarios": {
-            "CONSERVATIVE": {"exposure_share": 0.20, "density": 1, "unit_cost": 54250.0},
-            "BASE":         {"exposure_share": 0.40, "density": 2, "unit_cost": 27100.0},
-            "OPTIMISTIC":   {"exposure_share": 0.60, "density": 4, "unit_cost": 10850.0},
+            "CONSERVATIVE": {"exposure_share": 0.20, "density": 1, "unit_cost": 27000.0},
+            "BASE":         {"exposure_share": 0.40, "density": 2, "unit_cost": 22500.0},
+            "OPTIMISTIC":   {"exposure_share": 0.60, "density": 4, "unit_cost": 18000.0},
         },
     },
 }
@@ -270,7 +270,20 @@ def build_treatment_benefits_panel(
     df_merged["demand_risk_rank"] = df_merged.index + 1
     df_merged["demand_risk_percentile"] = 1.0 - (df_merged["demand_risk_rank"] - 1.0) / len(df_merged)
 
-    # 4. Generate 387 Benefit Scenario Rows
+    # 4. Physical Applicability Screening (FHWA Proxy Rule)
+    # Identify MultiLineString / divided carriageway corridors where Road Diet (TRT_002) is NOT_APPLICABLE
+    import geopandas as gpd
+
+    corridors_parquet_path = ROOT / "data" / "interim" / "high_crash_corridors.parquet"
+    if corridors_parquet_path.exists():
+        gdf_corridors = gpd.read_parquet(corridors_parquet_path)
+        multilinestring_cids = set(
+            gdf_corridors[gdf_corridors.geometry.geom_type == "MultiLineString"]["corridor_id"]
+        )
+    else:
+        multilinestring_cids = set()
+
+    # 5. Generate 387 Benefit Scenario Rows
     scenario_rows: List[Dict[str, Any]] = []
 
     for _, row in df_merged.iterrows():
@@ -302,6 +315,12 @@ def build_treatment_benefits_panel(
             cmf_se = float(meta["cmf_se"])
             life_yrs = int(meta["useful_life_years"])
             pv_fac = compute_present_value_factor(REAL_DISCOUNT_RATE, life_yrs)
+
+            # Determine Physical Applicability Status (FHWA guidance proxy)
+            if trt_id == "TRT_002" and cid in multilinestring_cids:
+                applicability_status = "NOT_APPLICABLE"
+            else:
+                applicability_status = "APPLICABLE"
 
             # Target baseline forecast
             if meta["target"] == "pedestrian":
@@ -375,7 +394,7 @@ def build_treatment_benefits_panel(
                         "scenario_level": sc_name,
                         "demand_risk_rank": rank,
                         "demand_risk_percentile": round(pctile, 6),
-                        "physical_applicability_status": "UNKNOWN",
+                        "physical_applicability_status": applicability_status,
                         "optimization_status": "PROVISIONAL_SCENARIO_ONLY",
                         "relevant_forecast_crashes": round(rel_forecast, 6),
                         "eligible_crash_exposure_share": round(exp_share, 6),

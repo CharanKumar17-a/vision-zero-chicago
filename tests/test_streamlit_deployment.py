@@ -84,7 +84,7 @@ class TestStreamlitDeployment:
         df_benefits = verify_and_load_deployment_file("treatment_benefits.csv")
 
         assert len(df_summary) == 36
-        assert len(df_selections) == 1410
+        assert len(df_selections) == 1212
         assert len(df_master) == 43
         assert len(df_benefits) == 387
 

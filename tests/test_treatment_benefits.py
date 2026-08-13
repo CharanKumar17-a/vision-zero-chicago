@@ -181,3 +181,27 @@ class TestTreatmentBenefits:
         assert report["status"] == "PASS_WITH_WARNINGS"
         assert report["downstream_readiness"] == "READY_FOR_PORTFOLIO_SCENARIO_REVIEW"
         assert report["critical_failure_count"] == 0
+
+    def test_realistic_unit_costs_and_applicability_screening(self):
+        """Verify sourced realistic unit costs and physical applicability screening for MultiLineString corridors."""
+        df_b, _ = build_treatment_benefits_panel()
+
+        # TRT_001 base unit cost = $15,000
+        trt001_base = df_b[(df_b["treatment_id"] == "TRT_001") & (df_b["scenario_level"] == "BASE")]
+        assert (trt001_base["unit_cost"] == 15000.0).all()
+
+        # TRT_002 base unit cost = $400,000 / mile
+        trt002_base = df_b[(df_b["treatment_id"] == "TRT_002") & (df_b["scenario_level"] == "BASE")]
+        assert (trt002_base["unit_cost"] == 400000.0).all()
+
+        # TRT_004 base unit cost = $22,500
+        trt004_base = df_b[(df_b["treatment_id"] == "TRT_004") & (df_b["scenario_level"] == "BASE")]
+        assert (trt004_base["unit_cost"] == 22500.0).all()
+
+        # Physical applicability: HCC019 (Lake Shore Drive MultiLineString) TRT_002 is NOT_APPLICABLE
+        hcc019_rd = df_b[(df_b["corridor_id"] == "HCC019") & (df_b["treatment_id"] == "TRT_002")]
+        assert (hcc019_rd["physical_applicability_status"] == "NOT_APPLICABLE").all()
+
+        # Other TRT_001 and TRT_004 on HCC019 are APPLICABLE
+        hcc019_loc = df_b[(df_b["corridor_id"] == "HCC019") & (df_b["treatment_id"].isin(["TRT_001", "TRT_004"]))]
+        assert (hcc019_loc["physical_applicability_status"] == "APPLICABLE").all()

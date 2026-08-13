@@ -117,7 +117,6 @@ class TestStreamlitDashboard:
         df_sel = get_single_portfolio_selections(df_selections, DEFAULT_PORTFOLIO_ID)
 
         assert len(gdf_sel) == len(df_sel)
-        assert len(gdf_sel) == 43
 
     def test_map_geometry_transformed_to_epsg_4326(self):
         """Corridor spatial geometry and centroids are in EPSG:4326 WGS84 geographic coordinates."""

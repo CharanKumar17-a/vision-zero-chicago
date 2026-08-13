@@ -142,8 +142,16 @@ def solve_portfolio_scenario(
     """Formulate, solve with repeat determinism, and summarize single portfolio scenario."""
     df_scen = df_scenario.reset_index(drop=True).copy()
     initial_candidate_count = len(df_scen)
+
+    # Filter out physically non-applicable treatments (e.g. TRT_002 Road Diet on MultiLineString divided carriageways)
+    if "physical_applicability_status" in df_scen.columns:
+        df_scen = df_scen[df_scen["physical_applicability_status"] != "NOT_APPLICABLE"].reset_index(drop=True)
+    candidate_count_after_applicability = len(df_scen)
+    excluded_applicability_candidate_count = int(initial_candidate_count - candidate_count_after_applicability)
+
+    # Candidate BCR >= 1.0 eligibility filter (D023)
     df_scen = df_scen[df_scen["benefit_cost_ratio"] >= MIN_ELIGIBLE_BCR].reset_index(drop=True)
-    excluded_bcr_candidate_count = int(initial_candidate_count - len(df_scen))
+    excluded_bcr_candidate_count = int(candidate_count_after_applicability - len(df_scen))
     n = len(df_scen)
 
     c = -df_scen["present_value_benefit"].values
