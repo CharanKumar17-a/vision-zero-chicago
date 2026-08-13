@@ -139,7 +139,7 @@ try {
 }
 
 if ($gitStatusBefore -eq $gitStatusAfter) {
-    $beforeCount = ($gitStatusBefore -split "`n" | Where-Object { $_.Trim().Length -gt 0 }).Count
+    $beforeCount = @($gitStatusBefore -split "`n" | Where-Object { $_.Trim().Length -gt 0 }).Count
     Add-GateResult -GateName "Git-Visible Test Side Effects" -Status "PASS" -Details "Before: $beforeCount item(s) | After: $beforeCount item(s) (no side effects created)"
 } else {
     Add-GateResult -GateName "Git-Visible Test Side Effects" -Status "FAIL" -Details "Git status changed during pytest execution!`nBEFORE:`n$gitStatusBefore`nAFTER:`n$gitStatusAfter"
