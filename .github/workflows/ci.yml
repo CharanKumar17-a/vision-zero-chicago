@@ -1,0 +1,50 @@
+name: CI & Governance Verifier Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    name: Run Pytest & Verification Protocol
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Create virtual environment (.venv)
+        run: |
+          python -m venv .venv
+
+      - name: Install dependencies
+        run: |
+          .\.venv\Scripts\python.exe -m pip install --upgrade pip
+          .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+
+      - name: Run Pytest Suite
+        run: |
+          .\.venv\Scripts\python.exe -m pytest -q
+
+      - name: Run Mandatory Verification Protocol
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File automation/verify_project.ps1
+        continue-on-error: false
+
+      - name: Upload Quality & Verification Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-verification-artifacts
+          path: |
+            docs/data_quality/*.json
+            outputs/logs/
+          retention-days: 14
