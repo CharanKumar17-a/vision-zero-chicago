@@ -107,7 +107,8 @@ def render_engineering_review_banner():
 def render_economic_caveat_banner():
     """Render mandatory economic cost-benefit disclaimer banner."""
     st.warning(
-        "**Analyst-defined planning costs and crash-cost assumptions — not an approved City benefit-cost estimate.**"
+        "**Analyst-defined planning costs and crash-cost assumptions — not an approved City benefit-cost estimate.** "
+        "Planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns."
     )
 
 

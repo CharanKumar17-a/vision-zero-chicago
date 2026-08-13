@@ -128,7 +128,7 @@ deck = pdk.Deck(
 
 st.pydeck_chart(deck, use_container_width=True)
 
-st.caption("Orange markers = High-SVI Equity Priority Areas; Blue markers = Non-Equity Priority Corridors.")
+st.caption("Orange markers = High-SVI Equity Priority Areas; Blue markers = Non-Equity Priority Corridors. (Note: Equity classification uses CDC/ATSDR Social Vulnerability Index [SVI] as a project-defined planning proxy, not the City of Chicago's official equity definition.)")
 
 st.markdown("---")
 st.subheader("Corridor Detail Inspector")
@@ -163,6 +163,8 @@ with ic3:
     st.markdown(f"**Provisional Capital Cost:** {format_currency(c_row['capital_project_cost'])}")
     st.markdown(f"**Annual Crashes Averted:** {c_row['crashes_averted_total']:.2f} / yr (K: {c_row['crashes_averted_k']:.2f}, A: {c_row['crashes_averted_a']:.2f})")
     st.markdown(f"**Physical Applicability:** `:orange[{c_row['physical_applicability_status']} - Review Required]`")
+
+st.caption("Note on crash figures: Expected values from the forecast model — not predictions of any individual crash event. BCR figures reflect planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns.")
 
 st.markdown("---")
 st.subheader("Selected Projects Detail Table & Export")

@@ -54,24 +54,24 @@ st.markdown("---")
 st.subheader("Governance Warning Register (Dynamic Evidence Audit)")
 
 # 1. Portfolio Optimization Governance Warnings
-st.markdown("#### Portfolio Optimization Warnings (Phase 4C Validation Evidence)")
 opt_warnings = opt_ev.get("governance_warnings", [])
-if opt_warnings:
-    df_opt_w = pd.DataFrame(opt_warnings)
-    cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_opt_w.columns]
-    st.dataframe(df_opt_w[cols_to_show], use_container_width=True, height=220)
-else:
-    st.info("No portfolio optimization warnings loaded.")
+with st.expander("Portfolio Optimization Governance Warnings (Phase 4C Evidence)", expanded=True):
+    if opt_warnings:
+        df_opt_w = pd.DataFrame(opt_warnings)
+        cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_opt_w.columns]
+        st.dataframe(df_opt_w[cols_to_show], use_container_width=True, height=220)
+    else:
+        st.info("No portfolio optimization warnings loaded.")
 
 # 2. Decision Mart Governance Warnings
-st.markdown("#### Decision Mart Serving Warnings (Phase 5A Validation Evidence)")
 mart_warnings = mart_ev.get("governance_warnings", [])
-if mart_warnings:
-    df_mart_w = pd.DataFrame(mart_warnings)
-    cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_mart_w.columns]
-    st.dataframe(df_mart_w[cols_to_show], use_container_width=True, height=150)
-else:
-    st.info("No decision mart warnings loaded.")
+with st.expander("Decision Mart Serving Governance Warnings (Phase 5A Evidence)", expanded=True):
+    if mart_warnings:
+        df_mart_w = pd.DataFrame(mart_warnings)
+        cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_mart_w.columns]
+        st.dataframe(df_mart_w[cols_to_show], use_container_width=True, height=150)
+    else:
+        st.info("No decision mart warnings loaded.")
 
 st.markdown("---")
 st.subheader("Decision Support Contracts & Methodological Boundaries")
@@ -86,6 +86,9 @@ st.markdown("""
 - **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,410 detail rows).
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
+
+### Equity Definition Disclaimer
+- **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
 
 ### Scenario Definitions
 - **OFFICIAL (27 runs)**: Scenarios evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official budgets and equity floors are nonbinding (`NONBINDING_CORRIDOR_CEILING` and `SLACK`).

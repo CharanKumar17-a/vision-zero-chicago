@@ -33,6 +33,13 @@ st.set_page_config(page_title="Portfolio Overview - Vision Zero Chicago", layout
 st.title("Vision Zero Chicago - Portfolio Overview")
 st.markdown("Interactive decision support for provisional high-crash corridor treatment portfolios.")
 
+st.info(
+    "**Planning Scenario Scope**: At official planning budgets ($15M/$25M/$40M) every eligible project is "
+    "affordable (max all-43 portfolio cost ≈ $9.31M), so budget and equity constraints are **NONBINDING** in the "
+    "official scenarios. The optimizer's real trade-offs appear in the binding-budget stress scenarios ($2M/$4M/$6M): "
+    "14 core corridors at $2M, 29 at $4M, 40 at $6M. Physical applicability remains UNKNOWN pending engineering field review."
+)
+
 # Load serving datasets
 df_summary = load_portfolio_summary()
 df_selections = load_project_selections()
@@ -77,7 +84,11 @@ with col5:
 
 with col6:
     tot_averted = df_sel_benefits["crashes_averted_total"].sum()
-    st.metric("Provisional Crashes Averted", f"{tot_averted:,.1f} / yr")
+    st.metric(
+        "Provisional Crashes Averted",
+        f"{tot_averted:,.1f} / yr",
+        help="Expected values from the forecast model — not predictions of any individual crash event.",
+    )
 
 st.markdown("---")
 
@@ -187,6 +198,10 @@ with ec1:
 with ec2:
     st.metric("Total Net Present Benefit", format_currency(s_row["total_net_present_benefit"]))
 with ec3:
-    st.metric("Portfolio Benefit-Cost Ratio (BCR)", f"{s_row['portfolio_bcr']:,.1f}")
+    st.metric(
+        "Portfolio Benefit-Cost Ratio (BCR)",
+        f"{s_row['portfolio_bcr']:,.1f}",
+        help="Planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns.",
+    )
 
 render_engineering_review_banner()
