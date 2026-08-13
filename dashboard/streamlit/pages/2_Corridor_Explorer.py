@@ -73,7 +73,30 @@ gdf_map = gdf_sel.merge(
     how="left",
 )
 
-# Convert centroids & attributes for PyDeck scatterplot / path layer
+# Prepare GeoJSON FeatureCollection dict for PyDeck GeoJsonLayer street linework
+geojson_dict = json.loads(gdf_map.to_json())
+for feature in geojson_dict["features"]:
+    props = feature["properties"]
+    props["color"] = [255, 140, 0] if props.get("equity_area_flag") else [31, 119, 180]
+    props["capital_cost"] = float(props.get("capital_project_cost", 0.0))
+    props["forecast_total"] = float(props.get("annual_forecast_total_crashes_2026", 0.0))
+    props["forecast_ksi"] = float(props.get("annual_forecast_ksi_crashes_2026", 0.0))
+    props["svi_score"] = float(props.get("corridor_length_weighted_svi", 0.0))
+    props["street_name"] = str(props.get("street_name") or props.get("corridor_name") or "N/A")
+    props["from_street"] = str(props.get("from_street") or "N/A")
+    props["to_street"] = str(props.get("to_street") or "N/A")
+
+# PyDeck GeoJsonLayer for street linework
+layer_lines = pdk.Layer(
+    "GeoJsonLayer",
+    data=geojson_dict,
+    get_line_color="properties.color",
+    get_line_width=35,
+    width_min_pixels=4,
+    pickable=True,
+)
+
+# PyDeck ScatterplotLayer for centroid markers
 map_data = []
 for idx, row in gdf_map.iterrows():
     color = [255, 140, 0] if row["equity_area_flag"] else [31, 119, 180]
@@ -108,12 +131,12 @@ layer_points = pdk.Layer(
     data=df_pydeck,
     get_position=["lon", "lat"],
     get_color="color",
-    get_radius=400,
+    get_radius=300,
     pickable=True,
 )
 
 deck = pdk.Deck(
-    layers=[layer_points],
+    layers=[layer_lines, layer_points],
     initial_view_state=view_state,
     tooltip={
         "html": "<b>Corridor:</b> {corridor_name} ({corridor_id})<br/>"
@@ -128,7 +151,7 @@ deck = pdk.Deck(
 
 st.pydeck_chart(deck, use_container_width=True)
 
-st.caption("Orange markers = High-SVI Equity Priority Areas; Blue markers = Non-Equity Priority Corridors. (Note: Equity classification uses CDC/ATSDR Social Vulnerability Index [SVI] as a project-defined planning proxy, not the City of Chicago's official equity definition.)")
+st.caption("Street Linework & Centroids: Orange = High-SVI Equity Priority Areas; Blue = Non-Equity Priority Corridors. (Note: Equity classification uses CDC/ATSDR Social Vulnerability Index [SVI] as a project-defined planning proxy, not the City of Chicago's official equity definition.)")
 
 st.markdown("---")
 st.subheader("Corridor Detail Inspector")
