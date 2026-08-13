@@ -56,6 +56,11 @@ STRESS_UNCERTAINTIES = ["BASE"]
 STRESS_BUDGETS = [2000000.0, 4000000.0, 6000000.0]
 STRESS_EQUITY_FLOORS = [0.20, 0.30, 0.40]
 
+# Minimum Benefit-Cost Ratio (BCR) candidate eligibility threshold
+# Candidates with BCR < 1.0 are un-economic (costs exceed present value of safety benefits) and are excluded prior to optimization.
+# Reference: Decision Log entry D023.
+MIN_ELIGIBLE_BCR = 1.0
+
 OFFICIAL_GOVERNANCE_LABELS = "OFFICIAL_BUDGET_SCENARIO; PROVISIONAL_PORTFOLIO_SCENARIO; ENGINEERING_REVIEW_REQUIRED"
 STRESS_GOVERNANCE_LABELS = "ANALYST_DEFINED_BINDING_BUDGET_STRESS_TEST; PROVISIONAL_PORTFOLIO_SCENARIO; ENGINEERING_REVIEW_REQUIRED"
 
@@ -136,6 +141,9 @@ def solve_portfolio_scenario(
 ) -> Tuple[Dict[str, Any], pd.DataFrame]:
     """Formulate, solve with repeat determinism, and summarize single portfolio scenario."""
     df_scen = df_scenario.reset_index(drop=True).copy()
+    initial_candidate_count = len(df_scen)
+    df_scen = df_scen[df_scen["benefit_cost_ratio"] >= MIN_ELIGIBLE_BCR].reset_index(drop=True)
+    excluded_bcr_candidate_count = int(initial_candidate_count - len(df_scen))
     n = len(df_scen)
 
     c = -df_scen["present_value_benefit"].values
@@ -275,6 +283,7 @@ def solve_portfolio_scenario(
         "road_diet_project_share": road_diet_project_share,
         "road_diet_spending_share": road_diet_spending_share,
         "physical_applicability_unknown_count": physical_applicability_unknown_count,
+        "excluded_bcr_candidate_count": excluded_bcr_candidate_count,
         "portfolio_hash": portfolio_hash,
         "budget_constraint_status": budget_constraint_status,
         "equity_constraint_status": equity_constraint_status,
@@ -376,6 +385,9 @@ def run_portfolio_optimization(
     df_summary = pd.DataFrame(summary_rows)
     df_selections = pd.concat(detail_frames, ignore_index=True)
 
+    official_excl = int(df_summary[df_summary["run_group"] == "OFFICIAL"]["excluded_bcr_candidate_count"].sum())
+    stress_excl = int(df_summary[df_summary["run_group"] == "BINDING-BUDGET STRESS TEST"]["excluded_bcr_candidate_count"].sum())
+
     # Save outputs
     summary_parquet_path.parent.mkdir(parents=True, exist_ok=True)
     df_summary.to_parquet(summary_parquet_path, index=False)
@@ -387,6 +399,7 @@ def run_portfolio_optimization(
 
     elapsed = time.time() - t0
     print(f"\nCompleted 36 portfolio optimization runs in {elapsed:.2f}s.")
+    print(f"Candidate BCR Eligibility Filter (BCR >= {MIN_ELIGIBLE_BCR}): Excluded {official_excl} candidates across 27 official runs, {stress_excl} candidates across 9 stress runs.")
     print(f"Summary dataset: {len(df_summary)} rows -> {summary_parquet_path}")
     print(f"Detail dataset:  {len(df_selections)} rows -> {selections_parquet_path}")
     print("=" * 80)

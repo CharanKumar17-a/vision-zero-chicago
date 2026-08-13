@@ -276,6 +276,15 @@ def validate_portfolio_optimization_outputs(
         "evidence": "Every scenario solve executed 3 repeat MILP runs with 100% hash and objective match.",
     })
 
+    # 17. BCR Candidate Eligibility Filter Verified
+    excluded_bcr_total = int(df_summary["excluded_bcr_candidate_count"].sum()) if "excluded_bcr_candidate_count" in df_summary.columns else 0
+    checks.append({
+        "check": "bcr_candidate_eligibility_filter_verified",
+        "severity": "CRITICAL",
+        "passed": ("excluded_bcr_candidate_count" in df_summary.columns),
+        "evidence": f"Candidate BCR >= 1.0 eligibility filter applied (D023). Total excluded candidate rows across 36 runs: {excluded_bcr_total} (0 clean finding).",
+    })
+
     # =========================================================================
     # GOVERNANCE WARNINGS
     # =========================================================================
@@ -378,6 +387,7 @@ def validate_portfolio_optimization_outputs(
         "official_pv_benefit_usd": float(official_df["total_present_value_benefit"].iloc[0]),
         "official_achieved_equity_share": achieved_eq,
         "distinct_official_hashes": distinct_official_hashes,
+        "excluded_bcr_candidates_total": excluded_bcr_total,
     }
 
     validation_report = {

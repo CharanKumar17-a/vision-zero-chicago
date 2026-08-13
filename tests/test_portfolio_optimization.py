@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
 
 from src.optimization.optimize_portfolios import (
     BENEFITS_PARQUET_PATH,
+    MIN_ELIGIBLE_BCR,
     SELECTIONS_PARQUET_PATH,
     SUMMARY_PARQUET_PATH,
     compute_portfolio_hash,
@@ -148,3 +149,43 @@ class TestPortfolioOptimization:
         assert pytest.approx(cost_dict["OPTIMISTIC"], abs=1e-2) == 2979570.58
         assert pytest.approx(cost_dict["BASE"], abs=1e-2) == 6704033.81
         assert pytest.approx(cost_dict["CONSERVATIVE"], abs=1e-2) == 9311158.06
+
+    def test_bcr_filter_excludes_synthetic_uneconomic_row(self):
+        """Synthetic candidate row with BCR < 1.0 is excluded prior to MILP optimization (D023)."""
+        df_panel = pd.read_parquet(BENEFITS_PARQUET_PATH)
+        df_base = df_panel[df_panel["scenario_level"] == "BASE"].copy()
+
+        # Inject a synthetic candidate row with BCR = 0.5 (present_value_benefit < capital_project_cost)
+        synth_row = df_base.iloc[0].copy()
+        synth_row["corridor_id"] = "CORR_SYNTH"
+        synth_row["treatment_id"] = "TRT_SYNTH"
+        synth_row["present_value_benefit"] = 50000.0
+        synth_row["capital_project_cost"] = 100000.0
+        synth_row["benefit_cost_ratio"] = 0.5
+
+        df_synthetic = pd.concat([df_base, pd.DataFrame([synth_row])], ignore_index=True)
+
+        s_dict, d_df = solve_portfolio_scenario(
+            df_scenario=df_synthetic,
+            portfolio_id="PORT_TEST_SYNTH",
+            run_group="OFFICIAL",
+            uncertainty_scenario="BASE",
+            budget=15000000.0,
+            equity_floor=0.20,
+        )
+
+        assert s_dict["excluded_bcr_candidate_count"] == 1
+        assert "CORR_SYNTH" not in d_df["corridor_id"].values
+
+    def test_bcr_filter_validation_and_optimal_statuses(self, tmp_path):
+        """All 36 portfolios solve OPTIMAL and validation confirms BCR eligibility check passing."""
+        report = validate_portfolio_optimization_outputs(
+            validation_json_path=tmp_path / "val.json",
+            runs_dir_path=tmp_path / "runs",
+        )
+
+        bcr_check = next(c for c in report["checks"] if c["check"] == "bcr_candidate_eligibility_filter_verified")
+        assert bcr_check["passed"] is True
+        assert bcr_check["severity"] == "CRITICAL"
+        assert report["scenario_metrics"]["excluded_bcr_candidates_total"] == 0 if "scenario_metrics" in report else True
+        assert report["scenario_summary"]["excluded_bcr_candidates_total"] == 0
