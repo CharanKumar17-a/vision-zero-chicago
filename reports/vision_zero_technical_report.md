@@ -14,15 +14,16 @@ crash burden is likely highest across the 43 official high-crash corridors,
 
 Headline (BASE): $5.84B total present-value safety benefit on $26.75M
 sourced capital cost across 387 corridor-treatment candidates; portfolio
-average BCR ≈ 218:1; 47.4% of spend lands in equity-priority corridors automatically.
+average BCR now ≈ 289:1 (TRT_002), 171:1 (TRT_001), 92:1 (TRT_004) — planning-level,
+not expected returns; 47.4% of spend lands in equity-priority corridors automatically.
 
 Critical finding: under sourced planning-level unit costs ($400k/mi Road Diet,
-$15k/island Refuge Island, $22.5k RRFB), full network treatment cost rises to
-$20.11M ($19.93M–$21.26M across scenarios). Consequently, the official **$15M
-planning budget is strictly BINDING** ($14.99M cost, selecting 34 projects in
-BASE scenario). Physical applicability screening (disqualifying Road Diets on
-divided carriageways like Lake Shore Drive HCC019) causes the solver to select
-Refuge Islands (`TRT_001`) for HCC019, introducing multi-treatment diversity.
+$15k/island Refuge Island, $22.5k RRFB; D024), full 43-corridor network treatment cost
+is approx. $20.1M (BASE) ($15.93M–$21.26M across scenarios). Consequently, the official **$15M
+planning budget is strictly BINDING** (selects ~34 of 43 corridors in BASE at $14.99M cost);
+$25M and $40M remain nonbinding (all eligible corridors fit). Physical applicability
+screening (disqualifying Road Diets on divided carriageways like Lake Shore Drive HCC019)
+causes the solver to select Refuge Islands (`TRT_001`) for HCC019, introducing multi-treatment diversity.
 
 ## 2. Business Problem
 Decision question: which combination of corridor-level road-safety projects
@@ -72,33 +73,43 @@ Western +10.6%) vs CBD drops (LaSalle -55.9%, State -46.3%, Wacker -33.6%);
 
 ## 6. Treatment Benefits and Economics
 387 candidate rows (43 corridors x 3 treatments x 3 uncertainty scenarios).
-Sourced unit costs (docs/evidence/treatment_unit_costs_2024.csv):
+Sourced unit costs (D024, docs/evidence/treatment_unit_costs_2024.csv):
 TRT_001 Refuge Islands ($15k/island, 2/mi density), TRT_002 Road Diet ($400k/mi),
 TRT_004 RRFB ($22.5k/crossing). CMFs from FHWA CMF Clearinghouse; USDOT/FHWA
 comprehensive crash costs; 3.0% real discount; 20-year useful life; severity-specific K/A/B/C/O/U shares.
-BASE totals (committed): PV benefit $5.84B; capital cost $26.75M; avg BCR
-218:1. Candidate BCR >= 1.0 eligibility filter applied (D023). Physical applicability
-screening marks TRT_002 NOT_APPLICABLE on divided carriageway MultiLineString
-corridor HCC019 (Lake Shore Drive) (D024).
+BASE totals (committed): PV benefit $5.84B; capital cost $26.75M; mean BCRs:
+TRT_002 ≈ 289 (264:1 candidate mean), TRT_001 ≈ 171 (170:1 candidate mean), TRT_004 ≈ 92 (76:1 candidate mean).
+Candidate BCR >= 1.0 eligibility filter (D023) applied; 0 candidate rows excluded (all candidate BCRs >= 1.0).
+Selection is no longer 100% Road Diet: physical applicability screening marks TRT_002 NOT_APPLICABLE on divided
+carriageway MultiLineString corridor HCC019 (Lake Shore Drive), leading to TRT_001 selection there (D024).
 
 ## 7. Portfolio Optimization
 MILP (scipy.optimize.milp); objective = maximize total present-value benefit;
 constraints = budget ceiling, equity floor, candidate BCR >= 1.0 eligibility, physical applicability,
 at most 1 treatment/corridor, at least 1 project; repeat-solve determinism verified (3x identical).
 36 runs = 27 official ($15M/$25M/$40M x 20/30/40% x 3 uncertainty) + 9 binding stress
-($2M/$4M/$6M). Outputs: 36 summary rows; 1,212 selection rows; exact
+($2M/$4M/$6M). Outputs: 36 summary rows; 1,212 selection rows (was 1,410); exact
 summary-to-detail reconciliation; exact lineage; all OPTIMAL.
-Binding $15M official planning budget selects 34 projects in BASE scenario ($14.99M cost,
-$11.1k slack), leaving 9 corridors unselected. $25M and $40M budget ceilings allow network coverage.
+The $15M official planning budget now BINDS: selects ~34 corridors (BASE, cost $14.99M, slack $11.1k),
+40 corridors (CONSERVATIVE, cost $14.99M, slack $7.5k), and 35 corridors (OPTIMISTIC, cost $14.98M, slack $19.8k).
+$25M and $40M budget ceilings remain nonbinding (all eligible corridors fit).
+Stress tiers maintain the core concept: 14, 29, and 40 core corridors selected at $2M, $4M, and $6M.
 Equity floors never bind (achieved 43-58% > all floors) because high-BCR corridors
-naturally overlap high-SVI areas. Selection diversity introduced via TRT_001 selection on HCC019.
+naturally overlap high-SVI areas. Selection diversity is introduced via TRT_001 selection on HCC019.
 
 ## 8. Validation and Governance
 300 tests passed (full pytest -q), 0 Git side effects; 14-gate verifier PASS.
-Committed validation reports (PASS/PASS_WITH_WARNINGS): crash core, corridor register,
-corridor geometry, treatment benefits, portfolio optimization, decision mart, Streamlit dashboard.
-Deployment served from checksum-verified snapshots; three data modes. Decision log (D001–D024)
+Committed validation reports (PASS/PASS_WITH_WARNINGS):
+- Treatment benefits: run_id=20260813T184150Z
+- Portfolio optimization: run_id=20260813T184156Z (and 20260813T173316Z from GB1)
+- SQL analytics mart: run_id=20260813T184158Z
+- Streamlit dashboard: run_id=20260813T184201Z / 20260813T184858Z
+- Crash core, corridor register, corridor geometry, decision mart validation runs.
+Deployment served from checksum-verified snapshots; three data modes. Decision log through D024
 and assumption register maintained. Final authority: City staff and engineering teams.
+Hindsight backtest (notebook 09) demonstrates robust generalization: total-crash calibration
+ratio of 0.984 (2024 validation) and 1.030 (2025 test) with 2-year aggregate bias of +0.68%;
+KSI EB-calibrated ratio of 1.000 (2024) and 0.917 (2025).
 
 ## 9. Known Limitations
 1. Sourced unit costs are planning-level estimates; actual construction costs
@@ -113,5 +124,6 @@ and assumption register maintained. Final authority: City staff and engineering 
 
 ## 10. Sources of Every Number
 All figures trace to committed files under docs/data_quality/ (run IDs above),
-data/processed/*.parquet, notebooks/01,02,03,05,08, and python -m pytest -q
+docs/evidence/treatment_unit_costs_2024.csv, data/processed/*.parquet,
+notebooks/01,02,03,05,08,09 (09_hindsight_backtest.ipynb), and python -m pytest -q
 (300 passed, 2026-08-14).
