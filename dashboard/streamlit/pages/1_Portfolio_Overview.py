@@ -42,10 +42,12 @@ st.title("Vision Zero Chicago - Portfolio Overview")
 st.markdown("Interactive decision support for provisional high-crash corridor treatment portfolios.")
 
 st.info(
-    "**Planning Scenario Scope**: At official planning budgets ($15M/$25M/$40M) every eligible project is "
-    "affordable (max all-43 portfolio cost ≈ $9.31M), so budget and equity constraints are **NONBINDING** in the "
-    "official scenarios. The optimizer's real trade-offs appear in the binding-budget stress scenarios ($2M/$4M/$6M): "
-    "14 core corridors at $2M, 29 at $4M, 40 at $6M. Physical applicability remains UNKNOWN pending engineering field review."
+    "**Planning Scenario Scope**: Under sourced planning-level treatment costs (D024), "
+    "the full 43-corridor network costs approx. \\$20.1M (BASE). The \\$15M planning "
+    "budget is BINDING (selects ~34 of 43 corridors); \\$25M and \\$40M remain "
+    "nonbinding (all eligible corridors fit). Budget and equity scenarios are "
+    "planning-level, not official City budgets. Physical applicability remains "
+    "UNKNOWN pending engineering field review."
 )
 
 # Load serving datasets
