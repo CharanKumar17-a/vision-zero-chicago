@@ -80,31 +80,41 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
     return selected_pid
 
 
-def render_governance_header_banner(run_group: str, is_official: bool):
+def render_page_header(page_title: str, subtitle: str | None = None) -> None:
+    """Render unified two-level header across all application pages."""
+    st.caption("Vision Zero Chicago — Safety Capital Investment Prioritization")
+    st.title(page_title)
+    if subtitle:
+        st.markdown(subtitle)
+
+
+def render_governance_header_banner(run_group: str, is_official: bool) -> None:
     """Render mandatory governance banner based on run group."""
     if is_official:
         st.info(
-            "**OFFICIAL CITY PLANNING SCENARIO**: Official planning budgets ($15M, $25M, $40M) "
-            "exceed provisional portfolio costs ($9.31M CONSERVATIVE, $6.70M BASE, $2.98M OPTIMISTIC) "
-            "and are **NONBINDING**. Equity floors (20%, 30%, 40%) are also nonbinding (41.87% achieved)."
+            "**OFFICIAL CITY PLANNING SCENARIO**: Under sourced planning-level treatment costs (D024), "
+            "the full 43-corridor network costs approx. \\$20.1M (BASE). The \\$15M planning budget is BINDING "
+            "(selects ~34 of 43 corridors); \\$25M and \\$40M remain nonbinding (all eligible corridors fit). "
+            "Budget and equity scenarios are planning-level, not official City appropriations. "
+            "Physical applicability remains UNKNOWN pending engineering field review."
         )
     else:
         st.warning(
             "**ANALYST-DEFINED BINDING-BUDGET DIAGNOSTICS**: This stress scenario represents an analyst-defined "
-            "diagnostic scenario under constrained budgets ($2M, $4M, $6M) to evaluate binding constraint mechanics. "
+            "diagnostic scenario under constrained budgets (\\$2M, \\$4M, \\$6M) to evaluate binding constraint mechanics. "
             "Does not constitute official City policy."
         )
 
 
-def render_engineering_review_banner():
+def render_engineering_review_banner() -> None:
     """Render mandatory engineering field review warning banner."""
-    st.error(
+    st.warning(
         "**Engineering review required. Lane counts, median widths and crossing inventories are not yet available.** "
         "Physical applicability status is UNKNOWN across all candidate corridors. Field survey required prior to project programming."
     )
 
 
-def render_economic_caveat_banner():
+def render_economic_caveat_banner() -> None:
     """Render mandatory economic cost-benefit disclaimer banner."""
     st.warning(
         "**Analyst-defined planning costs and crash-cost assumptions — not an approved City benefit-cost estimate.** "

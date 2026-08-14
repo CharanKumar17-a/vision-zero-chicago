@@ -24,6 +24,7 @@ from dashboard.streamlit.components import (
     format_percent,
     render_engineering_review_banner,
     render_governance_header_banner,
+    render_page_header,
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
@@ -39,10 +40,10 @@ from dashboard.streamlit.data_access import (
     get_single_portfolio_summary,
 )
 
-st.set_page_config(page_title="Corridor Explorer - Vision Zero Chicago", layout="wide")
-
-st.title("Vision Zero Chicago - Corridor Explorer")
-st.markdown("Spatial corridor risk overlay, SVI equity classification, and project candidate drilldown.")
+render_page_header(
+    "Corridor Explorer",
+    "Spatial corridor risk overlay, SVI equity classification, and project candidate drilldown.",
+)
 
 # Load serving datasets
 df_summary = load_portfolio_summary()

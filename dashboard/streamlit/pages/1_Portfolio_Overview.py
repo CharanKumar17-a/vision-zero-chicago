@@ -24,6 +24,7 @@ from dashboard.streamlit.components import (
     render_economic_caveat_banner,
     render_engineering_review_banner,
     render_governance_header_banner,
+    render_page_header,
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
@@ -36,18 +37,9 @@ from dashboard.streamlit.data_access import (
     get_single_portfolio_summary,
 )
 
-st.set_page_config(page_title="Portfolio Overview - Vision Zero Chicago", layout="wide")
-
-st.title("Vision Zero Chicago - Portfolio Overview")
-st.markdown("Interactive decision support for provisional high-crash corridor treatment portfolios.")
-
-st.info(
-    "**Planning Scenario Scope**: Under sourced planning-level treatment costs (D024), "
-    "the full 43-corridor network costs approx. \\$20.1M (BASE). The \\$15M planning "
-    "budget is BINDING (selects ~34 of 43 corridors); \\$25M and \\$40M remain "
-    "nonbinding (all eligible corridors fit). Budget and equity scenarios are "
-    "planning-level, not official City budgets. Physical applicability remains "
-    "UNKNOWN pending engineering field review."
+render_page_header(
+    "Portfolio Overview",
+    "Interactive decision support for provisional high-crash corridor treatment portfolios.",
 )
 
 # Load serving datasets
@@ -67,7 +59,7 @@ is_official = (s_row["run_group"] == "OFFICIAL")
 render_governance_header_banner(s_row["run_group"], is_official)
 
 st.markdown("---")
-st.subheader("Executive Hero Metrics")
+st.subheader("Core Portfolio Metrics")
 
 # Hero KPI Cards
 col1, col2, col3, col4, col5, col6 = st.columns(6)

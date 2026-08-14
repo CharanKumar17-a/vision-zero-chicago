@@ -23,6 +23,7 @@ import streamlit as st
 from dashboard.streamlit.components import (
     format_currency,
     format_percent,
+    render_page_header,
 )
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
@@ -36,12 +37,10 @@ from dashboard.streamlit.data_access import (
     load_treatment_benefits,
 )
 
-st.set_page_config(page_title="Executive Recommendation - Vision Zero Chicago", layout="wide")
-
-st.title("🎯 Executive Recommendation: Safety Investment Portfolio")
-st.markdown(
+render_page_header(
+    "Executive Recommendation",
     "**What should we do?** High-level decision-support briefing and capital allocation recommendation "
-    "for City of Chicago transportation leadership."
+    "for City of Chicago transportation leadership.",
 )
 
 # -----------------------------------------------------------------------------

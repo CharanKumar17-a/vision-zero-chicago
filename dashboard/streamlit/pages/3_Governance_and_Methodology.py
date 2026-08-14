@@ -18,6 +18,7 @@ import streamlit as st
 
 from dashboard.streamlit.components import (
     render_engineering_review_banner,
+    render_page_header,
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
@@ -25,10 +26,10 @@ from dashboard.streamlit.data_access import (
     load_validation_evidence,
 )
 
-st.set_page_config(page_title="Governance & Methodology - Vision Zero Chicago", layout="wide")
-
-st.title("Vision Zero Chicago - Governance & Methodology")
-st.markdown("Dynamic audit of governance warning registers, source evidence lineage, and decision-support contracts.")
+render_page_header(
+    "Governance & Methodology",
+    "Dynamic audit of governance warning registers, source evidence lineage, and decision-support contracts.",
+)
 
 # Load serving datasets & validation evidence
 df_summary = load_portfolio_summary()
@@ -67,7 +68,7 @@ with st.expander("Portfolio Optimization Governance Warnings (Phase 4C Evidence)
     if opt_warnings:
         df_opt_w = pd.DataFrame(opt_warnings)
         cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_opt_w.columns]
-        st.dataframe(df_opt_w[cols_to_show], use_container_width=True, height=220)
+        st.dataframe(df_opt_w[cols_to_show], use_container_width=True, hide_index=True, height=220)
     else:
         st.info("No portfolio optimization warnings loaded.")
 
@@ -77,7 +78,7 @@ with st.expander("Decision Mart Serving Governance Warnings (Phase 5A Evidence)"
     if mart_warnings:
         df_mart_w = pd.DataFrame(mart_warnings)
         cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_mart_w.columns]
-        st.dataframe(df_mart_w[cols_to_show], use_container_width=True, height=150)
+        st.dataframe(df_mart_w[cols_to_show], use_container_width=True, hide_index=True, height=150)
     else:
         st.info("No decision mart warnings loaded.")
 
@@ -99,8 +100,8 @@ st.markdown("""
 - **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
 
 ### Scenario Definitions
-- **OFFICIAL (27 runs)**: Scenarios evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official $15M planning budgets bind strictly under realistic unit costs ($14.99M cost, selecting 34 corridors in BASE scenario), while $25M and $40M budget ceilings allow network-wide coverage.
-- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating $2M, $4M, and $6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
+- **OFFICIAL (27 runs)**: Scenarios evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 34 corridors in BASE scenario), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
+- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \\$2M, \\$4M, and \\$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 ### Model Horizon & Threshold Policy
 - **Risk Horizon**: 2026 Annual Crash Forecast (Beta-Binomial conjugate shrinkage, Empirical Bayes KSI calibration).
