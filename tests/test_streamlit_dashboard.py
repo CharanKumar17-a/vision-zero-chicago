@@ -253,3 +253,17 @@ class TestStreamlitDashboard:
 
             gdf_sel = get_selected_corridors_geodataframe(df_selections, gdf_corridors, pid)
             assert len(gdf_sel) == len(df_sel)
+
+    def test_default_portfolio_budget_utilization_calculation(self):
+        """Budget utilization equals selected capital cost divided by planning budget ceiling within tolerance."""
+        df_summary = load_portfolio_summary()
+        s_row = get_single_portfolio_summary(df_summary, DEFAULT_PORTFOLIO_ID)
+
+        cost = float(s_row["selected_capital_cost"])
+        budget = float(s_row["budget_usd"])
+        utilization_ratio = cost / budget
+        utilization_pct = utilization_ratio * 100.0
+
+        assert pytest.approx(utilization_pct, abs=0.01) == s_row["budget_utilization_pct"]
+        assert pytest.approx(utilization_pct, abs=0.05) == 99.93
+        assert 0.0 <= utilization_ratio <= 1.0

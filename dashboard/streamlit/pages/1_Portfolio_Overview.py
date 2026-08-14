@@ -65,31 +65,49 @@ st.subheader("Core Portfolio Metrics")
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
-    st.metric("Selected Projects", f"{int(s_row['selected_project_count'])} / 43")
+    st.metric(
+        "Selected Projects",
+        f"{int(s_row['selected_project_count'])} / 43",
+        help="Count of candidate corridors selected for capital investment in this scenario.",
+    )
 
 with col2:
-    st.metric("Modeled Capital Cost", format_currency(s_row["selected_capital_cost"]))
+    st.metric(
+        "Modeled Capital Cost",
+        format_currency(s_row["selected_capital_cost"]),
+        help="Total estimated initial construction cost for all selected corridor projects.",
+    )
 
 with col3:
-    st.metric("Budget Utilization", format_percent(s_row["budget_utilization_pct"]))
+    utilization_ratio = s_row["selected_capital_cost"] / s_row["budget_usd"] if s_row["budget_usd"] > 0 else 0.0
+    st.metric(
+        "Budget Utilization",
+        format_percent(utilization_ratio),
+        help="Selected capital cost divided by planning budget ceiling.",
+    )
 
 with col4:
-    st.metric("Achieved Equity Share", format_percent(s_row["achieved_equity_share"]), delta=f"Floor: {format_percent(s_row['equity_floor'])}")
+    st.metric(
+        "Achieved Equity Share",
+        format_percent(s_row["achieved_equity_share"]),
+        delta=f"Floor: {format_percent(s_row['equity_floor'])}",
+        help="Percentage of capital investment allocated to high-SVI equity priority areas.",
+    )
 
 with col5:
     tot_ksi_2026 = df_master["annual_forecast_ksi_crashes_2026"].sum()
     st.metric(
-        "Calibrated 2026 KSI Forecast",
+        "2026 Baseline KSI Forecast",
         f"{tot_ksi_2026:,.1f} / yr",
-        help="Forward-looking 2026 model forecast calibrated using empirical validation evidence. Separate from historical Empirical Bayes stability benchmark.",
+        help="Forward-looking 2026 baseline KSI forecast across all 43 candidate corridors calibrated using empirical validation evidence.",
     )
 
 with col6:
     tot_averted = df_sel_benefits["crashes_averted_total"].sum()
     st.metric(
-        "Provisional Crashes Averted",
+        "Annual Crashes Averted",
         f"{tot_averted:,.1f} / yr",
-        help="Expected values from the forecast model — not predictions of any individual crash event.",
+        help="Model-estimated annual reduction in total crashes across funded corridors.",
     )
 
 st.markdown("---")
@@ -136,7 +154,7 @@ with c3:
         df_sel_benefits,
         x="capital_project_cost",
         nbins=15,
-        title="Project Cost Distribution ($)",
+        title="Project Cost Distribution (USD)",
         labels={"capital_project_cost": "Capital Project Cost ($)"},
         color_discrete_sequence=["#1f77b4"],
     )
@@ -186,6 +204,7 @@ st.dataframe(
         "crashes_averted_a": "{:,.2f}",
     }),
     use_container_width=True,
+    hide_index=True,
     height=350,
 )
 
