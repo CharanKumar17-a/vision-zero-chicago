@@ -364,3 +364,44 @@ def get_selected_corridors_geodataframe(
     if len(gdf_merged) != len(df_sel):
         raise ValueError(f"Row count mismatch when creating spatial GeoDataFrame for '{portfolio_id}'.")
     return gdf_merged
+
+
+# FHWA 2025 Economic-Only Crash Cost Benchmarks (FHWA safety factsheet 2025: direct tangible costs only)
+# Reference: K (Fatal) = $1.61M, A (Incapacitating) = $172K, B (Non-incapacitating) = $44K, C (Possible) = $26K, O (PDO) = $6.3K
+ECONOMIC_ONLY_CRASH_COSTS: Dict[str, float] = {
+    "K": 1610000.0,
+    "A": 172000.0,
+    "B": 44000.0,
+    "C": 26000.0,
+    "O": 6300.0,
+}
+
+
+def compute_economic_only_benefits(
+    df_benefits: pd.DataFrame,
+    discount_rate: float = 0.03,
+    useful_life_years: int = 20,
+) -> pd.DataFrame:
+    """Compute annual and present-value economic-only benefits and BCR using FHWA 2025 economic-only crash costs.
+
+    Direct tangible costs only (medical, emergency services, wage loss, property damage) without quality-of-life additions.
+    Source: FHWA 2025 Economic Cost Guidelines.
+    """
+    df = df_benefits.copy()
+    annual_econ = (
+        df["crashes_averted_k"] * ECONOMIC_ONLY_CRASH_COSTS["K"]
+        + df["crashes_averted_a"] * ECONOMIC_ONLY_CRASH_COSTS["A"]
+        + df["crashes_averted_b"] * ECONOMIC_ONLY_CRASH_COSTS["B"]
+        + df["crashes_averted_c"] * ECONOMIC_ONLY_CRASH_COSTS["C"]
+        + df["crashes_averted_o"] * ECONOMIC_ONLY_CRASH_COSTS["O"]
+    )
+
+    if "present_value_factor" in df.columns:
+        pv_factor = df["present_value_factor"]
+    else:
+        pv_factor = (1.0 - (1.0 + discount_rate) ** (-useful_life_years)) / discount_rate
+
+    df["annual_economic_benefit"] = annual_econ
+    df["pv_economic_benefit"] = annual_econ * pv_factor
+    df["bcr_economic_only"] = df["pv_economic_benefit"] / df["capital_project_cost"].replace(0, float("nan"))
+    return df

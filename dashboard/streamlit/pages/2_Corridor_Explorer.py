@@ -27,6 +27,7 @@ from dashboard.streamlit.components import (
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
+    compute_economic_only_benefits,
     load_corridor_geodataframe,
     load_corridor_master,
     load_portfolio_summary,
@@ -56,6 +57,7 @@ portfolio_id = render_sidebar_controls(df_summary)
 # Extract single portfolio data & selected spatial GeoDataFrame
 s_row = get_single_portfolio_summary(df_summary, portfolio_id)
 df_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, portfolio_id)
+df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
 
 render_governance_header_banner(s_row["run_group"], (s_row["run_group"] == "OFFICIAL"))
 render_engineering_review_banner()
@@ -188,6 +190,9 @@ c_tot_averted = float(c_row["crashes_averted_total"])
 cost_per_ksi_str = format_currency(c_cost / c_ksi_averted) if c_ksi_averted > 0 else "N/A"
 cost_per_crash_str = format_currency(c_cost / c_tot_averted) if c_tot_averted > 0 else "N/A"
 
+c_comp_bcr = float(c_row["benefit_cost_ratio"])
+c_econ_bcr = float(c_row["bcr_economic_only"]) if "bcr_economic_only" in c_row and pd.notnull(c_row["bcr_economic_only"]) else 0.0
+
 ic1, ic2, ic3, ic4 = st.columns(4)
 with ic1:
     st.markdown(f"**Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
@@ -203,12 +208,13 @@ with ic3:
     st.markdown(f"**Physical Applicability:** `:orange[{c_row['physical_applicability_status']} - Review Required]`")
 with ic4:
     st.markdown(f"**Annual Crashes Averted:** {c_tot_averted:.2f} / yr (KSI: {c_ksi_averted:.2f})")
-    st.markdown(f"**Cost per KSI Averted:** {cost_per_ksi_str} / KSI" if cost_per_ksi_str != "N/A" else "**Cost per KSI Averted:** N/A")
-    st.markdown(f"**Cost per Crash Averted:** {cost_per_crash_str} / crash" if cost_per_crash_str != "N/A" else "**Cost per Crash Averted:** N/A")
+    st.markdown(f"**BCR (Comprehensive):** `{c_comp_bcr:.1f} : 1`")
+    st.markdown(f"**BCR (Economic-Only):** `{c_econ_bcr:.1f} : 1`")
 
 st.caption(
+    f"Efficiency: Cost per KSI Averted = {cost_per_ksi_str} / KSI | Cost per Crash Averted = {cost_per_crash_str} / crash. "
     "Lower cost per KSI averted = more efficient at preventing the most severe crashes. "
-    "These are planning-level estimates pending engineering review. "
+    "Economic-only BCR uses FHWA 2025 direct tangible costs (medical, emergency, property, wage loss) without quality-of-life additions. "
     "Note on crash figures: Expected values from the forecast model — not predictions of any individual crash event. "
     "BCR figures reflect planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns."
 )
@@ -224,6 +230,8 @@ df_export = df_sel_benefits[[
     "treatment_name",
     "uncertainty_scenario",
     "capital_project_cost",
+    "benefit_cost_ratio",
+    "bcr_economic_only",
     "crashes_averted_total",
     "crashes_averted_k",
     "crashes_averted_a",
@@ -238,6 +246,8 @@ df_export["cost_per_crash_averted"] = df_export["capital_project_cost"] / df_exp
 st.dataframe(
     df_export.style.format({
         "capital_project_cost": "${:,.0f}",
+        "benefit_cost_ratio": "{:,.1f}",
+        "bcr_economic_only": "{:,.1f}",
         "crashes_averted_total": "{:,.2f}",
         "crashes_averted_k": "{:,.2f}",
         "crashes_averted_a": "{:,.2f}",

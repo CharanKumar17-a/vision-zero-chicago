@@ -26,6 +26,7 @@ from dashboard.streamlit.components import (
 )
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
+    compute_economic_only_benefits,
     get_selected_portfolio_benefits,
     get_single_portfolio_selections,
     get_single_portfolio_summary,
@@ -55,6 +56,12 @@ df_benefits = load_treatment_benefits()
 rec_summary = get_single_portfolio_summary(df_summary, DEFAULT_PORTFOLIO_ID)
 rec_selections = get_single_portfolio_selections(df_selections, DEFAULT_PORTFOLIO_ID)
 rec_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, DEFAULT_PORTFOLIO_ID)
+
+# Compute economic-only benefits for recommended portfolio
+rec_benefits_econ = compute_economic_only_benefits(rec_benefits)
+total_annual_econ = float(rec_benefits_econ["annual_economic_benefit"].sum())
+total_pv_econ = float(rec_benefits_econ["pv_economic_benefit"].sum())
+bcr_econ_portfolio = total_pv_econ / float(rec_summary["selected_capital_cost"]) if float(rec_summary["selected_capital_cost"]) > 0 else 0.0
 
 # Derived metrics for recommended portfolio
 total_corridors_count = len(df_master)
@@ -139,6 +146,20 @@ with col_benefit2:
           with highest prioritization given to high-volume pedestrian and multi-lane arterial corridors.
         """
     )
+
+with st.expander("📊 View Economic-Only Cost View (Conservative)", expanded=False):
+    st.markdown(
+        "Using **economic-only crash costs** (FHWA 2025) yields a more conservative benefit estimate by accounting only for "
+        "direct tangible economic costs (medical treatment, emergency services, wage loss, property damage) without quality-of-life additions. "
+        "Comprehensive costs (incl. quality-of-life) are shown elsewhere. Neither is an expected City return; both are planning-level."
+    )
+    econ_col1, econ_col2, econ_col3 = st.columns(3)
+    with econ_col1:
+        st.metric("Economic-Only PV Benefit", format_currency(total_pv_econ), help="Present value benefit using direct tangible economic costs.")
+    with econ_col2:
+        st.metric("Economic-Only Portfolio BCR", f"{bcr_econ_portfolio:.1f} : 1", help="Benefit-Cost Ratio under conservative economic-only costs.")
+    with econ_col3:
+        st.metric("Annual Economic Savings", f"{format_currency(total_annual_econ)} / yr", help="Estimated annual direct economic crash costs prevented.")
 
 # -----------------------------------------------------------------------------
 # Section 3 — What Is NOT Funded (Deferred Corridors)
