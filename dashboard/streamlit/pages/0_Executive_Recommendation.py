@@ -229,17 +229,22 @@ st.caption(
 )
 
 # -----------------------------------------------------------------------------
-# Section 4 — Sensitivity to Budget
+# Section 4 — Sensitivity to Budget & Stress-Scenario Explorer
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.header("4. Sensitivity to Budget")
+st.header("4. Sensitivity to Budget & Stress-Scenario Explorer")
 
 st.markdown(
-    "How does corridor coverage and total safety return scale if additional capital is appropriated, "
-    "or if capital is severely constrained?"
+    "How does corridor coverage and total safety return scale if capital is severely constrained or if additional funds are appropriated? "
+    "Explore the **'what more money buys'** progression across both analyst-defined diagnostic stress tiers and official planning scenarios."
 )
 
-# Build sensitivity table across official and stress budgets in BASE scenario
+st.caption(
+    "Stress budgets (\\$2M/\\$4M/\\$6M) are analyst-defined diagnostic scenarios; "
+    "\\$15M/\\$25M/\\$40M are planning scenarios. All planning-level."
+)
+
+# Build sensitivity datasets across official and stress budgets in BASE scenario
 sens_official = df_summary[
     (df_summary["run_group"] == "OFFICIAL")
     & (df_summary["uncertainty_scenario"] == "BASE")
@@ -252,50 +257,146 @@ sens_stress = df_summary[
     & (df_summary["equity_floor"] == 0.20)
 ].sort_values("budget_usd")
 
-sensitivity_rows = []
+# Combine into progression records
+progression_records = []
+tier_map = {}
 
-# Add stress tiers
-for _, row in sens_stress.iterrows():
+for _, row in pd.concat([sens_stress, sens_official]).sort_values("budget_usd").iterrows():
+    pid = str(row["portfolio_id"])
     b_val = float(row["budget_usd"])
+    b_str = f"${int(b_val / 1e6)}M"
     c_cost = float(row["selected_capital_cost"])
     pv_b = float(row["total_present_value_benefit"])
     p_bcr = float(row["portfolio_bcr"])
     n_sel = int(row["selected_project_count"])
-    sensitivity_rows.append({
-        "Planning Budget Tier": f"\\${int(b_val / 1e6)}M (Stress Diagnostic)",
-        "Corridors Selected": f"{n_sel} of {total_corridors_count}",
+    eq_share = float(row["achieved_equity_share"]) * 100
+
+    # Calculate economic-only PV for this portfolio
+    p_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, pid)
+    p_econ = compute_economic_only_benefits(p_benefits)
+    pv_econ = float(p_econ["pv_economic_benefit"].sum())
+    tot_crashes_av = float(p_benefits["crashes_averted_total"].sum())
+    ksi_av = float(p_benefits["crashes_averted_k"].sum() + p_benefits["crashes_averted_a"].sum())
+
+    tier_type = "Diagnostic Stress" if "STR" in pid else ("Official (Binding)" if b_val == 15e6 else "Official (Nonbinding)")
+    display_label = f"{b_str} ({tier_type})"
+
+    tier_map[display_label] = {
+        "portfolio_id": pid,
+        "budget_usd": b_val,
+        "budget_str": b_str,
+        "tier_type": tier_type,
+        "n_sel": n_sel,
+        "c_cost": c_cost,
+        "pv_comp": pv_b,
+        "pv_econ": pv_econ,
+        "bcr_comp": p_bcr,
+        "crashes_averted": tot_crashes_av,
+        "ksi_averted": ksi_av,
+        "equity_share": eq_share,
+        "benefits_df": p_benefits,
+        "econ_df": p_econ,
+    }
+
+    progression_records.append({
+        "Budget Tier": b_str,
+        "Scenario Type": tier_type,
+        "Corridors Selected": n_sel,
+        "Corridor Coverage": f"{n_sel} of {total_corridors_count} ({n_sel/total_corridors_count*100:.0f}%)",
         "Total Capital Cost": format_currency(c_cost),
-        "Total PV Safety Benefit": format_currency(pv_b),
-        "Portfolio BCR": f"{p_bcr:.1f}",
-        "Budget Status": "BINDING (Constrained)",
+        "Comprehensive PV Benefit": format_currency(pv_b),
+        "Economic-Only PV Benefit": format_currency(pv_econ),
+        "Annual Crashes Averted": f"{tot_crashes_av:,.1f} / yr",
+        "Annual KSI Averted": f"{ksi_av:,.2f} / yr",
+        "Achieved Equity Share": f"{eq_share:.1f}%",
+        "Portfolio BCR (Comp)": f"{p_bcr:.1f} : 1",
     })
 
-# Add official tiers
-for _, row in sens_official.iterrows():
-    b_val = float(row["budget_usd"])
-    c_cost = float(row["selected_capital_cost"])
-    pv_b = float(row["total_present_value_benefit"])
-    p_bcr = float(row["portfolio_bcr"])
-    n_sel = int(row["selected_project_count"])
-    is_binding = b_val < 20000000.0
-    status_str = "BINDING (Default Recommended)" if b_val == 15000000.0 else "NONBINDING (Full Network Funded)"
-    sensitivity_rows.append({
-        "Planning Budget Tier": f"\\${int(b_val / 1e6)}M Official Planning",
-        "Corridors Selected": f"{n_sel} of {total_corridors_count}",
-        "Total Capital Cost": format_currency(c_cost),
-        "Total PV Safety Benefit": format_currency(pv_b),
-        "Portfolio BCR": f"{p_bcr:.1f}",
-        "Budget Status": status_str,
-    })
+df_prog = pd.DataFrame(progression_records)
 
-df_sens = pd.DataFrame(sensitivity_rows)
-st.dataframe(df_sens, use_container_width=True, hide_index=True)
+# Overview columns: Table on left, bar chart on right
+col_sens_tbl, col_sens_chart = st.columns([3, 2])
+
+with col_sens_tbl:
+    st.subheader("Corridors & Safety Return by Budget Tier")
+    st.dataframe(
+        df_prog[[
+            "Budget Tier", "Scenario Type", "Corridor Coverage", "Total Capital Cost",
+            "Comprehensive PV Benefit", "Annual KSI Averted", "Achieved Equity Share"
+        ]],
+        use_container_width=True,
+        hide_index=True,
+    )
+
+with col_sens_chart:
+    st.subheader("Corridors Selected by Budget")
+    df_chart = df_prog[["Budget Tier", "Corridors Selected"]].set_index("Budget Tier")
+    st.bar_chart(df_chart, height=220)
 
 st.info(
     "**Key Budget Finding**: Expanding the budget from **\\$15M** to **\\$25M** adds **\\$4.94M** in capital cost "
     "and funds the remaining **9 deferred corridors**, capturing an additional **\\$757M** in present-value safety benefits. "
     "Any budget above **\\$20.1M** funds 100% of the eligible 43-corridor network."
 )
+
+# Interactive Stress-Scenario Drilldown
+st.subheader("🔎 Interactive Budget Scenario Inspector")
+selected_tier_label = st.selectbox(
+    "Select Budget Scenario to Inspect:",
+    options=list(tier_map.keys()),
+    index=3,  # Default to $15M (Official Binding)
+    help="Select a budget level to inspect its specific portfolio trade-offs, selected corridor roster, and safety metrics."
+)
+
+sel_tier = tier_map[selected_tier_label]
+
+sc1, sc2, sc3, sc4, sc5 = st.columns(5)
+with sc1:
+    st.metric("Corridors Funded", f"{sel_tier['n_sel']} of {total_corridors_count}", f"{(sel_tier['n_sel']/total_corridors_count)*100:.1f}% of network")
+with sc2:
+    st.metric("Total Capital Cost", format_currency(sel_tier["c_cost"]), f"Budget: {sel_tier['budget_str']}")
+with sc3:
+    st.metric("PV Safety Benefit (Comp)", format_currency(sel_tier["pv_comp"]), f"BCR: {sel_tier['bcr_comp']:.1f} : 1")
+with sc4:
+    econ_bcr_val = sel_tier["pv_econ"] / sel_tier["c_cost"] if sel_tier["c_cost"] > 0 else 0.0
+    st.metric("PV Benefit (Economic-Only)", format_currency(sel_tier["pv_econ"]), f"Econ BCR: {econ_bcr_val:.1f} : 1")
+with sc5:
+    st.metric("Annual Crashes Averted", f"{sel_tier['crashes_averted']:,.1f} / yr", f"KSI: {sel_tier['ksi_averted']:.2f} / yr")
+
+# Display corridor roster table for this scenario
+st.markdown(f"**Selected Corridors for {selected_tier_label} ({sel_tier['n_sel']} Corridors):**")
+
+tier_sel_benefits = sel_tier["benefits_df"].copy()
+tier_sel_benefits["ksi_averted"] = tier_sel_benefits["crashes_averted_k"] + tier_sel_benefits["crashes_averted_a"]
+
+tier_roster = []
+for _, crow in tier_sel_benefits.iterrows():
+    cid = crow["corridor_id"]
+    cm = df_master[df_master["corridor_id"] == cid].iloc[0]
+    c_cost = float(crow["capital_project_cost"])
+    c_ksi = float(crow["ksi_averted"])
+    c_tot = float(crow["crashes_averted_total"])
+    c_bcr = float(crow["benefit_cost_ratio"])
+
+    is_eq = crow.get("equity_area_flag", False)
+    eq_str = "Yes" if (isinstance(is_eq, (bool, int)) and is_eq) else ("No" if isinstance(is_eq, (bool, int)) else str(is_eq))
+
+    cost_per_ksi_str = format_currency(c_cost / c_ksi) if c_ksi > 0 else "N/A"
+
+    tier_roster.append({
+        "Corridor ID": cid,
+        "Corridor Name": cm["corridor_name"],
+        "Treatment": crow["treatment_name"],
+        "Capital Cost": format_currency(c_cost),
+        "Benefit-Cost Ratio": f"{c_bcr:.1f}",
+        "Annual Total Crashes Averted": f"{c_tot:.2f} / yr",
+        "Annual KSI Averted": f"{c_ksi:.2f} / yr",
+        "Cost per KSI Averted": f"{cost_per_ksi_str} / KSI" if cost_per_ksi_str != "N/A" else "N/A",
+        "Equity Priority": eq_str,
+    })
+
+df_tier_roster = pd.DataFrame(tier_roster)
+st.dataframe(df_tier_roster, use_container_width=True, hide_index=True)
 
 # -----------------------------------------------------------------------------
 # Section 5 — Top Risks & Limitations
