@@ -5,6 +5,14 @@ Contract: docs/data_quality/decision_output_mart_contract.md
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Add repository root to sys.path so standalone scripts and Streamlit pages resolve dashboard namespace
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go

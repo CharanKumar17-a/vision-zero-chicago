@@ -20,7 +20,7 @@ Performs MILP portfolio optimization using scipy.optimize.milp:
    - B. BINDING-BUDGET STRESS TEST: BASE uncertainty x 3 budgets ($2M, $4M, $6M) x 3 equity floors (20%, 30%, 40%) = 9 runs.
 5. Output Datasets:
    - data/processed/portfolio_scenario_summary.parquet & .csv (36 summary rows)
-   - data/processed/portfolio_project_selections.parquet & .csv (1,410 detail rows)
+   - data/processed/portfolio_project_selections.parquet & .csv (1,212 detail rows across 36 scenarios)
 """
 
 from __future__ import annotations

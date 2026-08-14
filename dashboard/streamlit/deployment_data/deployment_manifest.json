@@ -1,7 +1,7 @@
 {
   "manifest_version": "1.0",
   "pipeline": "streamlit_public_community_cloud_deployment",
-  "generated_at_utc": "2026-08-13T18:07:19Z",
+  "generated_at_utc": "2026-08-13T18:41:59Z",
   "source_validation_run_id": "20260813T173351Z",
   "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
   "prohibited_data_included": false,
@@ -50,7 +50,7 @@
       ],
       "analytical_grain": "portfolio_id x 1 row (36 planning scenarios)",
       "sha256_checksum": "f5e3df5538c1999c4ab8d3fc45602c5c6ce0198ff333fd335497a3a687439b15",
-      "generated_at_utc": "2026-08-13T18:07:19Z",
+      "generated_at_utc": "2026-08-13T18:41:59Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Analyst-defined decision support scenarios under nonbinding planning budgets."
     },
@@ -84,9 +84,9 @@
         "selected_rank_by_benefit",
         "required_governance_labels"
       ],
-      "analytical_grain": "portfolio_id x corridor_id (1,410 selected treatment details)",
+      "analytical_grain": "portfolio_id x corridor_id (1,212 selected treatment details)",
       "sha256_checksum": "42a3364e33896b8d53ef5d3b84e287f8d0858de1d5c269c398fcfdade5d7ef41",
-      "generated_at_utc": "2026-08-13T18:07:19Z",
+      "generated_at_utc": "2026-08-13T18:41:59Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Provisional treatment selections subject to mandatory engineering field review."
     },
@@ -123,7 +123,7 @@
       ],
       "analytical_grain": "corridor_id x 1 row (43 high-crash corridors with WGS84 WKT linework)",
       "sha256_checksum": "99888f5fdd91c846f318eaf16d9ebbfae31737feb089fe8e5bca091001a5bd53",
-      "generated_at_utc": "2026-08-13T18:07:19Z",
+      "generated_at_utc": "2026-08-13T18:41:59Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Top 43 High-Crash Corridor boundaries with EPSG:4326 linework WKT."
     },
@@ -164,7 +164,7 @@
       ],
       "analytical_grain": "corridor_id x treatment_id x scenario_level (387 candidate treatment benefit rows)",
       "sha256_checksum": "84ca4ef72146053cd71b2b4f8e164171ec8460fa2874193e8dc0c9829c8688a8",
-      "generated_at_utc": "2026-08-13T18:07:19Z",
+      "generated_at_utc": "2026-08-13T18:41:59Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "CMF-based safety benefits and capital project cost estimates."
     }

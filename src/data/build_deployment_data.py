@@ -5,7 +5,7 @@ Decision: D022 (Public demonstration snapshot approval)
 
 Generates:
 1. dashboard/streamlit/deployment_data/portfolio_summary.csv (36 rows)
-2. dashboard/streamlit/deployment_data/project_selections.csv (1,410 rows)
+2. dashboard/streamlit/deployment_data/project_selections.csv (1,212 rows)
 3. dashboard/streamlit/deployment_data/corridor_master.csv (43 rows with WGS84 WKT geometry)
 4. dashboard/streamlit/deployment_data/treatment_benefits.csv (387 rows)
 5. dashboard/streamlit/deployment_data/deployment_manifest.json
@@ -123,7 +123,7 @@ def build_deployment_data() -> Dict[str, Any]:
             sel_csv_path,
             df_sel,
             "data/processed/power_bi_project_selections.parquet",
-            "portfolio_id x corridor_id (1,410 selected treatment details)",
+            "portfolio_id x corridor_id (1,212 selected treatment details)",
             "Provisional treatment selections subject to mandatory engineering field review.",
         ),
         (

@@ -1,5 +1,5 @@
 # Vision Zero Chicago — Road-Safety Investment Prioritization
-**Version:** 1.0 · **Date:** 2026-08-13
+**Version:** 1.1 · **Date:** 2026-08-13
 **Scope:** Independent capstone analysis aligned with the City of Chicago's
 Vision Zero framework. Not an official City product; does not approve or
 program projects. Final authority remains with City staff and engineering teams.
@@ -12,21 +12,24 @@ crash burden is likely highest across the 43 official high-crash corridors,
 (3) optimizes a project portfolio under budget and equity constraints, and
 (4) presents results in a deployed app with explicit governance reporting.
 
-Headline (BASE): .84B total present-value safety benefit on .38M
-provisional capital cost across 129 corridor-treatment candidates; portfolio
-average BCR ≈ 336:1 (individual up to 1,365 — planning-level, not expected
-returns); 41.9% of spend lands in equity-priority corridors automatically.
+Headline (BASE): $5.84B total present-value safety benefit on $26.75M
+sourced capital cost across 387 corridor-treatment candidates; portfolio
+average BCR ≈ 218:1; 47.4% of spend lands in equity-priority corridors automatically.
 
-Critical finding: all 43 corridors can be treated for ≈ .7–9.3M (BASE–
-CONSERVATIVE), below every official budget (//). Official budgets
-are NONBINDING; all 27 official runs select all 43 corridors. Real trade-offs
-appear in the analyst-defined binding stress scenarios (//).
+Critical finding: under sourced planning-level unit costs ($400k/mi Road Diet,
+$15k/island Refuge Island, $22.5k RRFB), full network treatment cost rises to
+$20.11M ($19.93M–$21.26M across scenarios). Consequently, the official **$15M
+planning budget is strictly BINDING** ($14.99M cost, selecting 34 projects in
+BASE scenario). Physical applicability screening (disqualifying Road Diets on
+divided carriageways like Lake Shore Drive HCC019) causes the solver to select
+Refuge Islands (`TRT_001`) for HCC019, introducing multi-treatment diversity.
 
 ## 2. Business Problem
 Decision question: which combination of corridor-level road-safety projects
 should be shortlisted for engineering review under a limited capital budget
 and an equity-spending requirement? Constraints modeled: budget ceiling,
-equity floor, at most one treatment per corridor. Responsible-use boundary:
+equity floor, at most one treatment per corridor, physical applicability screening,
+and candidate BCR >= 1.0 eligibility filter (D023). Responsible-use boundary:
 decision support only; does not replace engineering feasibility, community
 input, legal review, or final capital-program authority.
 
@@ -69,55 +72,46 @@ Western +10.6%) vs CBD drops (LaSalle -55.9%, State -46.3%, Wacker -33.6%);
 
 ## 6. Treatment Benefits and Economics
 387 candidate rows (43 corridors x 3 treatments x 3 uncertainty scenarios).
-Treatments: TRT_001 Refuge Islands, TRT_002 Road Diet, TRT_004 RRFB. CMFs
-from FHWA CMF Clearinghouse; USDOT/FHWA comprehensive crash costs; 3.0% real
-discount; 20-year useful life; severity-specific K/A/B/C/O/U shares.
-BASE totals (committed): PV benefit .84B; capital cost .38M; avg BCR
-335.9; max individual BCR 1,365.4. 53 rows exceed BCR 1,000 (BASE/OPTIMISTIC)
-- planning-level artifacts, not expected returns. Physical applicability
-UNKNOWN (no lane counts/median widths/crossing inventories); field review
-required. 100% of selected projects are Road Diet (TRT_002); TRT_001/004 never
-selected - flagged for treatment-diversity diagnostic.
+Sourced unit costs (docs/evidence/treatment_unit_costs_2024.csv):
+TRT_001 Refuge Islands ($15k/island, 2/mi density), TRT_002 Road Diet ($400k/mi),
+TRT_004 RRFB ($22.5k/crossing). CMFs from FHWA CMF Clearinghouse; USDOT/FHWA
+comprehensive crash costs; 3.0% real discount; 20-year useful life; severity-specific K/A/B/C/O/U shares.
+BASE totals (committed): PV benefit $5.84B; capital cost $26.75M; avg BCR
+218:1. Candidate BCR >= 1.0 eligibility filter applied (D023). Physical applicability
+screening marks TRT_002 NOT_APPLICABLE on divided carriageway MultiLineString
+corridor HCC019 (Lake Shore Drive) (D024).
 
 ## 7. Portfolio Optimization
 MILP (scipy.optimize.milp); objective = maximize total present-value benefit;
-constraints = budget ceiling, equity floor, at most 1 treatment/corridor,
-at least 1 project; repeat-solve determinism verified (3x identical). 36 runs
-= 27 official (// x 20/30/40% x 3 uncertainty) + 9 binding stress
-(//). Outputs: 36 summary rows; 1,410 selection rows; exact
+constraints = budget ceiling, equity floor, candidate BCR >= 1.0 eligibility, physical applicability,
+at most 1 treatment/corridor, at least 1 project; repeat-solve determinism verified (3x identical).
+36 runs = 27 official ($15M/$25M/$40M x 20/30/40% x 3 uncertainty) + 9 binding stress
+($2M/$4M/$6M). Outputs: 36 summary rows; 1,212 selection rows; exact
 summary-to-detail reconciliation; exact lineage; all OPTIMAL.
-Verified tier structure (BASE stress): 14 core corridors at  (BCR >= 850;
-equity share 56.1%), 29 at  (57.8%), 40 at  (43.0%); 3 high-budget-only
-corridors (Broadway, Western, Clark; BCRs 379-442) above  to the .31M
-all-43 ceiling. Equity floors never bind (achieved 43-58% > all floors)
-because high-BCR corridors naturally overlap high-SVI areas.
-Honest limitations: official budgets nonbinding (all-43, 1 hash); equity
-floors nonbinding; 100% Road-Diet concentration; BCR >= 1.0 eligibility filter
-not applied (documented); stress budgets are analyst-defined, not City budgets.
+Binding $15M official planning budget selects 34 projects in BASE scenario ($14.99M cost,
+$11.1k slack), leaving 9 corridors unselected. $25M and $40M budget ceilings allow network coverage.
+Equity floors never bind (achieved 43-58% > all floors) because high-BCR corridors
+naturally overlap high-SVI areas. Selection diversity introduced via TRT_001 selection on HCC019.
 
 ## 8. Validation and Governance
-297 tests passed (full pytest -q), 0 Git side effects; 11-gate verifier PASS.
-Committed validation reports (PASS/PASS_WITH_WARNINGS, run IDs): crash core
-20260809T162130Z; register 20260810T103635Z; geometry 20260810T120855Z;
-treatment benefits 20260812T082144Z; optimization 20260812T104902Z;
-decision mart 20260812T111723Z. Deployment served from checksum-verified
-snapshots; three data modes. Decision log and assumption register maintained.
-Final authority: City staff and engineering teams.
+300 tests passed (full pytest -q), 0 Git side effects; 14-gate verifier PASS.
+Committed validation reports (PASS/PASS_WITH_WARNINGS): crash core, corridor register,
+corridor geometry, treatment benefits, portfolio optimization, decision mart, Streamlit dashboard.
+Deployment served from checksum-verified snapshots; three data modes. Decision log (D001–D024)
+and assumption register maintained. Final authority: City staff and engineering teams.
 
 ## 9. Known Limitations
-1. Official budgets nonbinding - official scenarios all identical; binding
-   behavior only in stress runs.
-2. Physical applicability UNKNOWN (no lane counts/median widths/crossing
-   inventories); engineering field survey required.
-3. 100% Road Diet selections; TRT_001/004 not selected (diagnostic pending).
-4. Extreme BCRs are planning-level artifacts; not expected returns.
-5. Equity uses CDC/ATSDR SVI as project-defined planning proxy, not Chicago's
+1. Sourced unit costs are planning-level estimates; actual construction costs
+   depend on site-specific ROW, drainage, and utility work.
+2. Physical applicability screening is active for divided carriageways (`HCC019`);
+   detailed field engineering survey required prior to project programming.
+3. Extreme BCRs are planning-level artifacts; not expected returns.
+4. Equity uses CDC/ATSDR SVI as project-defined planning proxy, not Chicago's
    official equity rule.
-6. Forecasts are of recorded crash burden; no exposure (traffic volume) data.
-7. BCR < 1.0 eligibility exclusion not applied in the optimizer.
-8. 2026 outputs are a retrospective planning simulation; not observed 2026.
+5. Forecasts are of recorded crash burden; no exposure (traffic volume) data.
+6. 2026 outputs are a retrospective planning simulation; not observed 2026.
 
 ## 10. Sources of Every Number
 All figures trace to committed files under docs/data_quality/ (run IDs above),
-data/processed/*.parquet, notebooks/01,02,03,05, and python -m pytest -q
-(297 passed, 2026-08-13).
+data/processed/*.parquet, notebooks/01,02,03,05,08, and python -m pytest -q
+(300 passed, 2026-08-14).

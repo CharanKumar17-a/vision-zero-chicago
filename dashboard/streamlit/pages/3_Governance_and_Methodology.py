@@ -5,6 +5,14 @@ Contract: docs/data_quality/decision_output_mart_contract.md
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Add repository root to sys.path so standalone scripts and Streamlit pages resolve dashboard namespace
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 import pandas as pd
 import streamlit as st
 
@@ -83,7 +91,7 @@ st.markdown("""
 
 ### Analytical Grains & Lineage
 - **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 runs total: 27 Official, 9 Stress).
-- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,410 detail rows).
+- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,212 detail rows across 36 runs).
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
 
@@ -91,7 +99,7 @@ st.markdown("""
 - **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
 
 ### Scenario Definitions
-- **OFFICIAL (27 runs)**: Scenarios evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official budgets and equity floors are nonbinding (`NONBINDING_CORRIDOR_CEILING` and `SLACK`).
+- **OFFICIAL (27 runs)**: Scenarios evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official $15M planning budgets bind strictly under realistic unit costs ($14.99M cost, selecting 34 corridors in BASE scenario), while $25M and $40M budget ceilings allow network-wide coverage.
 - **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating $2M, $4M, and $6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 ### Model Horizon & Threshold Policy

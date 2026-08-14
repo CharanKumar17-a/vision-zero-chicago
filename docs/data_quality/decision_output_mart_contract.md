@@ -24,10 +24,10 @@ The Phase 5A Decision-Output Mart serves as the single source of truth for Visio
   - `is_default_dashboard_portfolio`: Boolean flag marking `PORT_OFF_BASE_B15M_EQ20` as the default executive dashboard selection.
 
 ### B. `fact_portfolio_project_selections` (`vw_power_bi_project_selections`)
-- **Analytical Grain**: `portfolio_id` × `corridor_id` (1,410 detail rows across 36 portfolios).
+- **Analytical Grain**: `portfolio_id` × `corridor_id` (1,212 detail rows across 36 portfolios).
 - **Primary Key**: `(portfolio_id, corridor_id)`
 - **Governed Fields**:
-  - `portfolio_id`, `corridor_id`, `corridor_name`, `treatment_id`, `treatment_name`, `uncertainty_scenario`, `capital_project_cost`, `present_value_benefit`, `net_present_benefit`, `benefit_cost_ratio`, `equity_area_flag`, `physical_applicability_status` (`UNKNOWN`), `evidence_status`, `selected_rank_by_benefit`, `required_governance_labels`, `run_group`, `scenario_level`, `budget_usd`, `equity_floor`, `selection_hash`, `portfolio_equivalence_group`, `is_canonical_portfolio`, `is_default_dashboard_portfolio`.
+  - `portfolio_id`, `corridor_id`, `corridor_name`, `treatment_id`, `treatment_name`, `uncertainty_scenario`, `capital_project_cost`, `present_value_benefit`, `net_present_benefit`, `benefit_cost_ratio`, `equity_area_flag`, `physical_applicability_status` (`APPLICABLE` / `NOT_APPLICABLE`), `evidence_status`, `selected_rank_by_benefit`, `required_governance_labels`, `run_group`, `scenario_level`, `budget_usd`, `equity_floor`, `selection_hash`, `portfolio_equivalence_group`, `is_canonical_portfolio`, `is_default_dashboard_portfolio`.
 
 ### C. `dim_corridor_master` (`vw_power_bi_corridor_master`)
 - **Analytical Grain**: `corridor_id` × 1 row (43 high-crash corridor rows).
@@ -46,7 +46,7 @@ The Phase 5A Decision-Output Mart serves as the single source of truth for Visio
 - **`dim_corridor_master` to `fact_portfolio_project_selections`**: **1-to-Many** (`corridor_id`).
 - **`fact_portfolio_scenario_summary` to `fact_portfolio_project_selections`**: **1-to-Many** (`portfolio_id`).
 - **`fact_corridor_treatment_benefits` to `fact_portfolio_project_selections`**: **1-to-Many** (`corridor_id, treatment_id, uncertainty_scenario`).
-  - *Lineage Rule*: Phase 4B candidate panel contains 387 unique candidate rows. Phase 5A project selections contain 1,410 detail rows. Each selection row joins back 100% to exactly 1 candidate row with 0 unmatched rows and 0 join expansion. Candidate project reuse across multiple `portfolio_id` runs is expected and valid.
+  - *Lineage Rule*: Phase 4B candidate panel contains 387 unique candidate rows. Phase 5A project selections contain 1,212 detail rows. Each selection row joins back 100% to exactly 1 candidate row with 0 unmatched rows and 0 join expansion. Candidate project reuse across multiple `portfolio_id` runs is expected and valid.
 
 ---
 
