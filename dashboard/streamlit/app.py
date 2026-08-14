@@ -25,7 +25,8 @@ st.set_page_config(
 PAGES_DIR = Path(__file__).parent / "pages"
 
 pages = [
-    st.Page(str(PAGES_DIR / "1_Portfolio_Overview.py"), title="Portfolio Overview", icon="📊", default=True),
+    st.Page(str(PAGES_DIR / "0_Executive_Recommendation.py"), title="Executive Recommendation", icon="🎯", default=True),
+    st.Page(str(PAGES_DIR / "1_Portfolio_Overview.py"), title="Portfolio Overview", icon="📊"),
     st.Page(str(PAGES_DIR / "2_Corridor_Explorer.py"), title="Corridor Explorer", icon="🗺️"),
     st.Page(str(PAGES_DIR / "3_Governance_and_Methodology.py"), title="Governance & Methodology", icon="📜"),
 ]
