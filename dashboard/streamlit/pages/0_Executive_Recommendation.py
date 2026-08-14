@@ -167,6 +167,13 @@ for cid in unselected_ids:
     best_cand = c_cands.sort_values("benefit_cost_ratio", ascending=False).iloc[0]
     c_master = df_master[df_master["corridor_id"] == cid].iloc[0]
     
+    cand_cost = float(best_cand["capital_project_cost"])
+    cand_ksi_averted = float(best_cand["crashes_averted_k"] + best_cand["crashes_averted_a"])
+    cand_tot_averted = float(best_cand["crashes_averted_total"])
+    
+    cost_per_ksi_str = format_currency(cand_cost / cand_ksi_averted) if cand_ksi_averted > 0 else "N/A"
+    cost_per_crash_str = format_currency(cand_cost / cand_tot_averted) if cand_tot_averted > 0 else "N/A"
+
     is_equity = best_cand.get("equity_area_flag", False)
     if isinstance(is_equity, (bool, int)):
         equity_str = "Yes" if is_equity else "No"
@@ -177,7 +184,9 @@ for cid in unselected_ids:
         "Corridor ID": cid,
         "Corridor Name": c_master["corridor_name"],
         "Best Applicable Treatment": best_cand["treatment_name"],
-        "Estimated Capital Cost": format_currency(float(best_cand["capital_project_cost"])),
+        "Estimated Capital Cost": format_currency(cand_cost),
+        "Cost per KSI Averted": f"{cost_per_ksi_str} / KSI" if cost_per_ksi_str != "N/A" else "N/A",
+        "Cost per Crash Averted": f"{cost_per_crash_str} / crash" if cost_per_crash_str != "N/A" else "N/A",
         "Benefit-Cost Ratio (BCR)": f"{float(best_cand['benefit_cost_ratio']):.1f}",
         "PV Safety Benefit": format_currency(float(best_cand["present_value_benefit"])),
         "Equity Priority Area": equity_str,
@@ -193,6 +202,10 @@ st.markdown(
 )
 
 st.dataframe(df_deferred, use_container_width=True, hide_index=True)
+st.caption(
+    "Lower cost per KSI averted = more efficient at preventing the most severe crashes. "
+    "These are planning-level estimates pending engineering review."
+)
 
 # -----------------------------------------------------------------------------
 # Section 4 — Sensitivity to Budget

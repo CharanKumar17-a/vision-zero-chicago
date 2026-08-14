@@ -181,7 +181,14 @@ selected_cid = st.selectbox(
 c_row = df_sel_benefits[df_sel_benefits["corridor_id"] == selected_cid].iloc[0]
 m_row = df_master[df_master["corridor_id"] == selected_cid].iloc[0]
 
-ic1, ic2, ic3 = st.columns(3)
+# Compute corridor efficiency metrics
+c_cost = float(c_row["capital_project_cost"])
+c_ksi_averted = float(c_row["crashes_averted_k"] + c_row["crashes_averted_a"])
+c_tot_averted = float(c_row["crashes_averted_total"])
+cost_per_ksi_str = format_currency(c_cost / c_ksi_averted) if c_ksi_averted > 0 else "N/A"
+cost_per_crash_str = format_currency(c_cost / c_tot_averted) if c_tot_averted > 0 else "N/A"
+
+ic1, ic2, ic3, ic4 = st.columns(4)
 with ic1:
     st.markdown(f"**Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
     st.markdown(f"**Length:** {m_row['spatial_total_length_miles']:.2f} miles")
@@ -193,10 +200,18 @@ with ic2:
 with ic3:
     st.markdown(f"**Recommended Treatment:** {c_row['treatment_name']}")
     st.markdown(f"**Provisional Capital Cost:** {format_currency(c_row['capital_project_cost'])}")
-    st.markdown(f"**Annual Crashes Averted:** {c_row['crashes_averted_total']:.2f} / yr (K: {c_row['crashes_averted_k']:.2f}, A: {c_row['crashes_averted_a']:.2f})")
     st.markdown(f"**Physical Applicability:** `:orange[{c_row['physical_applicability_status']} - Review Required]`")
+with ic4:
+    st.markdown(f"**Annual Crashes Averted:** {c_tot_averted:.2f} / yr (KSI: {c_ksi_averted:.2f})")
+    st.markdown(f"**Cost per KSI Averted:** {cost_per_ksi_str} / KSI" if cost_per_ksi_str != "N/A" else "**Cost per KSI Averted:** N/A")
+    st.markdown(f"**Cost per Crash Averted:** {cost_per_crash_str} / crash" if cost_per_crash_str != "N/A" else "**Cost per Crash Averted:** N/A")
 
-st.caption("Note on crash figures: Expected values from the forecast model — not predictions of any individual crash event. BCR figures reflect planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns.")
+st.caption(
+    "Lower cost per KSI averted = more efficient at preventing the most severe crashes. "
+    "These are planning-level estimates pending engineering review. "
+    "Note on crash figures: Expected values from the forecast model — not predictions of any individual crash event. "
+    "BCR figures reflect planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns."
+)
 
 st.markdown("---")
 st.subheader("Selected Projects Detail Table & Export")
@@ -216,12 +231,18 @@ df_export = df_sel_benefits[[
     "physical_applicability_status",
 ]].copy()
 
+df_export["ksi_averted"] = df_export["crashes_averted_k"] + df_export["crashes_averted_a"]
+df_export["cost_per_ksi_averted"] = df_export["capital_project_cost"] / df_export["ksi_averted"].replace(0, float("nan"))
+df_export["cost_per_crash_averted"] = df_export["capital_project_cost"] / df_export["crashes_averted_total"].replace(0, float("nan"))
+
 st.dataframe(
     df_export.style.format({
         "capital_project_cost": "${:,.0f}",
         "crashes_averted_total": "{:,.2f}",
         "crashes_averted_k": "{:,.2f}",
         "crashes_averted_a": "{:,.2f}",
+        "cost_per_ksi_averted": "${:,.0f}",
+        "cost_per_crash_averted": "${:,.0f}",
     }),
     use_container_width=True,
     height=300,
