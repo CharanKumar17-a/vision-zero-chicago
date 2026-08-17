@@ -1,129 +1,66 @@
 # Vision Zero Chicago — Road-Safety Investment Prioritization
-**Version:** 1.1 · **Date:** 2026-08-13
-**Scope:** Independent capstone analysis aligned with the City of Chicago's
-Vision Zero framework. Not an official City product; does not approve or
-program projects. Final authority remains with City staff and engineering teams.
+Version: 1.2 · Date: 2026-08-17
+Scope: Independent capstone analysis aligned with the City of Chicago's Vision Zero framework. Not an official City product; does not approve or program projects. Final authority remains with City staff and engineering teams.
 
-## 1. Executive Summary
-Chicago cannot fund every high-crash corridor at once. This project builds a
-transparent decision-support system that (1) forecasts where future recorded
-crash burden is likely highest across the 43 official high-crash corridors,
-(2) estimates safety benefits of applicable treatments using FHWA CMFs,
-(3) optimizes a project portfolio under budget and equity constraints, and
-(4) presents results in a deployed app with explicit governance reporting.
+1. Executive Summary
+Chicago cannot fund every high-crash corridor at once. This project builds a transparent decision-support system that (1) forecasts where future recorded crash burden is likely highest across the 43 official high-crash corridors, (2) estimates the safety benefits of applicable treatments using FHWA Crash Modification Factors (CMFs), (3) optimizes a project portfolio under budget and equity constraints, and (4) presents results in a deployed interactive application with explicit governance and limitation reporting.
 
-Headline (BASE): $5.84B total present-value safety benefit on $26.75M
-sourced capital cost across 387 corridor-treatment candidates; portfolio
-average BCR now ≈ 289:1 (TRT_002), 171:1 (TRT_001), 92:1 (TRT_004) — planning-level,
-not expected returns; 47.4% of spend lands in equity-priority corridors automatically.
+Headline results (BASE uncertainty scenario):
 
-Critical finding: under sourced planning-level unit costs ($400k/mi Road Diet,
-$15k/island Refuge Island, $22.5k RRFB; D024), full 43-corridor network treatment cost
-is approx. $20.1M (BASE) ($15.93M–$21.26M across scenarios). Consequently, the official **$15M
-planning budget is strictly BINDING** (selects ~34 of 43 corridors in BASE at $14.99M cost);
-$25M and $40M remain nonbinding (all eligible corridors fit). Physical applicability
-screening (disqualifying Road Diets on divided carriageways like Lake Shore Drive HCC019)
-causes the solver to select Refuge Islands (`TRT_001`) for HCC019, introducing multi-treatment diversity.
+Total present-value safety benefit $6.55B on $26.75M provisional capital cost across 387 corridor-treatment candidate rows (43 corridors × 3 treatments × 3 scenarios).
+Portfolio selection detail: 1,362 rows across 36 scenarios; 42 of 43 corridors funded at the $15M planning budget (cost ≈ $14.99M, budget binds).
+Treatment diversity: pedestrian treatments (Refuge Islands TRT_001, RRFB TRT_004) are now valued with pedestrian-specific KSI severity and are selected in portfolios — no longer a 100% Road Diet concentration.
+Equity: spending lands 43–58% in high-SVI equity-priority areas across scenarios, satisfying all tested floors without constraint pressure.
+Critical findings on scenario design:
 
-## 2. Business Problem
-Decision question: which combination of corridor-level road-safety projects
-should be shortlisted for engineering review under a limited capital budget
-and an equity-spending requirement? Constraints modeled: budget ceiling,
-equity floor, at most one treatment per corridor, physical applicability screening,
-and candidate BCR >= 1.0 eligibility filter (D023). Responsible-use boundary:
-decision support only; does not replace engineering feasibility, community
-input, legal review, or final capital-program authority.
+Under sourced planning-level costs (D024), the full 43-corridor network costs ≈ $20–27M depending on scenario. The $15M planning budget is BINDING (selects ~42 corridors in BASE); $25M and $40M remain nonbinding.
+A methodological audit (2026-08-17) identified and corrected a severity-allocation issue: pedestrian treatments previously used the all-crash KSI share (~2%) instead of the pedestrian-specific KSI share (~17.5%), understating pedestrian fatal/serious-injury benefits ~8×. Corrected in this version; all downstream outputs regenerated.
+2. Business Problem
+Decision question: which combination of corridor-level road-safety projects should be shortlisted for engineering review under a limited capital budget and an equity-spending requirement?
 
-## 3. Data Foundation (verified)
-- Clean crash core: 877,919 rows; 0 missing/dup keys; 0 invalid dates;
-  valid-coordinate coverage 99.19% (7,150 invalid, preserved).
-- Spatially eligible crashes: 870,769.
-- Corridor register: 43 corridors (HCC001–HCC043).
-- Corridor geometry: 43 valid geometries, EPSG:3435; 3 governed exceptions
-  (Lake Shore Drive, Fairbanks, Wacker); 42 LineString + 1 MultiLineString.
-- Street centerlines: 56,338 features; 99.996% valid coverage.
+Constraints modeled: budget ceiling; minimum equity-spending floor; at most one treatment per corridor; BCR ≥ 1.0 candidate eligibility (D023).
 
-## 4. Crash-to-Corridor Assignment
-100-ft threshold (internal modeling decision, not City policy). 114,224 unique
-crashes matched (13.1%); 8,132 multiple-candidate; 1,803 ties at 10-ft
-(excluded as unresolved_tie). Valid coordinates required; nearest candidate is
-primary; at most one primary corridor per crash; unmatched/invalid preserved
-and reported; no double-counting. Sensitivity rationale: 50 ft too restrictive
-(104,750 matched); 100 ft adds 9,474 with modest ambiguity rise (5.5% to 7.1%);
-quality deteriorates beyond 100 ft.
+Responsible-use boundary: the system supports decision-making; it does not replace engineering feasibility, community input, legal review, or final capital-program authority.
 
-## 5. Panel, Features, Forecasting
-4,128-row corridor-month panel (43 x 96 months, 2018-2025); zero-filled;
-no partial 2026 in modeling. Time-safe split: 2018 warm-up / 2019-23 train /
-2024 val / 2025 test; chronological only; leakage audit clean.
-Production forecast: 516 corridor-month 2026 predictions (43 x 12) with
-Beta-Binomial shrinkage and Empirical-Bayes KSI calibration.
-Selected production models: total_crashes = 12-month rolling-mean benchmark
-(selected on 2024 validation deviance over Poisson/NegBin GLMs - reported
-honestly, not overstated as ML forecast); ksi_crashes = Negative Binomial GLM
-+ EB calibration. Feature importance (KSI): total-crash lags/roll means
-dominate over sparse KSI lags (KSI 61.6% zero-month); month_cos most
-significant (p=0.0046).
-EDA (notebook 01): 112,421 total / 2,297 KSI crashes; July peak; top-3
-corridors Lake Shore Drive 7,702 / Michigan 6,449 / Fullerton 6,014 (~18%);
-top-15 = 57.1%; severity mix O 82.8 / B 9.7 / C 5.5 / A 1.9 / K 0.12%.
-Trends (notebook 02): 32 decreasing, 9 stable, 2 increasing (Chicago +10.9%,
-Western +10.6%) vs CBD drops (LaSalle -55.9%, State -46.3%, Wacker -33.6%);
-14 3-sigma anomaly months across 13 corridors.
+3. Data Foundation (verified)
+Clean crash core: 877,919 rows; 0 missing/dup keys; 0 invalid dates; valid-coordinate coverage 99.19% (7,150 invalid, preserved).
+Spatially eligible crashes: 870,769.
+Corridor register: 43 corridors (HCC001–HCC043), official Vision Zero framework.
+Corridor geometry: 43 valid geometries, EPSG:3435; 42 LineString + 1 MultiLineString; 3 governed exceptions (Lake Shore Drive, Fairbanks, Wacker).
+Street centerlines: 56,338 features; 99.996% valid coverage.
+4. Crash-to-Corridor Assignment
+100-ft threshold (internal modeling decision, not City policy). 114,224 unique crashes matched (13.1%); 8,132 multiple-candidate; 1,803 ties at 10-ft (excluded as unresolved_tie). Valid coordinates required; nearest candidate is primary; at most one primary corridor per crash; unmatched/invalid preserved and reported; no double-counting. Sensitivity rationale: 50 ft too restrictive (104,750 matched); 100 ft adds 9,474 with modest ambiguity rise (5.5%→7.1%); quality deteriorates beyond 100 ft.
 
-## 6. Treatment Benefits and Economics
-387 candidate rows (43 corridors x 3 treatments x 3 uncertainty scenarios).
-Sourced unit costs (D024, docs/evidence/treatment_unit_costs_2024.csv):
-TRT_001 Refuge Islands ($15k/island, 2/mi density), TRT_002 Road Diet ($400k/mi),
-TRT_004 RRFB ($22.5k/crossing). CMFs from FHWA CMF Clearinghouse; USDOT/FHWA
-comprehensive crash costs; 3.0% real discount; 20-year useful life; severity-specific K/A/B/C/O/U shares.
-BASE totals (committed): PV benefit $5.84B; capital cost $26.75M; mean BCRs:
-TRT_002 ≈ 289 (264:1 candidate mean), TRT_001 ≈ 171 (170:1 candidate mean), TRT_004 ≈ 92 (76:1 candidate mean).
-Candidate BCR >= 1.0 eligibility filter (D023) applied; 0 candidate rows excluded (all candidate BCRs >= 1.0).
-Selection is no longer 100% Road Diet: physical applicability screening marks TRT_002 NOT_APPLICABLE on divided
-carriageway MultiLineString corridor HCC019 (Lake Shore Drive), leading to TRT_001 selection there (D024).
-
-## 7. Portfolio Optimization
-MILP (scipy.optimize.milp); objective = maximize total present-value benefit;
-constraints = budget ceiling, equity floor, candidate BCR >= 1.0 eligibility, physical applicability,
-at most 1 treatment/corridor, at least 1 project; repeat-solve determinism verified (3x identical).
-36 runs = 27 official ($15M/$25M/$40M x 20/30/40% x 3 uncertainty) + 9 binding stress
-($2M/$4M/$6M). Outputs: 36 summary rows; 1,212 selection rows (was 1,410); exact
-summary-to-detail reconciliation; exact lineage; all OPTIMAL.
-The $15M official planning budget now BINDS: selects ~34 corridors (BASE, cost $14.99M, slack $11.1k),
-40 corridors (CONSERVATIVE, cost $14.99M, slack $7.5k), and 35 corridors (OPTIMISTIC, cost $14.98M, slack $19.8k).
-$25M and $40M budget ceilings remain nonbinding (all eligible corridors fit).
-Stress tiers maintain the core concept: 14, 29, and 40 core corridors selected at $2M, $4M, and $6M.
-Equity floors never bind (achieved 43-58% > all floors) because high-BCR corridors
-naturally overlap high-SVI areas. Selection diversity is introduced via TRT_001 selection on HCC019.
-
-## 8. Validation and Governance
-300 tests passed (full pytest -q), 0 Git side effects; 14-gate verifier PASS.
-Committed validation reports (PASS/PASS_WITH_WARNINGS):
-- Treatment benefits: run_id=20260813T184150Z
-- Portfolio optimization: run_id=20260813T184156Z (and 20260813T173316Z from GB1)
-- SQL analytics mart: run_id=20260813T184158Z
-- Streamlit dashboard: run_id=20260813T184201Z / 20260813T184858Z
-- Crash core, corridor register, corridor geometry, decision mart validation runs.
-Deployment served from checksum-verified snapshots; three data modes. Decision log through D024
-and assumption register maintained. Final authority: City staff and engineering teams.
-Hindsight backtest (notebook 09) demonstrates robust generalization: total-crash calibration
-ratio of 0.984 (2024 validation) and 1.030 (2025 test) with 2-year aggregate bias of +0.68%;
-KSI EB-calibrated ratio of 1.000 (2024) and 0.917 (2025).
-
-## 9. Known Limitations
-1. Sourced unit costs are planning-level estimates; actual construction costs
-   depend on site-specific ROW, drainage, and utility work.
-2. Physical applicability screening is active for divided carriageways (`HCC019`);
-   detailed field engineering survey required prior to project programming.
-3. Extreme BCRs are planning-level artifacts; not expected returns.
-4. Equity uses CDC/ATSDR SVI as project-defined planning proxy, not Chicago's
-   official equity rule.
-5. Forecasts are of recorded crash burden; no exposure (traffic volume) data.
-6. 2026 outputs are a retrospective planning simulation; not observed 2026.
-
-## 10. Sources of Every Number
-All figures trace to committed files under docs/data_quality/ (run IDs above),
-docs/evidence/treatment_unit_costs_2024.csv, data/processed/*.parquet,
-notebooks/01,02,03,05,08,09 (09_hindsight_backtest.ipynb), and python -m pytest -q
-(300 passed, 2026-08-14).
+5. Panel, Features, Forecasting
+4,128-row corridor-month panel (43 × 96 months, 2018–2025); zero-filled; no partial 2026 in modeling.
+Time-safe split: 2018 warm-up / 2019–23 train / 2024 validation / 2025 test; chronological only; leakage audit clean.
+Production forecast: 516 corridor-month 2026 predictions (43 × 12) with Beta-Binomial shrinkage and Empirical-Bayes KSI calibration.
+Selected production models: total_crashes = 12-month rolling-mean benchmark (selected on 2024 validation Poisson deviance over GLMs — reported honestly, not overstated as ML forecast); ksi_crashes = Negative Binomial GLM + EB calibration. KSI is 61.6% zero-month; historical total-crash lags and annual seasonality dominate feature importance.
+Hindsight backtest (notebook 09): total-crash calibration 0.984 (2024) / 1.030 (2025), 2-year aggregate bias +0.68%; KSI EB-calibrated 1.000 / 0.917. The forecast generalizes to held-out years.
+6. Treatment Benefits and Economics
+387 candidate rows (43 corridors × 3 treatments × 3 uncertainty scenarios). Treatments: TRT_001 Refuge Islands, TRT_002 Road Diet, TRT_004 RRFB.
+CMFs from FHWA CMF Clearinghouse; USDOT/FHWA comprehensive crash costs; 3.0% real discount rate (approved decision D021; config aligned); 20-yr useful life (TRT_001/002), 10-yr (TRT_004); severity-specific K/A/B/C/O/U shares.
+Severity allocation (corrected 2026-08-17): pedestrian treatments use pedestrian-specific KSI shares (~17.5%); total-crash treatments use all-crash shares (~2%). This corrects an ~8× understatement of pedestrian K/A benefits.
+BASE totals (verified run 20260817T145547Z): PV benefit $6.55B; capital cost $26.75M; net PV benefit $6.52B. Portfolio-average BCR ≈ 245:1 comprehensive / ≈ 34:1 economic-only (planning-level, not expected City returns).
+Physical applicability: default UNKNOWN (governance-consistent); TRT_002 explicitly NOT_APPLICABLE on divided carriageways (HCC019 Lake Shore Drive) → TRT_001 selected there. Engineering field review required before programming.
+7. Portfolio Optimization
+MILP (scipy.optimize.milp); objective = maximize total present-value benefit; constraints = budget ceiling, equity floor, ≤1 treatment/corridor, ≥1 project, BCR ≥ 1.0 eligibility (D023); repeat-solve determinism verified (3× identical).
+36 runs = 27 official ($15M/$25M/$40M × 20/30/40% equity × 3 uncertainty) + 9 binding stress ($2M/$4M/$6M).
+Outputs (run 20260817T145559Z): 36 summary rows; 1,362 selection rows; exact summary↔detail reconciliation; exact lineage; all OPTIMAL.
+Verified selection tiers (BASE): $2M → 16 corridors, $4M → 24, $6M → 30, $15M → 42 (binding), $25M/$40M → all eligible. Equity floors never bind (achieved 43–58% > all floors).
+Honest limitations: $15M binds but $25M/$40M are nonbinding; equity floors slack; planning-level costs; stress budgets are analyst-defined, not City budgets.
+8. Validation and Governance
+301 tests passed (full pytest -q, 2026-08-17), 0 Git side effects; 11-gate verifier PASS.
+Committed validation reports (PASS_WITH_WARNINGS), run IDs: treatment benefits 20260817T145547Z; optimization 20260817T145559Z; decision mart 20260817T145601Z / 150635Z; dashboard 20260817T145605Z.
+Decision log through D025 (config discount reconciliation to approved 3%); assumption register maintained; deployment served from checksum-verified snapshots (1,362 selections).
+Final authority: City staff and engineering teams.
+9. Known Limitations
+$15M binds; $25M/$40M nonbinding (all eligible corridors fit) — real trade-offs shown in stress tiers.
+Physical applicability UNKNOWN (no lane counts/median widths/crossing inventories); engineering field survey required.
+BCRs are planning-level (provisional costs + comprehensive crash costs); not expected City returns; economic-only view provided for a conservative estimate.
+Equity uses CDC/ATSDR SVI as a project-defined planning proxy, not Chicago's official equity rule.
+Forecasts are of recorded crash burden; no exposure (traffic volume) data; not exposure-adjusted risk.
+2026 outputs are a retrospective planning simulation (source records can be amended); not observed 2026 outcomes.
+Road Diet remains the dominant selected treatment on applicable corridors (all-crash target scope); pedestrian treatments now competitive and selected where applicable.
+10. Sources of Every Number
+All figures trace to committed files: docs/data_quality/*_validation.json (run IDs above), data/processed/*.parquet (benefits, summary, selections), dashboard/streamlit/deployment_data/ snapshots, notebooks 01–09 (incl. hindsight backtest), and python -m pytest -q (301 passed, 2026-08-17). Decision log D001–D025; evidence tables under docs/evidence/ (CMF matrix, unit costs 2024).
