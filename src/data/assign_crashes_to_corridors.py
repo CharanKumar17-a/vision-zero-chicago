@@ -1,4 +1,6 @@
-﻿"""Spatial-indexed crash-to-corridor candidate generation.
+"""Spatial-indexed crash-to-corridor candidate generation.
+
+Spatial indexing library imported by src/data/build_crash_corridor_assignments.py.
 
 Contract: docs/data_quality/spatial_assignment_contract.md
 Config:   config/spatial.yml

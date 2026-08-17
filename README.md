@@ -75,18 +75,25 @@ Scenarios are planning tools. They are not official City of Chicago budget commi
 
 ## Repository Structure
 
-- `config/` — project settings and modeling parameters
-- `data/raw/` — immutable source extracts (never modified)
-- `data/interim/` — intermediate transformations
-- `data/processed/` — validated analytical datasets
-- `docs/` — decision log, assumptions, evidence and quality reports
-- `notebooks/` — reproducible exploratory analysis
-- `src/` — production Python code
-- `tests/` — automated validation suite
-- `outputs/` — generated tables, forecasts, figures and logs
-- `dashboard/` — Power BI and Streamlit decision-support interface
-- `automation/` — pipeline scheduling and refresh scripts
-- `reports/` — final technical and stakeholder reports
+- `config/` — Project configurations, spatial thresholds, CMF parameters, and cleaning rules
+- `data/` — Data pipeline storage (immutable `raw/`, staged `interim/`, validated `processed/`)
+- `docs/` — Decision register (`decision_log.csv`), methodological contracts, and run-level validation JSONs
+- `notebooks/` — Reproducible exploratory data analysis and spatial/portfolio diagnostics (01–09)
+- `src/` — Production Python pipeline modules:
+  - `src/data/` — Source verification, coordinate cleaning, spatial assignment, and mart builders
+  - `src/features/` — Time-safe corridor-month feature engineering
+  - `src/models/` — Empirical Bayes shrinkage and crash risk forecasting
+  - `src/treatments/` — Treatment readiness scoring and CMF safety benefit calculations
+  - `src/optimization/` — MILP capital allocation and equity-floor optimization
+  - `src/validation/` — Automated quality validation scripts
+- `tests/` — Automated pytest verification suite (301 acceptance tests)
+- `sql/` — Analytical and serving SQL views for DuckDB and Power BI
+- `dashboard/` — Interactive decision-support interface:
+  - `dashboard/streamlit/` — Multi-page Streamlit application and published deployment data
+  - `dashboard/powerbi/` — Power BI template and workbook documentation
+- `automation/` — Verification scripts and automated pipeline orchestration
+- `reports/` — Authoritative technical report (`vision_zero_technical_report.md`)
+- `outputs/` — Generated forecasts, summary tables, figures, and execution logs
 
 ## Data Sources
 
