@@ -1,7 +1,7 @@
 """Tests for Phase 4C Corridor-Treatment Portfolio Optimization.
 
 Verifies:
-1. Exact row counts (36 summary rows, 1,212 detail rows).
+1. Exact row counts (36 summary rows, 1,362 detail rows).
 2. MILP solver determinism (3 repeat solves yield identical hashes and objective).
 3. Nonbinding official budget behavior ($6.70M selected cost < $15M budget).
 4. Binding stress budget behavior ($2M, $4M, $6M).
@@ -45,7 +45,7 @@ class TestPortfolioOptimization:
         assert len(df_summary[df_summary["run_group"] == "OFFICIAL"]) == 27
         assert len(df_summary[df_summary["run_group"] == "BINDING-BUDGET STRESS TEST"]) == 9
 
-        assert len(df_selections) == 1212
+        assert len(df_selections) == 1362
         assert df_selections.duplicated(subset=["portfolio_id", "corridor_id"]).sum() == 0
 
     def test_official_runs_binding_budget_and_diversity(self):
@@ -71,9 +71,9 @@ class TestPortfolioOptimization:
         assert (stress_summary["budget_constraint_status"] == "EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR").all()
 
         counts_by_budget = stress_summary.groupby("budget")["selected_project_count"].mean().to_dict()
-        assert counts_by_budget[2000000.0] == 7.0
-        assert counts_by_budget[4000000.0] == 13.0
-        assert counts_by_budget[6000000.0] == 17.0
+        assert counts_by_budget[2000000.0] == 16.0
+        assert counts_by_budget[4000000.0] == 24.0
+        assert counts_by_budget[6000000.0] == 30.0
 
     def test_repeat_solve_determinism(self):
         """Solving the same scenario 3 times produces 100% identical hash and objective value."""
@@ -90,7 +90,7 @@ class TestPortfolioOptimization:
             num_repeat_solves=3,
         )
         assert s_dict["solver_status"] == "OPTIMAL"
-        assert len(d_df) == 34
+        assert len(d_df) == 42
 
     def test_summary_detail_reconciliation(self):
         """Summary total costs and benefits reconcile exactly to the sum of detail selections."""

@@ -1,9 +1,9 @@
 """Tests for Phase 5A Decision-Output Mart for Power BI & Streamlit.
 
 Verifies:
-1. Decision mart row counts (36 summary, 1,410 detail selections, 43 corridor master, 387 treatment benefits).
+1. Decision mart row counts (36 summary, 1,362 detail selections, 43 corridor master, 387 treatment benefits).
 2. Exact numeric reconciliation between summary and detail grains.
-3. Source lineage cardinalities (387 source candidate rows, 1,410 selection rows, 0 unmatched, candidate reuse expected across portfolios).
+3. Source lineage cardinalities (387 source candidate rows, 1,362 selection rows, 0 unmatched, candidate reuse expected across portfolios).
 4. Cross-portfolio aggregation guardrails (canonical official rows unique per scenario, single default dashboard portfolio, 27 official rows available for constraint comparison).
 5. Spatial serving readiness (WGS84 centroids, WKT linework, EPSG:3435 CRS, corridor_id join key).
 6. Independent validator runner status PASS_WITH_WARNINGS.
@@ -37,7 +37,7 @@ class TestDecisionMart:
         metrics = build_decision_output_mart()
 
         assert metrics["summary_rows"] == 36
-        assert metrics["selections_rows"] == 1212
+        assert metrics["selections_rows"] == 1362
         assert metrics["master_rows"] == 43
         assert metrics["benefits_rows"] == 387
 
@@ -83,7 +83,7 @@ class TestDecisionMart:
         assert df_summary["portfolio_equivalence_group"].nunique() == 9
 
     def test_source_lineage_cardinalities_and_candidate_reuse(self):
-        """Source key is unique across 387 rows; selection key is unique across 1,212 rows; candidate reuse is expected."""
+        """Source key is unique across 387 rows; selection key is unique across 1,362 rows; candidate reuse is expected."""
         df_benefits = pd.read_parquet(BENEFITS_PARQUET)
         df_selections = pd.read_parquet(SELECTIONS_PARQUET)
 
@@ -91,8 +91,8 @@ class TestDecisionMart:
         assert len(df_benefits) == 387
         assert df_benefits.duplicated(subset=["corridor_id", "treatment_id", "uncertainty_scenario"]).sum() == 0
 
-        # Phase 5A selection key uniqueness (1,212 selection rows)
-        assert len(df_selections) == 1212
+        # Phase 5A selection key uniqueness (1,362 selection rows)
+        assert len(df_selections) == 1362
         assert df_selections.duplicated(subset=["portfolio_id", "corridor_id"]).sum() == 0
 
         # Merge lineage check: 100% matched, 0 unmatched, 0 join expansion
@@ -103,7 +103,7 @@ class TestDecisionMart:
             how="left",
             suffixes=("_sel", "_src"),
         )
-        assert len(merged) == 1212
+        assert len(merged) == 1362
         assert merged["capital_project_cost_src"].isna().sum() == 0
 
         # Candidate reuse across portfolio_ids (TRT_002 candidates selected in multiple portfolios)

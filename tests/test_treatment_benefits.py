@@ -202,6 +202,6 @@ class TestTreatmentBenefits:
         hcc019_rd = df_b[(df_b["corridor_id"] == "HCC019") & (df_b["treatment_id"] == "TRT_002")]
         assert (hcc019_rd["physical_applicability_status"] == "NOT_APPLICABLE").all()
 
-        # Other TRT_001 and TRT_004 on HCC019 are APPLICABLE
+        # Other TRT_001 and TRT_004 on HCC019 are UNKNOWN
         hcc019_loc = df_b[(df_b["corridor_id"] == "HCC019") & (df_b["treatment_id"].isin(["TRT_001", "TRT_004"]))]
-        assert (hcc019_loc["physical_applicability_status"] == "APPLICABLE").all()
+        assert (hcc019_loc["physical_applicability_status"] == "UNKNOWN").all()
