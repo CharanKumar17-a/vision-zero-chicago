@@ -73,24 +73,27 @@ def build_decision_output_mart(
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = duckdb.connect(str(db_path) if not in_memory else ":memory:")
 
-    # Register spatial corridor metadata view in DuckDB
-    df_spatial = prepare_spatial_corridor_df(corridors_geo_path)
-    conn.register("temp_corridor_spatial", df_spatial)
+    try:
+        # Register spatial corridor metadata view in DuckDB
+        df_spatial = prepare_spatial_corridor_df(corridors_geo_path)
+        conn.register("temp_corridor_spatial", df_spatial)
 
-    sql_script = sql_file.read_text(encoding="utf-8")
-    conn.execute(sql_script)
+        sql_script = sql_file.read_text(encoding="utf-8")
+        conn.execute(sql_script)
 
-    # Query row counts from created views
-    summary_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_portfolio_summary").fetchone()[0])
-    selections_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_project_selections").fetchone()[0])
-    master_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_corridor_master").fetchone()[0])
-    benefits_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_treatment_benefits").fetchone()[0])
+        # Query row counts from created views
+        summary_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_portfolio_summary").fetchone()[0])
+        selections_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_project_selections").fetchone()[0])
+        master_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_corridor_master").fetchone()[0])
+        benefits_count = int(conn.execute("SELECT COUNT(*) FROM vw_power_bi_treatment_benefits").fetchone()[0])
 
-    # Export datasets
-    df_summary = conn.execute("SELECT * FROM vw_power_bi_portfolio_summary").df()
-    df_selections = conn.execute("SELECT * FROM vw_power_bi_project_selections").df()
-    df_master = conn.execute("SELECT * FROM vw_power_bi_corridor_master").df()
-    df_benefits = conn.execute("SELECT * FROM vw_power_bi_treatment_benefits").df()
+        # Export datasets
+        df_summary = conn.execute("SELECT * FROM vw_power_bi_portfolio_summary").df()
+        df_selections = conn.execute("SELECT * FROM vw_power_bi_project_selections").df()
+        df_master = conn.execute("SELECT * FROM vw_power_bi_corridor_master").df()
+        df_benefits = conn.execute("SELECT * FROM vw_power_bi_treatment_benefits").df()
+    finally:
+        conn.close()
 
     df_summary.to_parquet(SUMMARY_PARQUET, index=False)
     df_summary.to_csv(SUMMARY_CSV, index=False)
@@ -104,7 +107,6 @@ def build_decision_output_mart(
     df_benefits.to_parquet(BENEFITS_PARQUET, index=False)
     df_benefits.to_csv(BENEFITS_CSV, index=False)
 
-    conn.close()
     elapsed = time.time() - t0
 
     print(f"Decision mart built successfully in {elapsed:.2f}s.")

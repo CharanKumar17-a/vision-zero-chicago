@@ -116,11 +116,12 @@ def fit_empirical_bayes_ksi(
     # 2. Fallback to Nelder-Mead if L-BFGS-B fails
     if not res.success:
         fallback_used = True
+        # Nelder-Mead does not support bounds; ensure positive initial point
+        # and validate result post-optimization
         res = minimize(
             neg_log_likelihood,
-            x0=np.array([alpha_init, beta_init]),
+            x0=np.array([max(1e-6, alpha_init), max(1e-6, beta_init)]),
             method="Nelder-Mead",
-            bounds=bounds,
         )
         accepted_optimizer = "Nelder-Mead"
 
@@ -130,6 +131,7 @@ def fit_empirical_bayes_ksi(
     alpha_fit = float(res.x[0])
     beta_fit = float(res.x[1])
 
+    # Enforce positivity regardless of optimizer (Nelder-Mead cannot enforce bounds)
     if alpha_fit <= 0 or beta_fit <= 0:
         raise ValueError(f"Invalid fitted EB parameters: alpha={alpha_fit}, beta={beta_fit}")
 

@@ -1,7 +1,7 @@
 """Tests for Phase 4C Corridor-Treatment Portfolio Optimization.
 
 Verifies:
-1. Exact row counts (36 summary rows, 1,410 detail rows).
+1. Exact row counts (36 summary rows, 1,212 detail rows).
 2. MILP solver determinism (3 repeat solves yield identical hashes and objective).
 3. Nonbinding official budget behavior ($6.70M selected cost < $15M budget).
 4. Binding stress budget behavior ($2M, $4M, $6M).

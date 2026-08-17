@@ -37,6 +37,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 
@@ -272,8 +273,6 @@ def build_treatment_benefits_panel(
 
     # 4. Physical Applicability Screening (FHWA Proxy Rule)
     # Identify MultiLineString / divided carriageway corridors where Road Diet (TRT_002) is NOT_APPLICABLE
-    import geopandas as gpd
-
     corridors_parquet_path = ROOT / "data" / "interim" / "high_crash_corridors.parquet"
     if corridors_parquet_path.exists():
         gdf_corridors = gpd.read_parquet(corridors_parquet_path)
@@ -317,10 +316,12 @@ def build_treatment_benefits_panel(
             pv_fac = compute_present_value_factor(REAL_DISCOUNT_RATE, life_yrs)
 
             # Determine Physical Applicability Status (FHWA guidance proxy)
+            # Default is UNKNOWN because physical attribute data (lane count, ADT, speed)
+            # are not yet available for field verification (D005 governance requirement).
             if trt_id == "TRT_002" and cid in multilinestring_cids:
                 applicability_status = "NOT_APPLICABLE"
             else:
-                applicability_status = "APPLICABLE"
+                applicability_status = "UNKNOWN"
 
             # Target baseline forecast
             if meta["target"] == "pedestrian":
@@ -334,8 +335,16 @@ def build_treatment_benefits_panel(
                     share_k_all, share_a_all, share_b_all, share_c_all, share_o_all, share_u_all
                 )
 
-            # Corridor-level KSI share
-            p_ksi = float(row["ksi_crashes_hist"]) / float(row["total_crashes_hist"]) if row["total_crashes_hist"] > 0 else 0.020432
+            # Target-specific KSI share:
+            # Pedestrian treatments use pedestrian-specific KSI proportion (~17.5%)
+            # Total-crash treatments use all-crash KSI proportion (~2.0%)
+            # This ensures severity allocation matches the crash population being treated.
+            if meta["target"] == "pedestrian":
+                ped_tot_hist = float(row["pedestrian_crashes_tot"])
+                ped_ksi_hist = float(row["pedestrian_crashes_ksi"])
+                p_ksi = ped_ksi_hist / ped_tot_hist if ped_tot_hist > 0 else 0.175453
+            else:
+                p_ksi = float(row["ksi_crashes_hist"]) / float(row["total_crashes_hist"]) if row["total_crashes_hist"] > 0 else 0.020432
 
             for sc_name, sc_params in meta["scenarios"].items():
                 exp_share = float(sc_params["exposure_share"])
