@@ -62,14 +62,14 @@ df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
 render_governance_header_banner(s_row["run_group"], (s_row["run_group"] == "OFFICIAL"))
 
 st.markdown("---")
-st.subheader("Selected portfolio investment map")
+st.subheader("1. Selected portfolio investment map")
 
 # Visual Map Legend
 col_leg1, col_leg2 = st.columns([1, 1])
 with col_leg1:
-    st.markdown("🟠 **High-SVI equity priority areas** (CDC Social Vulnerability Index proxy)")
+    st.markdown(":orange[■] **High-SVI equity priority areas** (CDC Social Vulnerability Index proxy)")
 with col_leg2:
-    st.markdown("🔵 **Standard priority corridors**")
+    st.markdown(":blue[■] **Standard priority corridors**")
 
 # Prepare PyDeck map data for selected corridors
 gdf_sel = get_selected_corridors_geodataframe(df_selections, gdf_corridors, portfolio_id)
@@ -174,7 +174,7 @@ st.caption(
 )
 
 st.markdown("---")
-st.subheader("Corridor detail inspector")
+st.subheader("2. Corridor detail inspector")
 
 # Corridor Selector Dropdown
 corridor_options = df_sel_benefits["corridor_id"].tolist()
@@ -226,7 +226,8 @@ st.caption(
 )
 
 st.markdown("---")
-st.subheader("Selected projects detail table and export")
+st.subheader("3. Selected projects export table")
+
 
 df_export = df_sel_benefits[[
     "portfolio_id",

@@ -23,7 +23,6 @@ import streamlit as st
 from dashboard.streamlit.components import (
     format_currency,
     format_percent,
-    render_page_header,
 )
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
@@ -35,16 +34,6 @@ from dashboard.streamlit.data_access import (
     load_portfolio_summary,
     load_project_selections,
     load_treatment_benefits,
-)
-
-render_page_header(
-    "Executive recommendation",
-    "High-level decision-support briefing and capital allocation recommendation for transportation leadership.",
-)
-
-st.markdown(
-    "**About this tool:** An evidence-based decision-support system forecasting road-safety risk across Chicago's 43 high-crash corridors "
-    "and optimizing project portfolios under budget and equity planning scenarios."
 )
 
 # -----------------------------------------------------------------------------
@@ -66,7 +55,7 @@ total_annual_econ = float(rec_benefits_econ["annual_economic_benefit"].sum())
 total_pv_econ = float(rec_benefits_econ["pv_economic_benefit"].sum())
 bcr_econ_portfolio = total_pv_econ / float(rec_summary["selected_capital_cost"]) if float(rec_summary["selected_capital_cost"]) > 0 else 0.0
 
-# Derived metrics for recommended portfolio
+# Derived metrics for recommended portfolio (all dynamically computed)
 total_corridors_count = len(df_master)
 selected_corridors_count = int(rec_summary["selected_project_count"])
 selected_capital_cost = float(rec_summary["selected_capital_cost"])
@@ -84,41 +73,60 @@ annual_o_averted = float(rec_benefits["crashes_averted_o"].sum())
 annual_ksi_averted = annual_k_averted + annual_a_averted
 
 # -----------------------------------------------------------------------------
-# Section 1 — Recommended Portfolio
+# Landing Header & 4 Key Decision Metrics Hero
 # -----------------------------------------------------------------------------
-st.markdown("---")
-st.subheader("1. Recommended portfolio")
+st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
+st.markdown("Decide which road-safety projects to fund under a limited budget and equity requirement.")
 
-headline_text = (
-    f"At a \\$15M planning budget, this portfolio funds **{selected_corridors_count} of {total_corridors_count}** "
-    f"corridors for **{format_currency(selected_capital_cost)}**, averting ~**{annual_crashes_averted:,.0f}** crashes/yr "
-    f"including ~**{annual_ksi_averted:,.1f}** fatal and serious injury (KSI) crashes, with "
-    f"**{achieved_equity_pct:.1f}%** of spend in equity-priority areas."
-)
+st.markdown("")
 
-st.success(headline_text)
-
-col1, col2, col3, col4, col5 = st.columns(5)
+# 4 Key Decision Metrics
+col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.metric("Total capital cost", format_currency(selected_capital_cost), help="Total estimated initial capital cost for selected corridor projects.")
+    st.metric(
+        "Total capital cost",
+        format_currency(selected_capital_cost),
+        help="Total estimated initial capital cost for recommended corridor projects.",
+    )
 with col2:
-    st.metric("Corridors funded", f"{selected_corridors_count} / {total_corridors_count}", help="High-crash corridors funded under this portfolio.")
+    st.metric(
+        "Corridors funded",
+        f"{selected_corridors_count} of {total_corridors_count}",
+        help="High-crash corridors funded under the recommended $15M planning scenario.",
+    )
 with col3:
-    st.metric("Annual crashes averted", f"~{annual_crashes_averted:,.0f} / yr", help="Estimated annual total crashes prevented.")
+    st.metric(
+        "Annual KSI averted",
+        f"~{annual_ksi_averted:,.1f} / yr",
+        help="Estimated annual fatal (K) and serious injury (A) crashes prevented across funded corridors.",
+    )
 with col4:
-    st.metric("Annual KSI averted", f"~{annual_ksi_averted:,.1f} / yr", help="Estimated annual fatal (K) and serious injury (A) crashes prevented.")
-with col5:
-    st.metric("Equity spend share", f"{achieved_equity_pct:.1f}%", help="Percentage of capital investment allocated to high-SVI equity tracts (vs 20% policy floor).")
+    st.metric(
+        "Equity spend share",
+        f"{achieved_equity_pct:.1f}%",
+        delta=f"Floor: {format_percent(rec_summary['equity_floor'])}",
+        help="Percentage of capital investment allocated to high-SVI equity priority areas.",
+    )
+
+st.markdown("")
+
+# Executive Recommendation Callout
+st.success(
+    f"**Recommendation:** At a \\$15M planning budget, fund **{selected_corridors_count} of {total_corridors_count}** "
+    f"corridors for **{format_currency(selected_capital_cost)}**, averting ~**{annual_crashes_averted:,.0f}** crashes/yr "
+    f"(including ~**{annual_ksi_averted:,.1f}** fatal and serious injury crashes), with "
+    f"**{achieved_equity_pct:.1f}%** of spend directed to high-SVI equity-priority areas."
+)
 
 st.caption(
-    f"Scenario ID: `{DEFAULT_PORTFOLIO_ID}` | Status: `OPTIMAL` | Budget slack: `{format_currency(budget_slack)}`"
+    f"Recommended scenario: `{DEFAULT_PORTFOLIO_ID}` | Status: `OPTIMAL` | Budget slack: `{format_currency(budget_slack)}`"
 )
 
 # -----------------------------------------------------------------------------
-# Section 2 — What This Buys
+# Section 1 — What This Investment Buys
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("2. What this investment buys")
+st.subheader("1. What this investment buys")
 
 st.markdown(
     "Over a 20-year project lifecycle with standard federal discount rates (3.0% real), "
@@ -140,14 +148,14 @@ with col_benefit1:
     st.dataframe(pd.DataFrame(severity_data), use_container_width=True, hide_index=True)
 
 with col_benefit2:
-    st.markdown("#### Economic and equity return")
+    st.markdown("#### Economic and equity return summary")
     st.markdown(
         f"""
         - **Present value safety benefit:** `{format_currency(total_pv_benefit)}`
         - **Portfolio benefit-cost ratio (BCR):** `{portfolio_bcr:.1f} : 1`
         - **Achieved equity share:** `{achieved_equity_pct:.1f}%` (Policy floor: `20.0%`)
-        - **Eligibility criteria:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0,
-          with highest prioritization given to high-volume pedestrian and multi-lane arterial corridors.
+        - **Physical applicability:** `UNKNOWN` (Mandatory engineering field inspection required prior to design)
+        - **Eligibility criteria:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0.
         """
     )
 
@@ -166,10 +174,10 @@ with st.expander("View conservative economic-only cost scenario", expanded=False
         st.metric("Annual economic savings", f"{format_currency(total_annual_econ)} / yr", help="Estimated annual direct economic crash costs prevented.")
 
 # -----------------------------------------------------------------------------
-# Section 3 — What Is Deferred (Non-Funded Corridors)
+# Section 2 — Deferred Corridors
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("3. Deferred corridors")
+st.subheader("2. Deferred corridors")
 
 selected_ids = set(rec_selections["corridor_id"])
 all_ids = set(df_master["corridor_id"])
@@ -233,14 +241,14 @@ st.caption(
 )
 
 # -----------------------------------------------------------------------------
-# Section 4 — Sensitivity to Budget & Stress Scenarios
+# Section 3 — Sensitivity to Budget & Stress Scenarios
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("4. Sensitivity to budget and stress scenarios")
+st.subheader("3. Budget sensitivity and stress scenarios")
 
 st.markdown(
     "How does corridor coverage and total safety return scale if capital is constrained or if additional funds are appropriated? "
-    "Explore the **'what more money buys'** progression across both analyst-defined diagnostic stress tiers and official planning scenarios."
+    "Explore the **'what more money buys'** progression across both diagnostic stress tiers and official planning scenarios."
 )
 
 st.caption(
@@ -402,27 +410,27 @@ df_tier_roster = pd.DataFrame(tier_roster)
 st.dataframe(df_tier_roster, use_container_width=True, hide_index=True)
 
 # -----------------------------------------------------------------------------
-# Section 5 — Key Governance & Engineering Limitations
+# Section 4 — Key Governance & Engineering Limitations
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("5. Key governance and engineering limitations")
+st.subheader("4. Key governance and engineering limitations")
 
-with st.expander("Review 5 critical governance and engineering limitations", expanded=True):
+with st.expander("Review critical governance and engineering limitations", expanded=True):
     st.markdown(
         """
-        1. **Physical applicability is provisional (`UNKNOWN`)**:
-           - Treatments are selected based on corridor road classifications and centerline geometry.
-           - Specific corridor constraints (curb alignments, turn lanes, utility conflicts, bridge deck widths, transit lanes)
-             require detailed engineering field inspections before design or construction.
-        2. **Sourced planning costs versus contract bids**:
-           - Unit costs (\\$400k/mi Road Diet, \\$15k/island Refuge Island, \\$22.5k RRFB; `D024`) are planning-level benchmarks.
-           - Actual construction costs will vary based on procurement, site work, signal integration, and material prices.
-        3. **CDC Social Vulnerability Index (SVI) as equity proxy**:
-           - SVI percentile tracks spatial vulnerability across census tracts, but does not substitute for localized community engagement or neighborhood-level equity evaluations.
-        4. **Statistical crash burden versus deterministic occurrence**:
-           - Forecast models evaluate multi-year statistical crash risk and regression-to-the-mean tendencies. They identify high-probability corridors, not guarantees of specific crash occurrences.
-        5. **Planning scenarios versus policy appropriations**:
-           - Portfolio scenarios represent decision-support alternatives. They do not constitute official City of Chicago capital budget commitments.
+        - **Physical applicability is provisional (`UNKNOWN`)**:
+          Treatments are selected based on corridor road classifications and centerline geometry.
+          Specific corridor constraints (curb alignments, turn lanes, utility conflicts, bridge deck widths, transit lanes)
+          require detailed engineering field inspections before design or construction.
+        - **Sourced planning costs versus contract bids**:
+          Unit costs (\\$400k/mi Road Diet, \\$15k/island Refuge Island, \\$22.5k RRFB; `D024`) are planning-level benchmarks.
+          Actual construction costs will vary based on procurement, site work, signal integration, and material prices.
+        - **CDC Social Vulnerability Index (SVI) as equity proxy**:
+          SVI percentile tracks spatial vulnerability across census tracts, but does not substitute for localized community engagement or neighborhood-level equity evaluations.
+        - **Statistical crash burden versus deterministic occurrence**:
+          Forecast models evaluate multi-year statistical crash risk and regression-to-the-mean tendencies. They identify high-probability corridors, not guarantees of specific crash occurrences.
+        - **Planning scenarios versus policy appropriations**:
+          Portfolio scenarios represent decision-support alternatives. They do not constitute official City of Chicago capital budget commitments.
         """
     )
 
@@ -434,4 +442,5 @@ st.caption(
     "**Vision Zero Chicago Decision Support System** | "
     "Decision support only. Final authority remains with City staff and engineering review."
 )
+
 

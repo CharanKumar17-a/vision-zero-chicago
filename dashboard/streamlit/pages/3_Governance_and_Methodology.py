@@ -39,7 +39,7 @@ evidence = load_validation_evidence()
 portfolio_id = render_sidebar_controls(df_summary)
 
 st.markdown("---")
-st.subheader("Source pipeline lineage and evidence run IDs")
+st.subheader("1. Source pipeline lineage and evidence run IDs")
 
 geom_ev = evidence.get("geometry", {})
 opt_ev = evidence.get("optimization", {})
@@ -60,7 +60,7 @@ with col4:
     st.metric("Decision mart status", mart_ev.get("status", "N/A"))
 
 st.markdown("---")
-st.subheader("Governance warning register")
+st.subheader("2. Governance warning register")
 
 # 1. Portfolio Optimization Governance Warnings
 opt_warnings = opt_ev.get("governance_warnings", [])
@@ -74,7 +74,7 @@ with st.expander("Portfolio optimization governance warnings (Phase 4C evidence)
     else:
         st.info("No portfolio optimization warnings loaded.")
 
-# 2. Decision Mart Governance Warnings
+# 2. Decision Mart Serving Governance Warnings
 mart_warnings = mart_ev.get("governance_warnings", [])
 with st.expander("Decision mart serving governance warnings (Phase 5A evidence)", expanded=True):
     if mart_warnings:
@@ -87,7 +87,8 @@ with st.expander("Decision mart serving governance warnings (Phase 5A evidence)"
         st.info("No decision mart warnings loaded.")
 
 st.markdown("---")
-st.subheader("Decision support contracts and methodological boundaries")
+st.subheader("3. Decision-support contracts and methodological boundaries")
+
 
 st.markdown("""
 #### Final decision authority

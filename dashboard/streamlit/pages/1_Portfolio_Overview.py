@@ -62,7 +62,8 @@ is_official = (s_row["run_group"] == "OFFICIAL")
 render_governance_header_banner(s_row["run_group"], is_official)
 
 st.markdown("---")
-st.subheader("Core portfolio metrics")
+st.subheader("1. Core portfolio metrics")
+
 
 # Hero KPI Cards (4 primary decision metrics)
 col1, col2, col3, col4 = st.columns(4)
@@ -118,6 +119,7 @@ with st.expander("View secondary metrics and economic indicators", expanded=Fals
         st.metric("Portfolio BCR (comprehensive)", f"{s_row['portfolio_bcr']:,.1f} : 1", help="Planning-level benefit-cost ratio from comprehensive crash costs.")
 
 st.markdown("---")
+st.subheader("2. Scenario visual analytics")
 
 # Visual Charts Section
 c1, c2 = st.columns(2)
@@ -230,7 +232,7 @@ with c4:
     st.plotly_chart(fig_sev, use_container_width=True)
 
 st.markdown("---")
-st.subheader("Selected projects detail register")
+st.subheader("3. Selected projects detail register")
 
 df_table = df_sel_benefits[[
     "corridor_id",
@@ -270,4 +272,5 @@ st.dataframe(
 )
 
 render_engineering_review_banner()
+
 
