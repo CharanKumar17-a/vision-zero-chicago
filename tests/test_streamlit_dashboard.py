@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
 
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
+    find_what_if_grid_portfolio,
     get_selected_corridors_geodataframe,
     get_selected_portfolio_benefits,
     get_single_portfolio_selections,
@@ -267,3 +268,44 @@ class TestStreamlitDashboard:
         assert pytest.approx(utilization_pct, abs=0.01) == s_row["budget_utilization_pct"]
         assert pytest.approx(utilization_pct, abs=0.05) == 99.93
         assert 0.0 <= utilization_ratio <= 1.0
+
+    def test_find_what_if_grid_portfolio_lookup(self):
+        """find_what_if_grid_portfolio accurately retrieves exact and nearest grid scenarios."""
+        df_summary = load_portfolio_summary()
+
+        # Exact match tests
+        row_24m_35, is_exact = find_what_if_grid_portfolio(df_summary, 24e6, 0.35)
+        assert is_exact is True
+        assert row_24m_35["portfolio_id"] == "PORT_GRID_BASE_B24M_EQ35"
+        assert row_24m_35["budget_usd"] == 24000000.0
+        assert row_24m_35["equity_floor"] == 0.35
+
+        row_11m_35, is_exact = find_what_if_grid_portfolio(df_summary, 11e6, 0.35)
+        assert is_exact is True
+        assert row_11m_35["portfolio_id"] == "PORT_GRID_BASE_B11M_EQ35"
+
+        # Nearest match test
+        row_nearest, is_exact = find_what_if_grid_portfolio(df_summary, 15.5e6, 0.22)
+        assert is_exact is False
+        assert row_nearest["portfolio_id"] == "PORT_GRID_BASE_B15M_EQ20"
+
+    def test_what_if_planner_apptest_interaction(self):
+        """AppTest interaction with What-If planner sliders dynamically updates Scenario ID."""
+        at = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at.run()
+        assert not at.exception
+
+        # Change What-If sliders to $24M, 35% equity
+        at.slider[0].set_value(24)
+        at.select_slider[0].set_value(35)
+        at.run()
+        assert not at.exception
+        info_texts = [i.value for i in at.info]
+        assert any("PORT_GRID_BASE_B24M_EQ35" in text for text in info_texts)
+
+        # Switch sidebar budget to $25M
+        at.select_slider[1].set_value(25000000.0)
+        at.run()
+        assert not at.exception
+        captions = [c.value for c in at.caption]
+        assert any("PORT_OFF_BASE_B25M_EQ20" in text for text in captions)

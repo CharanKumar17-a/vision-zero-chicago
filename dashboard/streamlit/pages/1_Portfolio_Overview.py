@@ -27,6 +27,7 @@ from dashboard.streamlit.components import (
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
+    find_what_if_grid_portfolio,
     get_selected_portfolio_benefits,
     get_single_portfolio_summary,
     load_corridor_master,
@@ -298,21 +299,26 @@ with wif_col2:
         help="Select minimum percentage of funding reserved for high-SVI equity priority corridors."
     )
 
-target_portfolio_id = f"PORT_GRID_BASE_B{user_budget_m}M_EQ{user_equity_pct}"
+wif_s_row, is_exact = find_what_if_grid_portfolio(
+    df_summary=df_summary,
+    budget_usd=float(user_budget_m * 1e6),
+    equity_floor=float(user_equity_pct / 100.0),
+    uncertainty_scenario="BASE",
+)
 
-if target_portfolio_id in df_summary["portfolio_id"].values:
-    wif_s_row = get_single_portfolio_summary(df_summary, target_portfolio_id)
-    wif_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, target_portfolio_id)
-else:
-    wif_s_row = s_row
-    wif_sel_benefits = df_sel_benefits
+target_portfolio_id = str(wif_s_row["portfolio_id"])
+wif_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, target_portfolio_id)
 
 wif_k = wif_sel_benefits["crashes_averted_k"].sum()
 wif_a = wif_sel_benefits["crashes_averted_a"].sum()
 wif_ksi = wif_k + wif_a
 
+exact_note = "" if is_exact else f" *(Nearest precomputed match shown for ${user_budget_m}M / {user_equity_pct}% equity)*"
+
 st.info(
-    f"**Precomputed scenario active:** Budget Ceiling: **${user_budget_m}M** | Equity Floor: **{user_equity_pct}%** | Scenario ID: `{wif_s_row['portfolio_id']}`"
+    f"**Precomputed scenario active:** Budget Ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
+    f"Equity Floor: **{int(round(wif_s_row['equity_floor']*100))}%** | "
+    f"Scenario ID: `{target_portfolio_id}`{exact_note}"
 )
 
 wc1, wc2, wc3, wc4 = st.columns(4)
@@ -363,9 +369,9 @@ st.dataframe(
 
 csv_data = wif_table.to_csv(index=False).encode("utf-8")
 st.download_button(
-    label=f"Download what-if portfolio CSV (${user_budget_m}M / {user_equity_pct}% equity)",
+    label=f"Download what-if portfolio CSV (${int(wif_s_row['budget_usd']/1e6)}M / {int(round(wif_s_row['equity_floor']*100))}% equity)",
     data=csv_data,
-    file_name=f"vision_zero_what_if_B{user_budget_m}M_EQ{user_equity_pct}.csv",
+    file_name=f"vision_zero_what_if_{target_portfolio_id}.csv",
     mime="text/csv",
 )
 

@@ -405,3 +405,38 @@ def compute_economic_only_benefits(
     df["pv_economic_benefit"] = annual_econ * pv_factor
     df["bcr_economic_only"] = df["pv_economic_benefit"] / df["capital_project_cost"].replace(0, float("nan"))
     return df
+
+
+def find_what_if_grid_portfolio(
+    df_summary: pd.DataFrame,
+    budget_usd: float,
+    equity_floor: float,
+    uncertainty_scenario: str = "BASE",
+) -> Tuple[pd.Series, bool]:
+    """Find the exact or nearest precomputed What-If Planner grid portfolio.
+
+    Returns:
+        Tuple of (portfolio_summary_series, is_exact_match_bool)
+    """
+    df_grid = df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]
+    if df_grid.empty:
+        df_grid = df_summary
+
+    df_scen = df_grid[df_grid["uncertainty_scenario"] == uncertainty_scenario]
+    if df_scen.empty:
+        df_scen = df_grid
+
+    # 1. Exact match within tolerance
+    exact_match = df_scen[
+        (df_scen["budget_usd"].sub(budget_usd).abs() < 1.0)
+        & (df_scen["equity_floor"].sub(equity_floor).abs() < 1e-3)
+    ]
+    if not exact_match.empty:
+        return exact_match.iloc[0], True
+
+    # 2. Nearest match by |budget - selected| then |floor - selected|
+    df_scored = df_scen.copy()
+    df_scored["budget_diff"] = df_scored["budget_usd"].sub(budget_usd).abs()
+    df_scored["floor_diff"] = df_scored["equity_floor"].sub(equity_floor).abs()
+    df_sorted = df_scored.sort_values(by=["budget_diff", "floor_diff"])
+    return df_sorted.iloc[0], False

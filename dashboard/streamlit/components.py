@@ -34,27 +34,26 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
 
     # 3. Budget Level
     budgets = sorted(df_filtered_scen["budget_usd"].unique().tolist())
-    formatted_budgets = [f"${int(b / 1e6)}M" for b in budgets]
-    default_b_idx = 0
-    for idx, b in enumerate(budgets):
-        if b == 15000000.0:
-            default_b_idx = idx
-            break
-    selected_b_str = st.sidebar.select_slider("Planning budget ceiling", options=formatted_budgets, value=formatted_budgets[default_b_idx])
-    selected_b_val = budgets[formatted_budgets.index(selected_b_str)]
+    default_b_val = 15000000.0 if 15000000.0 in budgets else budgets[0]
+    selected_b_val = st.sidebar.select_slider(
+        "Planning budget ceiling",
+        options=budgets,
+        value=default_b_val,
+        format_func=lambda b: f"${int(b / 1e6)}M" if b >= 1e6 else f"${int(b / 1e3)}k",
+    )
 
     df_filtered_b = df_filtered_scen[df_filtered_scen["budget_usd"] == selected_b_val]
 
     # 4. Equity Spending Floor
     equity_floors = sorted(df_filtered_b["equity_floor"].unique().tolist())
-    formatted_floors = [f"{int(ef * 100)}%" for ef in equity_floors]
-    default_ef_idx = 0
-    for idx, ef in enumerate(equity_floors):
-        if ef == 0.20:
-            default_ef_idx = idx
-            break
-    selected_ef_str = st.sidebar.selectbox("Minimum equity spending floor", options=formatted_floors, index=default_ef_idx)
-    selected_ef_val = equity_floors[formatted_floors.index(selected_ef_str)]
+    default_ef_val = 0.20 if 0.20 in equity_floors else equity_floors[0]
+    default_ef_idx = equity_floors.index(default_ef_val)
+    selected_ef_val = st.sidebar.selectbox(
+        "Minimum equity spending floor",
+        options=equity_floors,
+        index=default_ef_idx,
+        format_func=lambda ef: f"{int(round(ef * 100))}%",
+    )
 
     df_final_match = df_filtered_b[df_filtered_b["equity_floor"] == selected_ef_val]
 
