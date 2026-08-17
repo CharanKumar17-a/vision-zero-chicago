@@ -94,10 +94,10 @@ def validate_portfolio_optimization_outputs(
     portfolio_count = len(df_summary)
     unique_portfolios = df_summary["portfolio_id"].nunique()
     checks.append({
-        "check": "portfolio_count_36_unique",
+        "check": "portfolio_count_192_unique",
         "severity": "CRITICAL",
-        "passed": (portfolio_count == 36 and unique_portfolios == 36),
-        "evidence": f"Portfolio count: {portfolio_count}, unique portfolio_ids: {unique_portfolios} (expected 36)",
+        "passed": (portfolio_count == 192 and unique_portfolios == 192),
+        "evidence": f"Portfolio count: {portfolio_count}, unique portfolio_ids: {unique_portfolios} (expected 192: 27 official + 9 stress + 156 grid)",
     })
 
     official_count = len(df_summary[df_summary["run_group"] == "OFFICIAL"])
@@ -116,12 +116,20 @@ def validate_portfolio_optimization_outputs(
         "evidence": f"Stress test portfolio count: {stress_count} (expected 9)",
     })
 
+    grid_count = len(df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"])
+    checks.append({
+        "check": "grid_portfolio_count_156",
+        "severity": "CRITICAL",
+        "passed": (grid_count == 156),
+        "evidence": f"What-If Planner grid portfolio count: {grid_count} (expected 156: 26 budgets x 6 equity floors)",
+    })
+
     total_detail_rows = len(df_selections)
     checks.append({
         "check": "total_detail_selections_valid",
         "severity": "CRITICAL",
-        "passed": (total_detail_rows > 0 and total_detail_rows <= 1410),
-        "evidence": f"Total project selection detail rows: {total_detail_rows} (valid range <= 1,410)",
+        "passed": (total_detail_rows > 0 and total_detail_rows <= 10000),
+        "evidence": f"Total project selection detail rows: {total_detail_rows} (valid range <= 10,000)",
     })
 
     # 3. Solver Statuses
@@ -130,7 +138,17 @@ def validate_portfolio_optimization_outputs(
         "check": "all_solver_statuses_optimal",
         "severity": "CRITICAL",
         "passed": bool(all_optimal),
-        "evidence": f"All 36 portfolio solver statuses OPTIMAL: {all_optimal}",
+        "evidence": f"All 192 portfolio solver statuses OPTIMAL: {all_optimal}",
+    })
+
+    # 3b. Diversification Cap (Decision D026: Road Diet share <= 70%)
+    max_rd_share = float(df_summary["road_diet_project_share"].max())
+    div_respected = bool(max_rd_share <= 0.70 + 1e-4)
+    checks.append({
+        "check": "road_diet_diversification_cap_respected",
+        "severity": "CRITICAL",
+        "passed": div_respected,
+        "evidence": f"Maximum Road Diet project share across all portfolios: {max_rd_share:.1%} (cap <= 70.0%, D026): {div_respected}",
     })
 
     # 4. At most 1 treatment per corridor per portfolio
@@ -325,9 +343,9 @@ def validate_portfolio_optimization_outputs(
         "official_road_diet_project_count": official_rd_count,
         "official_total_selected_projects": official_total_sel,
         "official_road_diet_share": float(official_rd_count / official_total_sel),
-        "explanation": "100% of selected official project candidates are Road Diet (TRT_002) conversions due to high modeled crash reduction benefits.",
+        "explanation": f"{official_rd_count / official_total_sel:.1%} of selected official project candidates are Road Diet (TRT_002) conversions, capped at 70.0% max concentration per Decision D026.",
         "limitation_or_resolution": "Physical applicability status remains UNKNOWN. Field engineering review required before project programming.",
-        "governance_reference": "A004, D005",
+        "governance_reference": "A004, D005, D026",
     })
 
     # Warning 4: Equity Floors Nonbinding

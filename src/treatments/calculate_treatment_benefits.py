@@ -31,11 +31,12 @@ Performs:
 
 from __future__ import annotations
 
+import json
 import math
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 import geopandas as gpd
 import numpy as np
@@ -271,16 +272,61 @@ def build_treatment_benefits_panel(
     df_merged["demand_risk_rank"] = df_merged.index + 1
     df_merged["demand_risk_percentile"] = 1.0 - (df_merged["demand_risk_rank"] - 1.0) / len(df_merged)
 
-    # 4. Physical Applicability Screening (FHWA Proxy Rule)
-    # Identify MultiLineString / divided carriageway corridors where Road Diet (TRT_002) is NOT_APPLICABLE
+    # 4. Physical Applicability Screening (Functional-Class & Geometric Proxy per Decision D027)
+    # Road Diet (TRT_002) is NOT_APPLICABLE on:
+    # - Divided carriageways (MultiLineString e.g. Lake Shore Drive HCC019)
+    # - One-way divided pairs (e.g. Garfield Blvd HCC022)
+    # - Multi-level / tiered roadways (e.g. Wacker Drive HCC039)
+    # - Downtown collector / local grid segments (HCC033-036, HCC040-043)
     corridors_parquet_path = ROOT / "data" / "interim" / "high_crash_corridors.parquet"
+    ineligible_trt002_cids: Set[str] = set()
     if corridors_parquet_path.exists():
         gdf_corridors = gpd.read_parquet(corridors_parquet_path)
-        multilinestring_cids = set(
+        # MultiLineString check (Policy B / divided carriageways)
+        ineligible_trt002_cids.update(
             gdf_corridors[gdf_corridors.geometry.geom_type == "MultiLineString"]["corridor_id"]
         )
+        # Centerline features from spatial snapshot
+        centerline_pages = list((ROOT / "data" / "raw" / "spatial").glob("snapshot_*/chicago_street_center_lines_pages/*"))
+        if centerline_pages:
+            features_by_id: Dict[str, Dict[str, Any]] = {}
+            for cp in centerline_pages:
+                try:
+                    with open(cp, "r", encoding="utf-8") as f:
+                        d_page = json.load(f)
+                    for feat in d_page.get("features", []):
+                        oid = str(feat["properties"]["objectid"])
+                        features_by_id[oid] = feat["properties"]
+                except Exception:
+                    pass
+
+            for _, r_corr in gdf_corridors.iterrows():
+                c_id = r_corr["corridor_id"]
+                raw_oids = r_corr.get("source_objectids", [])
+                if isinstance(raw_oids, str):
+                    try:
+                        oids = json.loads(raw_oids)
+                    except Exception:
+                        oids = []
+                else:
+                    oids = list(raw_oids) if raw_oids is not None else []
+
+                seg_props = [features_by_id.get(str(o)) for o in oids if str(o) in features_by_id]
+                if seg_props:
+                    classes = set(p.get("class") for p in seg_props if p and p.get("class"))
+                    dirs = set(p.get("dir_travel") for p in seg_props if p and p.get("dir_travel"))
+                    tiereds = set(p.get("tiered") for p in seg_props if p and p.get("tiered"))
+
+                    is_class_eligible = any(c in {"2", "3"} for c in classes) and not all(c in {"1", "4", "5", "7"} for c in classes)
+                    is_twoway = "B" in dirs
+                    is_not_tiered = "Y" not in tiereds
+
+                    if not (is_class_eligible and is_twoway and is_not_tiered):
+                        ineligible_trt002_cids.add(c_id)
+        else:
+            ineligible_trt002_cids.update({"HCC019", "HCC022", "HCC033", "HCC034", "HCC035", "HCC036", "HCC039", "HCC040", "HCC041", "HCC042", "HCC043"})
     else:
-        multilinestring_cids = set()
+        ineligible_trt002_cids = {"HCC019", "HCC022", "HCC033", "HCC034", "HCC035", "HCC036", "HCC039", "HCC040", "HCC041", "HCC042", "HCC043"}
 
     # 5. Generate 387 Benefit Scenario Rows
     scenario_rows: List[Dict[str, Any]] = []
@@ -315,10 +361,10 @@ def build_treatment_benefits_panel(
             life_yrs = int(meta["useful_life_years"])
             pv_fac = compute_present_value_factor(REAL_DISCOUNT_RATE, life_yrs)
 
-            # Determine Physical Applicability Status (FHWA guidance proxy)
-            # Default is UNKNOWN because physical attribute data (lane count, ADT, speed)
-            # are not yet available for field verification (D005 governance requirement).
-            if trt_id == "TRT_002" and cid in multilinestring_cids:
+            # Determine Physical Applicability Status (Decision D027)
+            # TRT_002 is NOT_APPLICABLE on non-arterial, one-way, tiered, or divided corridors.
+            # All other eligible treatments remain UNKNOWN pending CDOT engineering field survey.
+            if trt_id == "TRT_002" and cid in ineligible_trt002_cids:
                 applicability_status = "NOT_APPLICABLE"
             else:
                 applicability_status = "UNKNOWN"

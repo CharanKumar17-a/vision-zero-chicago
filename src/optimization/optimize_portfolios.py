@@ -56,13 +56,27 @@ STRESS_UNCERTAINTIES = ["BASE"]
 STRESS_BUDGETS = [2000000.0, 4000000.0, 6000000.0]
 STRESS_EQUITY_FLOORS = [0.20, 0.30, 0.40]
 
-# Minimum Benefit-Cost Ratio (BCR) candidate eligibility threshold
-# Candidates with BCR < 1.0 are un-economic (costs exceed present value of safety benefits) and are excluded prior to optimization.
-# Reference: Decision Log entry D023.
+# What-If Planner Grid Scenarios: BASE uncertainty x 26 budgets x 6 equity floors = 156 runs
+GRID_UNCERTAINTIES = ["BASE"]
+GRID_BUDGETS = [
+    2000000.0, 3000000.0, 4000000.0, 5000000.0, 6000000.0,
+    7000000.0, 8000000.0, 9000000.0, 10000000.0, 11000000.0,
+    12000000.0, 13000000.0, 14000000.0, 15000000.0, 16000000.0,
+    17000000.0, 18000000.0, 19000000.0, 20000000.0, 21000000.0,
+    22000000.0, 23000000.0, 24000000.0, 25000000.0, 30000000.0,
+    40000000.0,
+]
+GRID_EQUITY_FLOORS = [0.15, 0.20, 0.25, 0.30, 0.35, 0.40]
+
+# Minimum Benefit-Cost Ratio (BCR) candidate eligibility threshold (Decision D023)
 MIN_ELIGIBLE_BCR = 1.0
+
+# Maximum Road Diet (TRT_002) portfolio concentration cap (Decision D026)
+MAX_ROAD_DIET_SHARE = 0.70
 
 OFFICIAL_GOVERNANCE_LABELS = "OFFICIAL_BUDGET_SCENARIO; PROVISIONAL_PORTFOLIO_SCENARIO; ENGINEERING_REVIEW_REQUIRED"
 STRESS_GOVERNANCE_LABELS = "ANALYST_DEFINED_BINDING_BUDGET_STRESS_TEST; PROVISIONAL_PORTFOLIO_SCENARIO; ENGINEERING_REVIEW_REQUIRED"
+GRID_GOVERNANCE_LABELS = "WHAT_IF_PLANNER_GRID; PROVISIONAL_PORTFOLIO_SCENARIO; ENGINEERING_REVIEW_REQUIRED"
 
 
 def compute_portfolio_hash(selected_keys: List[Tuple[str, str]]) -> str:
@@ -76,10 +90,12 @@ def solve_single_milp(
     c: np.ndarray,
     costs: np.ndarray,
     equity_flags: np.ndarray,
+    treatment_ids: np.ndarray,
     corridors: np.ndarray,
     unique_corridors: List[str],
     budget: float,
     equity_floor: float,
+    max_road_diet_share: float = MAX_ROAD_DIET_SHARE,
 ) -> Tuple[np.ndarray, int, str]:
     """Execute single scipy.optimize.milp call.
 
@@ -89,6 +105,7 @@ def solve_single_milp(
       2. Capital cost ceiling: sum(cost * x) <= budget
       3. Equity floor: sum(cost * (equity_floor - equity_flag) * x) <= 0
       4. At least 1 project selected: sum(x) >= 1
+      5. Treatment diversification cap (D026): Road Diet (TRT_002) share <= max_road_diet_share
     """
     n = len(c)
 
@@ -101,25 +118,36 @@ def solve_single_milp(
     A_budget = costs.reshape(1, -1)
 
     # 3. Equity constraint matrix: 1 x n
-    # cost * equity_flag * x >= equity_floor * cost * x <=> cost * (equity_floor - equity_flag) * x <= 0
+    # cost * (equity_floor - equity_flag) * x <= 0
     A_equity = (costs * (equity_floor - equity_flags)).reshape(1, -1)
 
     # 4. Minimum 1 project constraint: 1 x n
     A_min1 = np.ones((1, n))
 
-    A = np.vstack([A_corr, A_budget, A_equity, A_min1])
+    # 5. Treatment diversification constraint (Decision D026):
+    # sum_{TRT_002} x <= max_road_diet_share * sum_{all} x
+    # <=> sum((1 - max_road_diet_share) * x_trt002 - max_road_diet_share * x_other) <= 0
+    A_div = np.where(
+        treatment_ids == "TRT_002",
+        1.0 - max_road_diet_share,
+        -max_road_diet_share,
+    ).reshape(1, -1)
+
+    A = np.vstack([A_corr, A_budget, A_equity, A_min1, A_div])
 
     lb = np.concatenate([
         np.full(len(unique_corridors), -np.inf),
         np.array([-np.inf]),
         np.array([-np.inf]),
         np.array([1.0]),
+        np.array([-np.inf]),
     ])
     ub = np.concatenate([
         np.ones(len(unique_corridors)),
         np.array([budget]),
         np.array([0.0]),
         np.array([np.inf]),
+        np.array([0.0]),
     ])
 
     constraints = LinearConstraint(A, lb, ub)
@@ -157,6 +185,7 @@ def solve_portfolio_scenario(
     c = -df_scen["present_value_benefit"].values
     costs = df_scen["capital_project_cost"].values
     equity_flags = df_scen["equity_area_flag"].values.astype(float)
+    treatment_ids = df_scen["treatment_id"].values
     corridors = df_scen["corridor_id"].values
     unique_corridors = sorted(list(set(corridors)))
 
@@ -172,6 +201,7 @@ def solve_portfolio_scenario(
             c=c,
             costs=costs,
             equity_flags=equity_flags,
+            treatment_ids=treatment_ids,
             corridors=corridors,
             unique_corridors=unique_corridors,
             budget=budget,
@@ -265,7 +295,12 @@ def solve_portfolio_scenario(
     else:
         limiting_constraint = "NONE (SLACK)"
 
-    governance_labels = OFFICIAL_GOVERNANCE_LABELS if run_group == "OFFICIAL" else STRESS_GOVERNANCE_LABELS
+    if run_group == "OFFICIAL":
+        governance_labels = OFFICIAL_GOVERNANCE_LABELS
+    elif run_group == "WHAT-IF PLANNER GRID":
+        governance_labels = GRID_GOVERNANCE_LABELS
+    else:
+        governance_labels = STRESS_GOVERNANCE_LABELS
 
     summary_dict = {
         "portfolio_id": portfolio_id,
@@ -334,7 +369,7 @@ def run_portfolio_optimization(
     selections_parquet_path: Path = SELECTIONS_PARQUET_PATH,
     selections_csv_path: Path = SELECTIONS_CSV_PATH,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Execute complete Phase 4C portfolio optimization across all 36 runs."""
+    """Execute complete Phase 4C portfolio optimization across official, stress, and what-if grid runs."""
     t0 = time.time()
     print("=" * 80)
     print("PHASE 4C: PORTFOLIO OPTIMIZATION UNDER PLANNING BUDGETS & EQUITY FLOORS")
@@ -390,11 +425,31 @@ def run_portfolio_optimization(
             summary_rows.append(s_dict)
             detail_frames.append(d_df)
 
+    # 3. WHAT-IF PLANNER GRID RUNS (156 runs: 26 budgets x 6 equity floors)
+    print("Executing What-If Planner Grid Run Group (156 runs)...")
+    for b in GRID_BUDGETS:
+        b_m = int(b / 1e6)
+        for eq_f in GRID_EQUITY_FLOORS:
+            eq_pct = int(eq_f * 100)
+            portfolio_id = f"PORT_GRID_BASE_B{b_m}M_EQ{eq_pct}"
+
+            s_dict, d_df = solve_portfolio_scenario(
+                df_scenario=df_base,
+                portfolio_id=portfolio_id,
+                run_group="WHAT-IF PLANNER GRID",
+                uncertainty_scenario="BASE",
+                budget=b,
+                equity_floor=eq_f,
+            )
+            summary_rows.append(s_dict)
+            detail_frames.append(d_df)
+
     df_summary = pd.DataFrame(summary_rows)
     df_selections = pd.concat(detail_frames, ignore_index=True)
 
     official_excl = int(df_summary[df_summary["run_group"] == "OFFICIAL"]["excluded_bcr_candidate_count"].sum())
     stress_excl = int(df_summary[df_summary["run_group"] == "BINDING-BUDGET STRESS TEST"]["excluded_bcr_candidate_count"].sum())
+    grid_excl = int(df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]["excluded_bcr_candidate_count"].sum())
 
     # Save outputs
     summary_parquet_path.parent.mkdir(parents=True, exist_ok=True)
@@ -406,8 +461,9 @@ def run_portfolio_optimization(
     df_selections.to_csv(selections_csv_path, index=False)
 
     elapsed = time.time() - t0
-    print(f"\nCompleted 36 portfolio optimization runs in {elapsed:.2f}s.")
-    print(f"Candidate BCR Eligibility Filter (BCR >= {MIN_ELIGIBLE_BCR}): Excluded {official_excl} candidates across 27 official runs, {stress_excl} candidates across 9 stress runs.")
+    total_runs = len(df_summary)
+    print(f"\nCompleted {total_runs} portfolio optimization runs in {elapsed:.2f}s.")
+    print(f"Candidate BCR Eligibility Filter (BCR >= {MIN_ELIGIBLE_BCR}): Excluded {official_excl} (official), {stress_excl} (stress), {grid_excl} (grid).")
     print(f"Summary dataset: {len(df_summary)} rows -> {summary_parquet_path}")
     print(f"Detail dataset:  {len(df_selections)} rows -> {selections_parquet_path}")
     print("=" * 80)

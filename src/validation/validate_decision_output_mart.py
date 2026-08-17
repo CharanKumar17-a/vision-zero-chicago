@@ -122,18 +122,18 @@ def validate_decision_output_mart(
     s_rows = len(df_summary)
     s_uniq = df_summary["portfolio_id"].nunique()
     checks.append({
-        "check": "portfolio_summary_count_36",
+        "check": "portfolio_summary_count_192",
         "severity": "CRITICAL",
-        "passed": (s_rows == 36 and s_uniq == 36),
-        "evidence": f"Portfolio summary rows: {s_rows}, unique portfolio_ids: {s_uniq} (expected 36)",
+        "passed": (s_rows == 192 and s_uniq == 192),
+        "evidence": f"Portfolio summary rows: {s_rows}, unique portfolio_ids: {s_uniq} (expected 192: 27 official + 9 stress + 156 grid)",
     })
 
     sel_rows = len(df_selections)
     checks.append({
         "check": "project_selections_count_valid",
         "severity": "CRITICAL",
-        "passed": (sel_rows > 0 and sel_rows <= 1410),
-        "evidence": f"Project selection detail rows: {sel_rows} (valid range <= 1,410)",
+        "passed": (sel_rows > 0 and sel_rows <= 10000),
+        "evidence": f"Project selection detail rows: {sel_rows} (valid range <= 10,000)",
     })
 
     m_rows = len(df_master)

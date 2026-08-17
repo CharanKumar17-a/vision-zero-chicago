@@ -56,13 +56,13 @@ class TestStreamlitDeployment:
         load_portfolio_summary.clear()
         assert is_cloud_deployment_mode() is True
         df_dep = load_portfolio_summary()
-        assert len(df_dep) == 36
+        assert len(df_dep) == 192
 
         monkeypatch.setenv("VISION_ZERO_DATA_MODE", "local")
         load_portfolio_summary.clear()
         assert is_cloud_deployment_mode() is False
         df_loc = load_portfolio_summary()
-        assert len(df_loc) == 36
+        assert len(df_loc) == 192
 
         monkeypatch.setenv("VISION_ZERO_DATA_MODE", "auto")
         load_portfolio_summary.clear()
@@ -83,8 +83,8 @@ class TestStreamlitDeployment:
         df_master = verify_and_load_deployment_file("corridor_master.csv")
         df_benefits = verify_and_load_deployment_file("treatment_benefits.csv")
 
-        assert len(df_summary) == 36
-        assert len(df_selections) == 1362
+        assert len(df_summary) == 192
+        assert len(df_selections) == 6999
         assert len(df_master) == 43
         assert len(df_benefits) == 387
 
@@ -99,7 +99,7 @@ class TestStreamlitDeployment:
                 "portfolio_summary.csv": {
                     "filename": "portfolio_summary.csv",
                     "sha256_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
-                    "row_count": 36,
+                    "row_count": 192,
                     "columns": ["portfolio_id"],
                 }
             }

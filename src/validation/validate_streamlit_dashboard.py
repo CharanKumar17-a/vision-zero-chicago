@@ -144,7 +144,7 @@ def validate_streamlit_dashboard(
             m_data = json.load(f)
         files_dict = m_data.get("files", {})
         counts_ok = (
-            files_dict.get("portfolio_summary.csv", {}).get("row_count") == 36
+            files_dict.get("portfolio_summary.csv", {}).get("row_count") == 192
             and files_dict.get("project_selections.csv", {}).get("row_count") > 0
             and files_dict.get("corridor_master.csv", {}).get("row_count") == 43
             and files_dict.get("treatment_benefits.csv", {}).get("row_count") == 387

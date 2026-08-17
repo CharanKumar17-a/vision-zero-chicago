@@ -271,6 +271,104 @@ st.dataframe(
     height=350,
 )
 
+st.markdown("---")
+st.subheader("4. What-if capital planner")
+st.caption("Precomputed illustrative grid; nearest portfolio shown.")
+
+st.markdown(
+    "Explore how capital allocation and equity requirements respond to custom budget ceilings and equity floors across the precomputed optimization grid."
+)
+
+wif_col1, wif_col2 = st.columns(2)
+with wif_col1:
+    user_budget_m = st.slider(
+        "Select custom planning budget ($M)",
+        min_value=2,
+        max_value=25,
+        value=15,
+        step=1,
+        help="Interactive slider over precomputed budget grid ($2M to $25M in $1M increments)."
+    )
+with wif_col2:
+    user_equity_pct = st.select_slider(
+        "Select minimum equity spending floor",
+        options=[15, 20, 25, 30, 35, 40],
+        value=20,
+        format_func=lambda x: f"{x}%",
+        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors."
+    )
+
+target_portfolio_id = f"PORT_GRID_BASE_B{user_budget_m}M_EQ{user_equity_pct}"
+
+if target_portfolio_id in df_summary["portfolio_id"].values:
+    wif_s_row = get_single_portfolio_summary(df_summary, target_portfolio_id)
+    wif_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, target_portfolio_id)
+else:
+    wif_s_row = s_row
+    wif_sel_benefits = df_sel_benefits
+
+wif_k = wif_sel_benefits["crashes_averted_k"].sum()
+wif_a = wif_sel_benefits["crashes_averted_a"].sum()
+wif_ksi = wif_k + wif_a
+
+st.info(
+    f"**Precomputed scenario active:** Budget Ceiling: **${user_budget_m}M** | Equity Floor: **{user_equity_pct}%** | Scenario ID: `{wif_s_row['portfolio_id']}`"
+)
+
+wc1, wc2, wc3, wc4 = st.columns(4)
+with wc1:
+    st.metric("Modeled capital cost", format_currency(wif_s_row["selected_capital_cost"]))
+with wc2:
+    st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} / 43")
+with wc3:
+    st.metric("Annual KSI averted", f"~{wif_ksi:,.1f} / yr")
+with wc4:
+    st.metric("Achieved equity share", format_percent(wif_s_row["achieved_equity_share"]))
+
+wif_table = wif_sel_benefits[[
+    "corridor_id",
+    "corridor_name",
+    "treatment_name",
+    "capital_project_cost",
+    "crashes_averted_total",
+    "crashes_averted_k",
+    "crashes_averted_a",
+    "equity_area_flag",
+    "physical_applicability_status",
+]].copy()
+wif_table["equity_area_flag"] = wif_table["equity_area_flag"].apply(lambda x: "Yes" if x else "No")
+wif_table.columns = [
+    "Corridor ID",
+    "Corridor Name",
+    "Recommended Treatment",
+    "Capital Cost",
+    "Total Crashes Averted / Yr",
+    "Fatal (K) Averted / Yr",
+    "Serious Injury (A) Averted / Yr",
+    "Equity Priority Area",
+    "Physical Applicability",
+]
+
+st.dataframe(
+    wif_table.style.format({
+        "Capital Cost": "${:,.0f}",
+        "Total Crashes Averted / Yr": "{:,.2f}",
+        "Fatal (K) Averted / Yr": "{:,.2f}",
+        "Serious Injury (A) Averted / Yr": "{:,.2f}",
+    }),
+    use_container_width=True,
+    hide_index=True,
+    height=280,
+)
+
+csv_data = wif_table.to_csv(index=False).encode("utf-8")
+st.download_button(
+    label=f"Download what-if portfolio CSV (${user_budget_m}M / {user_equity_pct}% equity)",
+    data=csv_data,
+    file_name=f"vision_zero_what_if_B{user_budget_m}M_EQ{user_equity_pct}.csv",
+    mime="text/csv",
+)
+
 render_engineering_review_banner()
 
 

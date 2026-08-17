@@ -40,13 +40,17 @@ class TestPortfolioOptimization:
         """Outputs exist and contain exact expected row counts and unique keys."""
         df_summary, df_selections = run_portfolio_optimization()
 
-        assert len(df_summary) == 36
-        assert df_summary["portfolio_id"].nunique() == 36
+        assert len(df_summary) == 192
+        assert df_summary["portfolio_id"].nunique() == 192
         assert len(df_summary[df_summary["run_group"] == "OFFICIAL"]) == 27
         assert len(df_summary[df_summary["run_group"] == "BINDING-BUDGET STRESS TEST"]) == 9
+        assert len(df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]) == 156
 
-        assert len(df_selections) == 1362
+        assert len(df_selections) == 6999
         assert df_selections.duplicated(subset=["portfolio_id", "corridor_id"]).sum() == 0
+
+        # Diversification cap check (Decision D026: Road Diet share <= 70%)
+        assert (df_summary["road_diet_project_share"] <= 0.70 + 1e-4).all()
 
     def test_official_runs_binding_budget_and_diversity(self):
         """Official $15M runs bind under realistic costs and select non-Road Diet treatments for MultiLineString corridors."""
@@ -71,9 +75,9 @@ class TestPortfolioOptimization:
         assert (stress_summary["budget_constraint_status"] == "EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR").all()
 
         counts_by_budget = stress_summary.groupby("budget")["selected_project_count"].mean().to_dict()
-        assert counts_by_budget[2000000.0] == 16.0
-        assert counts_by_budget[4000000.0] == 24.0
-        assert counts_by_budget[6000000.0] == 30.0
+        assert counts_by_budget[2000000.0] == 20.0
+        assert counts_by_budget[4000000.0] == 18.0
+        assert counts_by_budget[6000000.0] == 28.0
 
     def test_repeat_solve_determinism(self):
         """Solving the same scenario 3 times produces 100% identical hash and objective value."""
@@ -90,7 +94,7 @@ class TestPortfolioOptimization:
             num_repeat_solves=3,
         )
         assert s_dict["solver_status"] == "OPTIMAL"
-        assert len(d_df) == 42
+        assert len(d_df) == 39
 
     def test_summary_detail_reconciliation(self):
         """Summary total costs and benefits reconcile exactly to the sum of detail selections."""
