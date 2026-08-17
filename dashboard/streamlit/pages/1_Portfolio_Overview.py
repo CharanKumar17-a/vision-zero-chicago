@@ -21,25 +21,28 @@ import streamlit as st
 from dashboard.streamlit.components import (
     format_currency,
     format_percent,
-    render_economic_caveat_banner,
     render_engineering_review_banner,
     render_governance_header_banner,
     render_page_header,
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
+    get_selected_portfolio_benefits,
+    get_single_portfolio_summary,
     load_corridor_master,
     load_portfolio_summary,
     load_project_selections,
     load_treatment_benefits,
-    get_selected_portfolio_benefits,
-    get_single_portfolio_selections,
-    get_single_portfolio_summary,
 )
 
 render_page_header(
-    "Portfolio Overview",
+    "Portfolio overview",
     "Interactive decision support for provisional high-crash corridor treatment portfolios.",
+)
+
+st.markdown(
+    "**How to read this page:** Use the sidebar controls to explore portfolio investment scenarios. "
+    "This page summarizes the selected capital program, funding coverage, safety impacts, and equity distribution."
 )
 
 # Load serving datasets
@@ -59,56 +62,60 @@ is_official = (s_row["run_group"] == "OFFICIAL")
 render_governance_header_banner(s_row["run_group"], is_official)
 
 st.markdown("---")
-st.subheader("Core Portfolio Metrics")
+st.subheader("Core portfolio metrics")
 
-# Hero KPI Cards
-col1, col2, col3, col4, col5, col6 = st.columns(6)
+# Hero KPI Cards (4 primary decision metrics)
+col1, col2, col3, col4 = st.columns(4)
+
+annual_k = df_sel_benefits["crashes_averted_k"].sum()
+annual_a = df_sel_benefits["crashes_averted_a"].sum()
+annual_ksi = annual_k + annual_a
 
 with col1:
     st.metric(
-        "Selected Projects",
-        f"{int(s_row['selected_project_count'])} / 43",
-        help="Count of candidate corridors selected for capital investment in this scenario.",
-    )
-
-with col2:
-    st.metric(
-        "Modeled Capital Cost",
+        "Modeled capital cost",
         format_currency(s_row["selected_capital_cost"]),
         help="Total estimated initial construction cost for all selected corridor projects.",
     )
 
-with col3:
-    utilization_ratio = s_row["selected_capital_cost"] / s_row["budget_usd"] if s_row["budget_usd"] > 0 else 0.0
+with col2:
     st.metric(
-        "Budget Utilization",
-        format_percent(utilization_ratio),
-        help="Selected capital cost divided by planning budget ceiling.",
+        "Corridors funded",
+        f"{int(s_row['selected_project_count'])} / 43",
+        help="Count of candidate corridors selected for capital investment in this scenario.",
+    )
+
+with col3:
+    st.metric(
+        "Annual KSI averted",
+        f"~{annual_ksi:,.1f} / yr",
+        help="Estimated annual fatal (K) and serious injury (A) crashes prevented across funded corridors.",
     )
 
 with col4:
     st.metric(
-        "Achieved Equity Share",
+        "Achieved equity share",
         format_percent(s_row["achieved_equity_share"]),
         delta=f"Floor: {format_percent(s_row['equity_floor'])}",
         help="Percentage of capital investment allocated to high-SVI equity priority areas.",
     )
 
-with col5:
-    tot_ksi_2026 = df_master["annual_forecast_ksi_crashes_2026"].sum()
-    st.metric(
-        "2026 Baseline KSI Forecast",
-        f"{tot_ksi_2026:,.1f} / yr",
-        help="Forward-looking 2026 baseline KSI forecast across all 43 candidate corridors calibrated using empirical validation evidence.",
-    )
+# Secondary Metrics Expander
+utilization_ratio = s_row["selected_capital_cost"] / s_row["budget_usd"] if s_row["budget_usd"] > 0 else 0.0
+tot_ksi_2026 = df_master["annual_forecast_ksi_crashes_2026"].sum()
+tot_averted = df_sel_benefits["crashes_averted_total"].sum()
 
-with col6:
-    tot_averted = df_sel_benefits["crashes_averted_total"].sum()
-    st.metric(
-        "Annual Crashes Averted",
-        f"{tot_averted:,.1f} / yr",
-        help="Model-estimated annual reduction in total crashes across funded corridors.",
-    )
+with st.expander("View secondary metrics and economic indicators", expanded=False):
+    sec1, sec2, sec3 = st.columns(3)
+    with sec1:
+        st.metric("Budget utilization", format_percent(utilization_ratio), help="Selected capital cost divided by planning budget ceiling.")
+        st.metric("Total crashes averted", f"{tot_averted:,.1f} / yr", help="Model-estimated annual reduction in total crashes across funded corridors.")
+    with sec2:
+        st.metric("2026 baseline KSI forecast", f"{tot_ksi_2026:,.1f} / yr", help="Calibrated 2026 baseline KSI forecast across all 43 corridors.")
+        st.metric("Total present value benefit", format_currency(s_row["total_present_value_benefit"]), help="Comprehensive 20-year present value benefit.")
+    with sec3:
+        st.metric("Total net present benefit", format_currency(s_row["total_net_present_benefit"]), help="Present value benefit minus initial capital cost.")
+        st.metric("Portfolio BCR (comprehensive)", f"{s_row['portfolio_bcr']:,.1f} : 1", help="Planning-level benefit-cost ratio from comprehensive crash costs.")
 
 st.markdown("---")
 
@@ -116,56 +123,89 @@ st.markdown("---")
 c1, c2 = st.columns(2)
 
 with c1:
-    st.markdown("#### Capital Cost vs Selected Planning Budget")
+    st.markdown("#### Capital cost versus planning budget ceiling")
     fig_cost = go.Figure()
     fig_cost.add_trace(go.Bar(
-        x=["Selected Project Cost"],
+        x=["Selected capital cost"],
         y=[s_row["selected_capital_cost"]],
-        name="Selected Capital Cost",
+        name="Selected capital cost",
         marker_color="#1f77b4",
+        text=[format_currency(s_row["selected_capital_cost"])],
+        textposition="auto",
     ))
     fig_cost.add_trace(go.Bar(
-        x=["Budget Ceiling"],
+        x=["Budget ceiling"],
         y=[s_row["budget_usd"]],
-        name="Planning Budget Ceiling",
+        name="Planning budget ceiling",
         marker_color="#d62728",
+        text=[format_currency(s_row["budget_usd"])],
+        textposition="auto",
     ))
-    fig_cost.update_layout(barmode="group", height=320, margin=dict(l=20, r=20, t=30, b=20))
+    fig_cost.update_layout(
+        barmode="group",
+        height=320,
+        margin=dict(l=20, r=20, t=30, b=20),
+        yaxis=dict(tickprefix="$", tickformat="~s", title="Capital cost (USD)"),
+    )
     st.plotly_chart(fig_cost, use_container_width=True)
 
 with c2:
-    st.markdown("#### Achieved Equity Share vs Required Floor")
+    st.markdown("#### Achieved equity share versus required floor")
     fig_eq = go.Figure()
     fig_eq.add_trace(go.Bar(
-        x=["Achieved Spending Share", "Required Equity Floor"],
+        x=["Achieved spending share", "Required equity floor"],
         y=[s_row["achieved_equity_share"] * 100, s_row["equity_floor"] * 100],
         marker_color=["#2ca02c", "#ff7f0e"],
         text=[f"{s_row['achieved_equity_share']*100:.1f}%", f"{s_row['equity_floor']*100:.1f}%"],
         textposition="auto",
     ))
-    fig_eq.update_layout(yaxis_title="Percentage (%)", height=320, margin=dict(l=20, r=20, t=30, b=20))
+    fig_eq.update_layout(
+        height=320,
+        margin=dict(l=20, r=20, t=30, b=20),
+        yaxis=dict(ticksuffix="%", title="Spending share (%)"),
+    )
     st.plotly_chart(fig_eq, use_container_width=True)
 
 c3, c4 = st.columns(2)
 
 with c3:
-    st.markdown("#### Selected Project Cost Distribution")
+    st.markdown("#### Selected project cost distribution")
     fig_dist = px.histogram(
         df_sel_benefits,
         x="capital_project_cost",
         nbins=15,
-        title="Project Cost Distribution (USD)",
-        labels={"capital_project_cost": "Capital Project Cost ($)"},
+        labels={"capital_project_cost": "Capital project cost ($)"},
         color_discrete_sequence=["#1f77b4"],
     )
-    fig_dist.update_layout(height=320, margin=dict(l=20, r=20, t=30, b=20))
+    mean_cost = float(df_sel_benefits["capital_project_cost"].mean())
+    median_cost = float(df_sel_benefits["capital_project_cost"].median())
+    fig_dist.add_vline(
+        x=mean_cost,
+        line_dash="dash",
+        line_color="#d62728",
+        annotation_text=f"Mean: {format_currency(mean_cost)}",
+        annotation_position="top right",
+    )
+    fig_dist.add_vline(
+        x=median_cost,
+        line_dash="dot",
+        line_color="#2ca02c",
+        annotation_text=f"Median: {format_currency(median_cost)}",
+        annotation_position="top left",
+    )
+    fig_dist.update_layout(
+        height=320,
+        margin=dict(l=20, r=20, t=30, b=20),
+        xaxis=dict(tickprefix="$", tickformat="~s", title="Capital project cost (USD)"),
+        yaxis=dict(title="Corridor count"),
+    )
     st.plotly_chart(fig_dist, use_container_width=True)
 
 with c4:
-    st.markdown("#### Modeled Averted Crashes by Severity (Annual)")
+    st.markdown("#### Estimated annual averted crashes by severity")
     sev_data = {
-        "Severity": ["Fatal (K)", "Serious Injury (A)", "Minor Injury (B)", "Possible Injury (C)", "Property Damage (O)"],
-        "Annual Averted Crashes": [
+        "Severity": ["Fatal (K)", "Serious injury (A)", "Minor injury (B)", "Possible injury (C)", "Property damage (O)"],
+        "Annual averted crashes": [
             df_sel_benefits["crashes_averted_k"].sum(),
             df_sel_benefits["crashes_averted_a"].sum(),
             df_sel_benefits["crashes_averted_b"].sum(),
@@ -176,53 +216,58 @@ with c4:
     fig_sev = px.bar(
         pd.DataFrame(sev_data),
         x="Severity",
-        y="Annual Averted Crashes",
+        y="Annual averted crashes",
         text_auto=".1f",
         color="Severity",
         color_discrete_sequence=px.colors.qualitative.Set2,
     )
-    fig_sev.update_layout(height=320, margin=dict(l=20, r=20, t=30, b=20), showlegend=False)
+    fig_sev.update_layout(
+        height=320,
+        margin=dict(l=20, r=20, t=30, b=20),
+        showlegend=False,
+        yaxis=dict(title="Annual averted crashes"),
+    )
     st.plotly_chart(fig_sev, use_container_width=True)
 
 st.markdown("---")
-st.subheader("Selected Projects Detail Register")
+st.subheader("Selected projects detail register")
+
+df_table = df_sel_benefits[[
+    "corridor_id",
+    "corridor_name",
+    "treatment_name",
+    "capital_project_cost",
+    "crashes_averted_total",
+    "crashes_averted_k",
+    "crashes_averted_a",
+    "equity_area_flag",
+    "physical_applicability_status",
+]].copy()
+
+df_table["equity_area_flag"] = df_table["equity_area_flag"].apply(lambda x: "Yes" if x else "No")
+df_table.columns = [
+    "Corridor ID",
+    "Corridor Name",
+    "Recommended Treatment",
+    "Capital Cost",
+    "Total Crashes Averted / Yr",
+    "Fatal (K) Averted / Yr",
+    "Serious Injury (A) Averted / Yr",
+    "Equity Priority Area",
+    "Physical Applicability",
+]
+
 st.dataframe(
-    df_sel_benefits[[
-        "corridor_id",
-        "corridor_name",
-        "treatment_name",
-        "capital_project_cost",
-        "crashes_averted_total",
-        "crashes_averted_k",
-        "crashes_averted_a",
-        "equity_area_flag",
-        "physical_applicability_status",
-    ]].style.format({
-        "capital_project_cost": "${:,.0f}",
-        "crashes_averted_total": "{:,.2f}",
-        "crashes_averted_k": "{:,.2f}",
-        "crashes_averted_a": "{:,.2f}",
+    df_table.style.format({
+        "Capital Cost": "${:,.0f}",
+        "Total Crashes Averted / Yr": "{:,.2f}",
+        "Fatal (K) Averted / Yr": "{:,.2f}",
+        "Serious Injury (A) Averted / Yr": "{:,.2f}",
     }),
     use_container_width=True,
     hide_index=True,
     height=350,
 )
 
-st.markdown("---")
-# Secondary Economic Scenario Section
-st.subheader("Economic Scenario Analysis (Secondary Metrics)")
-render_economic_caveat_banner()
-
-ec1, ec2, ec3 = st.columns(3)
-with ec1:
-    st.metric("Total Present Value Benefit", format_currency(s_row["total_present_value_benefit"]))
-with ec2:
-    st.metric("Total Net Present Benefit", format_currency(s_row["total_net_present_benefit"]))
-with ec3:
-    st.metric(
-        "Portfolio Benefit-Cost Ratio (BCR)",
-        f"{s_row['portfolio_bcr']:,.1f}",
-        help="Planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns.",
-    )
-
 render_engineering_review_banner()
+

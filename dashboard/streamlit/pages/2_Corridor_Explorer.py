@@ -5,6 +5,7 @@ Contract: docs/data_quality/decision_output_mart_contract.md
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -13,7 +14,6 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import json
 import geopandas as gpd
 import pandas as pd
 import pydeck as pdk
@@ -29,20 +29,19 @@ from dashboard.streamlit.components import (
 )
 from dashboard.streamlit.data_access import (
     compute_economic_only_benefits,
+    get_selected_corridors_geodataframe,
+    get_selected_portfolio_benefits,
+    get_single_portfolio_summary,
     load_corridor_geodataframe,
     load_corridor_master,
     load_portfolio_summary,
     load_project_selections,
     load_treatment_benefits,
-    get_selected_corridors_geodataframe,
-    get_selected_portfolio_benefits,
-    get_single_portfolio_selections,
-    get_single_portfolio_summary,
 )
 
 render_page_header(
-    "Corridor Explorer",
-    "Spatial corridor risk overlay, SVI equity classification, and project candidate drilldown.",
+    "Corridor explorer",
+    "Spatial corridor risk overlay, equity classification, and project candidate drilldown.",
 )
 
 # Load serving datasets
@@ -61,10 +60,16 @@ df_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, po
 df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
 
 render_governance_header_banner(s_row["run_group"], (s_row["run_group"] == "OFFICIAL"))
-render_engineering_review_banner()
 
 st.markdown("---")
-st.subheader("Selected Portfolio Linework & Centroid Map (EPSG:4326)")
+st.subheader("Selected portfolio investment map")
+
+# Visual Map Legend
+col_leg1, col_leg2 = st.columns([1, 1])
+with col_leg1:
+    st.markdown("🟠 **High-SVI equity priority areas** (CDC Social Vulnerability Index proxy)")
+with col_leg2:
+    st.markdown("🔵 **Standard priority corridors**")
 
 # Prepare PyDeck map data for selected corridors
 gdf_sel = get_selected_corridors_geodataframe(df_selections, gdf_corridors, portfolio_id)
@@ -163,19 +168,22 @@ deck = pdk.Deck(
 
 st.pydeck_chart(deck, use_container_width=True)
 
-st.caption("Street Linework & Centroids: Orange = High-SVI Equity Priority Areas; Blue = Non-Equity Priority Corridors. (Note: Equity classification uses CDC/ATSDR Social Vulnerability Index [SVI] as a project-defined planning proxy, not the City of Chicago's official equity definition.)")
+st.caption(
+    "Note: Equity classification uses CDC/ATSDR Social Vulnerability Index (SVI) as a project-defined planning proxy, "
+    "not the City of Chicago's official equity definition."
+)
 
 st.markdown("---")
-st.subheader("Corridor Detail Inspector")
+st.subheader("Corridor detail inspector")
 
 # Corridor Selector Dropdown
 corridor_options = df_sel_benefits["corridor_id"].tolist()
 corridor_labels = {
-    row["corridor_id"]: f"{row['corridor_id']} - {row['corridor_name']} ({row['treatment_name']})"
+    row["corridor_id"]: f"{row['corridor_id']} — {row['corridor_name']} ({row['treatment_name']})"
     for idx, row in df_sel_benefits.iterrows()
 }
 selected_cid = st.selectbox(
-    "Select Corridor to Inspect",
+    "Select corridor to inspect:",
     options=corridor_options,
     format_func=lambda cid: corridor_labels[cid],
 )
@@ -214,14 +222,11 @@ with ic4:
 
 st.caption(
     f"Efficiency: Cost per KSI Averted = {cost_per_ksi_str} / KSI | Cost per Crash Averted = {cost_per_crash_str} / crash. "
-    "Lower cost per KSI averted = more efficient at preventing the most severe crashes. "
-    "Economic-only BCR uses FHWA 2025 direct tangible costs (medical, emergency, property, wage loss) without quality-of-life additions. "
-    "Note on crash figures: Expected values from the forecast model — not predictions of any individual crash event. "
-    "BCR figures reflect planning-level estimates from provisional costs and comprehensive crash costs — not expected City project returns."
+    "Lower cost per KSI averted indicates higher relative efficiency at preventing the most severe crashes."
 )
 
 st.markdown("---")
-st.subheader("Selected Projects Detail Table & Export")
+st.subheader("Selected projects detail table and export")
 
 df_export = df_sel_benefits[[
     "portfolio_id",
@@ -240,20 +245,53 @@ df_export = df_sel_benefits[[
     "physical_applicability_status",
 ]].copy()
 
+df_export["equity_area_flag"] = df_export["equity_area_flag"].apply(lambda x: "Yes" if x else "No")
 df_export["ksi_averted"] = df_export["crashes_averted_k"] + df_export["crashes_averted_a"]
 df_export["cost_per_ksi_averted"] = df_export["capital_project_cost"] / df_export["ksi_averted"].replace(0, float("nan"))
 df_export["cost_per_crash_averted"] = df_export["capital_project_cost"] / df_export["crashes_averted_total"].replace(0, float("nan"))
 
+df_export_display = df_export[[
+    "corridor_id",
+    "corridor_name",
+    "treatment_name",
+    "capital_project_cost",
+    "benefit_cost_ratio",
+    "bcr_economic_only",
+    "crashes_averted_total",
+    "crashes_averted_k",
+    "crashes_averted_a",
+    "cost_per_ksi_averted",
+    "cost_per_crash_averted",
+    "equity_area_flag",
+    "physical_applicability_status",
+]].copy()
+
+df_export_display.columns = [
+    "Corridor ID",
+    "Corridor Name",
+    "Recommended Treatment",
+    "Capital Cost",
+    "BCR (Comp)",
+    "BCR (Econ)",
+    "Total Crashes Averted / Yr",
+    "Fatal (K) Averted / Yr",
+    "Serious Injury (A) Averted / Yr",
+    "Cost / KSI Averted",
+    "Cost / Crash Averted",
+    "Equity Priority Area",
+    "Physical Applicability",
+]
+
 st.dataframe(
-    df_export.style.format({
-        "capital_project_cost": "${:,.0f}",
-        "benefit_cost_ratio": "{:,.1f}",
-        "bcr_economic_only": "{:,.1f}",
-        "crashes_averted_total": "{:,.2f}",
-        "crashes_averted_k": "{:,.2f}",
-        "crashes_averted_a": "{:,.2f}",
-        "cost_per_ksi_averted": "${:,.0f}",
-        "cost_per_crash_averted": "${:,.0f}",
+    df_export_display.style.format({
+        "Capital Cost": "${:,.0f}",
+        "BCR (Comp)": "{:,.1f}",
+        "BCR (Econ)": "{:,.1f}",
+        "Total Crashes Averted / Yr": "{:,.2f}",
+        "Fatal (K) Averted / Yr": "{:,.2f}",
+        "Serious Injury (A) Averted / Yr": "{:,.2f}",
+        "Cost / KSI Averted": "${:,.0f}",
+        "Cost / Crash Averted": "${:,.0f}",
     }),
     use_container_width=True,
     hide_index=True,
@@ -263,8 +301,11 @@ st.dataframe(
 # Download CSV button for CURRENTLY selected portfolio only
 csv_bytes = df_export.to_csv(index=False).encode("utf-8")
 st.download_button(
-    label=f"Download CSV for Active Portfolio ({portfolio_id})",
+    label=f"Download CSV for active scenario ({portfolio_id})",
     data=csv_bytes,
     file_name=f"vision_zero_portfolio_selections_{portfolio_id}.csv",
     mime="text/csv",
 )
+
+render_engineering_review_banner()
+
