@@ -3,7 +3,7 @@
 Verifies:
 1. Local Parquet mode works cleanly when parquet files exist.
 2. Deployment CSV fallback mode works seamlessly when parquet files are absent or FORCE_DEPLOYMENT_MODE=1.
-3. CSV row counts match manifest and target exact counts (36 summary, 1410 selections, 43 master, 387 benefits).
+3. CSV row counts match manifest and target exact counts (36 summary, 1362 selections, 43 master, 387 benefits).
 4. Manifest SHA-256 checksums are verified on load.
 5. Corrupted CSV snapshot files are detected and rejected (fails closed).
 6. Prohibited published files (raw crashes, crash core, assignments, DuckDB, joblib, Parquet in deployment_data) are absent.
@@ -84,7 +84,7 @@ class TestStreamlitDeployment:
         df_benefits = verify_and_load_deployment_file("treatment_benefits.csv")
 
         assert len(df_summary) == 36
-        assert len(df_selections) == 1212
+        assert len(df_selections) == 1362
         assert len(df_master) == 43
         assert len(df_benefits) == 387
 

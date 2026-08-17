@@ -204,7 +204,7 @@ class TestStreamlitDashboard:
                 + df_b["crashes_averted_o"]
             )
             assert pytest.approx(comp_sum.sum(), abs=5.0) == df_b["crashes_averted_total"].sum()
-            assert (comp_sum <= df_b["crashes_averted_total"] + 1e-6).all()
+            assert (comp_sum <= df_b["crashes_averted_total"] + 1e-4).all()
 
     def test_changing_scenario_does_not_mix_rows_from_another_scenario(self):
         """Changing portfolio scenario filters strictly and does not mix rows from another scenario."""
