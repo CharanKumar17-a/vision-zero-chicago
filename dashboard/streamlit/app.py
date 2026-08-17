@@ -17,7 +17,6 @@ import streamlit as st
 
 st.set_page_config(
     page_title="Vision Zero Chicago - Decision Support System",
-    page_icon="🚦",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -25,10 +24,10 @@ st.set_page_config(
 PAGES_DIR = Path(__file__).parent / "pages"
 
 pages = [
-    st.Page(str(PAGES_DIR / "0_Executive_Recommendation.py"), title="Executive Recommendation", icon="🎯", default=True),
-    st.Page(str(PAGES_DIR / "1_Portfolio_Overview.py"), title="Portfolio Overview", icon="📊"),
-    st.Page(str(PAGES_DIR / "2_Corridor_Explorer.py"), title="Corridor Explorer", icon="🗺️"),
-    st.Page(str(PAGES_DIR / "3_Governance_and_Methodology.py"), title="Governance & Methodology", icon="📜"),
+    st.Page(str(PAGES_DIR / "0_Executive_Recommendation.py"), title="Executive Recommendation", default=True),
+    st.Page(str(PAGES_DIR / "1_Portfolio_Overview.py"), title="Portfolio Overview"),
+    st.Page(str(PAGES_DIR / "2_Corridor_Explorer.py"), title="Corridor Explorer"),
+    st.Page(str(PAGES_DIR / "3_Governance_and_Methodology.py"), title="Governance & Methodology"),
 ]
 
 pg = st.navigation(pages)

@@ -86,24 +86,24 @@ st.markdown("---")
 st.subheader("Decision Support Contracts & Methodological Boundaries")
 
 st.markdown("""
-### Final Decision Authority
+#### Final Decision Authority
 > **City staff and engineering reviewers preserve final authority.**
 > The Vision Zero Chicago decision-support system provides transparent, reproducible analytical findings to inform planning. It does not automatically approve or program projects.
 
-### Analytical Grains & Lineage
+#### Analytical Grains & Lineage
 - **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 runs total: 27 Official, 9 Stress).
 - **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,212 detail rows across 36 runs).
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
 
-### Equity Definition Disclaimer
+#### Equity Definition Disclaimer
 - **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
 
-### Scenario Definitions
+#### Scenario Definitions
 - **OFFICIAL (27 runs)**: Scenarios evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 34 corridors in BASE scenario), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
 - **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \\$2M, \\$4M, and \\$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
-### Model Horizon & Threshold Policy
+#### Model Horizon & Threshold Policy
 - **Risk Horizon**: 2026 Annual Crash Forecast (Beta-Binomial conjugate shrinkage, Empirical Bayes KSI calibration).
 - **Corridor Inclusion**: Top 43 High-Crash Corridors (Tier 1 & Tier 2).
 - **Capital Discounting**: Real discount rate 3.0%, 20-year useful life for Road Diet (`TRT_002`) and Location Treatments (`TRT_001`, `TRT_004`).

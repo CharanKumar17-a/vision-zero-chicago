@@ -75,17 +75,17 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         evidence = load_validation_evidence()
         manifest_meta = evidence.get("deployment_manifest", {})
         gen_time = manifest_meta.get("generated_at_utc", "N/A")
-        st.sidebar.info(f"🌐 **Published Analytical Snapshot**\nGenerated: `{gen_time}`")
+        st.sidebar.info(f"**Published Analytical Snapshot**\nGenerated: `{gen_time}`")
 
     return selected_pid
 
 
 def render_page_header(page_title: str, subtitle: str | None = None) -> None:
-    """Render unified two-level header across all application pages."""
-    st.caption("Vision Zero Chicago — Safety Capital Investment Prioritization")
-    st.title(page_title)
+    """Render unified professional header across all application pages."""
+    st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
+    st.subheader(page_title)
     if subtitle:
-        st.markdown(subtitle)
+        st.caption(subtitle)
 
 
 def render_governance_header_banner(run_group: str, is_official: bool) -> None:

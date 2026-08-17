@@ -256,6 +256,7 @@ st.dataframe(
         "cost_per_crash_averted": "${:,.0f}",
     }),
     use_container_width=True,
+    hide_index=True,
     height=300,
 )
 

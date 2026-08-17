@@ -39,8 +39,7 @@ from dashboard.streamlit.data_access import (
 
 render_page_header(
     "Executive Recommendation",
-    "**What should we do?** High-level decision-support briefing and capital allocation recommendation "
-    "for City of Chicago transportation leadership.",
+    "High-level decision-support briefing and capital allocation recommendation for transportation leadership.",
 )
 
 # -----------------------------------------------------------------------------
@@ -82,7 +81,7 @@ annual_ksi_averted = annual_k_averted + annual_a_averted
 # -----------------------------------------------------------------------------
 # Section 1 — Recommended Portfolio
 # -----------------------------------------------------------------------------
-st.header("1. Recommended Portfolio")
+st.subheader("1. Recommended Portfolio")
 
 headline_text = (
     f"At a \\$15M planning budget, this portfolio funds **{selected_corridors_count} of {total_corridors_count}** "
@@ -113,7 +112,7 @@ st.caption(
 # Section 2 — What This Buys
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.header("2. What This Investment Buys")
+st.subheader("2. What This Investment Buys")
 
 st.markdown(
     "Over a 20-year project lifecycle with standard federal discount rates (3.0% real), "
@@ -123,7 +122,7 @@ st.markdown(
 col_benefit1, col_benefit2 = st.columns([3, 2])
 
 with col_benefit1:
-    st.subheader("Annual Safety Impact by Severity")
+    st.markdown("#### Annual Safety Impact by Severity")
     severity_data = [
         {"Severity Category": "Fatal Crashes (K)", "Crashes Averted / Year": f"{annual_k_averted:.2f}", "Share of Total": f"{(annual_k_averted / annual_crashes_averted) * 100:.2f}%"},
         {"Severity Category": "Incapacitating Injury Crashes (A)", "Crashes Averted / Year": f"{annual_a_averted:.2f}", "Share of Total": f"{(annual_a_averted / annual_crashes_averted) * 100:.2f}%"},
@@ -135,18 +134,18 @@ with col_benefit1:
     st.dataframe(pd.DataFrame(severity_data), use_container_width=True, hide_index=True)
 
 with col_benefit2:
-    st.subheader("Economic & Equity Return")
+    st.markdown("#### Economic & Equity Return")
     st.markdown(
         f"""
         - **Present Value Safety Benefit:** `{format_currency(total_pv_benefit)}`
         - **Portfolio Benefit-Cost Ratio (BCR):** `{portfolio_bcr:.1f} : 1`
         - **Achieved Equity Share:** `{achieved_equity_pct:.1f}%` (Policy Floor: `20.0%`)
-        - **Core Focus:** Every funded project provides an individual Benefit-Cost Ratio $\\ge 1.0$,
+        - **Core Focus:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0,
           with highest prioritization given to high-volume pedestrian and multi-lane arterial corridors.
         """
     )
 
-with st.expander("📊 View Economic-Only Cost View (Conservative)", expanded=False):
+with st.expander("View Economic-Only Cost View (Conservative)", expanded=False):
     st.markdown(
         "Using **economic-only crash costs** (FHWA 2025) yields a more conservative benefit estimate by accounting only for "
         "direct tangible economic costs (medical treatment, emergency services, wage loss, property damage) without quality-of-life additions. "
@@ -161,10 +160,10 @@ with st.expander("📊 View Economic-Only Cost View (Conservative)", expanded=Fa
         st.metric("Annual Economic Savings", f"{format_currency(total_annual_econ)} / yr", help="Estimated annual direct economic crash costs prevented.")
 
 # -----------------------------------------------------------------------------
-# Section 3 — What Is NOT Funded (Deferred Corridors)
+# Section 3 — What Is Deferred (Non-Funded Corridors)
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.header("3. What Is NOT Funded (Deferred Corridors)")
+st.subheader("3. What Is Deferred (Non-Funded Corridors)")
 
 selected_ids = set(rec_selections["corridor_id"])
 all_ids = set(df_master["corridor_id"])
@@ -216,7 +215,7 @@ df_deferred = pd.DataFrame(deferred_list).sort_values("Benefit-Cost Ratio (BCR)"
 
 st.markdown(
     f"Under the **\\$15M budget ceiling**, **{len(df_deferred)} corridors** are deferred. "
-    f"These corridors have viable safety projects (all $\\text{{BCR}} > 1.0$), but could not be accommodated "
+    f"These corridors have viable safety projects (all BCR > 1.0), but could not be accommodated "
     f"within the \\$15M ceiling because their cost exceeds the remaining budget slack ({format_currency(budget_slack)}) "
     f"or higher-ROI alternatives took precedence."
 )
@@ -228,10 +227,10 @@ st.caption(
 )
 
 # -----------------------------------------------------------------------------
-# Section 4 — Sensitivity to Budget & Stress-Scenario Explorer
+# Section 4 — Sensitivity to Budget & Stress Scenarios
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.header("4. Sensitivity to Budget & Stress-Scenario Explorer")
+st.subheader("4. Sensitivity to Budget & Stress Scenarios")
 
 st.markdown(
     "How does corridor coverage and total safety return scale if capital is severely constrained or if additional funds are appropriated? "
@@ -317,7 +316,7 @@ df_prog = pd.DataFrame(progression_records)
 col_sens_tbl, col_sens_chart = st.columns([3, 2])
 
 with col_sens_tbl:
-    st.subheader("Corridors & Safety Return by Budget Tier")
+    st.markdown("#### Corridors & Safety Return by Budget Tier")
     st.dataframe(
         df_prog[[
             "Budget Tier", "Scenario Type", "Corridor Coverage", "Total Capital Cost",
@@ -328,7 +327,7 @@ with col_sens_tbl:
     )
 
 with col_sens_chart:
-    st.subheader("Corridors Selected by Budget")
+    st.markdown("#### Corridors Selected by Budget")
     df_chart = df_prog[["Budget Tier", "Corridors Selected"]].set_index("Budget Tier")
     st.bar_chart(df_chart, height=220)
 
@@ -339,7 +338,7 @@ st.info(
 )
 
 # Interactive Stress-Scenario Drilldown
-st.subheader("🔎 Interactive Budget Scenario Inspector")
+st.markdown("#### Interactive Budget Scenario Inspector")
 selected_tier_label = st.selectbox(
     "Select Budget Scenario to Inspect:",
     options=list(tier_map.keys()),
@@ -398,10 +397,10 @@ df_tier_roster = pd.DataFrame(tier_roster)
 st.dataframe(df_tier_roster, use_container_width=True, hide_index=True)
 
 # -----------------------------------------------------------------------------
-# Section 5 — Top Risks & Limitations
+# Section 5 — Key Governance & Engineering Limitations
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.header("5. Top Risks & Decision Limitations")
+st.subheader("5. Key Governance & Engineering Limitations")
 
 with st.expander("Review 5 Critical Governance & Engineering Limitations", expanded=True):
     st.markdown(
@@ -427,6 +426,6 @@ with st.expander("Review 5 Critical Governance & Engineering Limitations", expan
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.caption(
-    "🚦 **Vision Zero Chicago Decision Support System** | "
+    "**Vision Zero Chicago Decision Support System** | "
     "Decision support only. Final authority remains with City staff and engineering review."
 )
