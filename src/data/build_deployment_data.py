@@ -5,7 +5,7 @@ Decision: D022 (Public demonstration snapshot approval)
 
 Generates:
 1. dashboard/streamlit/deployment_data/portfolio_summary.csv (36 rows)
-2. dashboard/streamlit/deployment_data/project_selections.csv (1,212 rows)
+2. dashboard/streamlit/deployment_data/project_selections.csv (1,362 rows)
 3. dashboard/streamlit/deployment_data/corridor_master.csv (43 rows with WGS84 WKT geometry)
 4. dashboard/streamlit/deployment_data/treatment_benefits.csv (387 rows)
 5. dashboard/streamlit/deployment_data/deployment_manifest.json
@@ -115,7 +115,7 @@ def build_deployment_data() -> Dict[str, Any]:
             sum_csv_path,
             df_sum,
             "data/processed/power_bi_portfolio_summary.parquet",
-            "portfolio_id x 1 row (36 planning scenarios)",
+            f"portfolio_id x 1 row ({len(df_sum):,} planning scenarios)",
             "Analyst-defined decision support scenarios under nonbinding planning budgets.",
         ),
         (
@@ -123,7 +123,7 @@ def build_deployment_data() -> Dict[str, Any]:
             sel_csv_path,
             df_sel,
             "data/processed/power_bi_project_selections.parquet",
-            "portfolio_id x corridor_id (1,212 selected treatment details)",
+            f"portfolio_id x corridor_id ({len(df_sel):,} selected treatment details)",
             "Provisional treatment selections subject to mandatory engineering field review.",
         ),
         (
@@ -131,7 +131,7 @@ def build_deployment_data() -> Dict[str, Any]:
             mas_csv_path,
             df_mas,
             "data/processed/power_bi_corridor_master.parquet & data/interim/high_crash_corridors.parquet",
-            "corridor_id x 1 row (43 high-crash corridors with WGS84 WKT linework)",
+            f"corridor_id x 1 row ({len(df_mas):,} high-crash corridors with WGS84 WKT linework)",
             "Top 43 High-Crash Corridor boundaries with EPSG:4326 linework WKT.",
         ),
         (
@@ -139,7 +139,7 @@ def build_deployment_data() -> Dict[str, Any]:
             ben_csv_path,
             df_ben,
             "data/processed/power_bi_treatment_benefits.parquet",
-            "corridor_id x treatment_id x scenario_level (387 candidate treatment benefit rows)",
+            f"corridor_id x treatment_id x scenario_level ({len(df_ben):,} candidate treatment benefit rows)",
             "CMF-based safety benefits and capital project cost estimates.",
         ),
     ]

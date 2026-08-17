@@ -1,15 +1,15 @@
 {
   "manifest_version": "1.0",
   "pipeline": "streamlit_public_community_cloud_deployment",
-  "generated_at_utc": "2026-08-17T14:56:03Z",
-  "source_validation_run_id": "20260817T145601Z",
+  "generated_at_utc": "2026-08-17T18:20:56Z",
+  "source_validation_run_id": "20260817T150635Z",
   "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
   "prohibited_data_included": false,
   "files": {
     "portfolio_summary.csv": {
       "filename": "portfolio_summary.csv",
       "authoritative_source": "data/processed/power_bi_portfolio_summary.parquet",
-      "source_validation_run_id": "20260817T145601Z",
+      "source_validation_run_id": "20260817T150635Z",
       "row_count": 36,
       "columns": [
         "portfolio_id",
@@ -50,14 +50,14 @@
       ],
       "analytical_grain": "portfolio_id x 1 row (36 planning scenarios)",
       "sha256_checksum": "34109fa31da169c415ea49125b42622ace596efac3b5f3a31dc7ea885b1206eb",
-      "generated_at_utc": "2026-08-17T14:56:03Z",
+      "generated_at_utc": "2026-08-17T18:20:56Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Analyst-defined decision support scenarios under nonbinding planning budgets."
     },
     "project_selections.csv": {
       "filename": "project_selections.csv",
       "authoritative_source": "data/processed/power_bi_project_selections.parquet",
-      "source_validation_run_id": "20260817T145601Z",
+      "source_validation_run_id": "20260817T150635Z",
       "row_count": 1362,
       "columns": [
         "portfolio_id",
@@ -84,16 +84,16 @@
         "selected_rank_by_benefit",
         "required_governance_labels"
       ],
-      "analytical_grain": "portfolio_id x corridor_id (1,212 selected treatment details)",
+      "analytical_grain": "portfolio_id x corridor_id (1,362 selected treatment details)",
       "sha256_checksum": "e2868813ba769cd2fb2a4b181a3e4a28ea933239c66a1c434ff6bc98955d69e4",
-      "generated_at_utc": "2026-08-17T14:56:03Z",
+      "generated_at_utc": "2026-08-17T18:20:56Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Provisional treatment selections subject to mandatory engineering field review."
     },
     "corridor_master.csv": {
       "filename": "corridor_master.csv",
       "authoritative_source": "data/processed/power_bi_corridor_master.parquet & data/interim/high_crash_corridors.parquet",
-      "source_validation_run_id": "20260817T145601Z",
+      "source_validation_run_id": "20260817T150635Z",
       "row_count": 43,
       "columns": [
         "corridor_id",
@@ -123,14 +123,14 @@
       ],
       "analytical_grain": "corridor_id x 1 row (43 high-crash corridors with WGS84 WKT linework)",
       "sha256_checksum": "99888f5fdd91c846f318eaf16d9ebbfae31737feb089fe8e5bca091001a5bd53",
-      "generated_at_utc": "2026-08-17T14:56:03Z",
+      "generated_at_utc": "2026-08-17T18:20:56Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "Top 43 High-Crash Corridor boundaries with EPSG:4326 linework WKT."
     },
     "treatment_benefits.csv": {
       "filename": "treatment_benefits.csv",
       "authoritative_source": "data/processed/power_bi_treatment_benefits.parquet",
-      "source_validation_run_id": "20260817T145601Z",
+      "source_validation_run_id": "20260817T150635Z",
       "row_count": 387,
       "columns": [
         "corridor_id",
@@ -164,7 +164,7 @@
       ],
       "analytical_grain": "corridor_id x treatment_id x scenario_level (387 candidate treatment benefit rows)",
       "sha256_checksum": "f8bac0a04a1d5bb38993a6ce63d830a1e49abfe9cb8e5032907bc6bb19b25e5f",
-      "generated_at_utc": "2026-08-17T14:56:03Z",
+      "generated_at_utc": "2026-08-17T18:20:56Z",
       "public_data_classification": "AGGREGATED_PUBLIC_DEMONSTRATION_SNAPSHOT",
       "limitations": "CMF-based safety benefits and capital project cost estimates."
     }
