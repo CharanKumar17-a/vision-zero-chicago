@@ -20,8 +20,11 @@ import pydeck as pdk
 import streamlit as st
 
 from dashboard.streamlit.components import (
+    format_cost_per_unit,
     format_currency,
+    format_equity_flag,
     format_percent,
+    render_economic_caveat_banner,
     render_engineering_review_banner,
     render_governance_header_banner,
     render_page_header,
@@ -50,6 +53,8 @@ df_selections = load_project_selections()
 df_master = load_corridor_master()
 df_benefits = load_treatment_benefits()
 gdf_corridors = load_corridor_geodataframe()
+
+total_corridors_count = len(df_master)
 
 # Render sidebar controls & get single selected portfolio_id
 portfolio_id = render_sidebar_controls(df_summary)
@@ -194,10 +199,10 @@ m_row = df_master[df_master["corridor_id"] == selected_cid].iloc[0]
 
 # Compute corridor efficiency metrics
 c_cost = float(c_row["capital_project_cost"])
-c_ksi_averted = float(c_row["crashes_averted_k"] + c_row["crashes_averted_a"])
+c_ksi_averted = float(c_row["crashes_averted_ksi"])
 c_tot_averted = float(c_row["crashes_averted_total"])
-cost_per_ksi_str = format_currency(c_cost / c_ksi_averted) if c_ksi_averted > 0 else "N/A"
-cost_per_crash_str = format_currency(c_cost / c_tot_averted) if c_tot_averted > 0 else "N/A"
+cost_per_ksi_str = format_cost_per_unit(c_cost, c_ksi_averted, "KSI")
+cost_per_crash_str = format_cost_per_unit(c_cost, c_tot_averted, "crash")
 
 c_comp_bcr = float(c_row["benefit_cost_ratio"])
 c_econ_bcr = float(c_row["bcr_economic_only"]) if "bcr_economic_only" in c_row and pd.notnull(c_row["bcr_economic_only"]) else 0.0
@@ -210,7 +215,7 @@ with ic1:
 with ic2:
     st.markdown(f"**2026 Forecast Total Crashes:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr")
     st.markdown(f"**2026 Forecast KSI Crashes:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr")
-    st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of 43")
+    st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
 with ic3:
     st.markdown(f"**Recommended Treatment:** {c_row['treatment_name']}")
     st.markdown(f"**Provisional Capital Cost:** {format_currency(c_row['capital_project_cost'])}")
@@ -221,13 +226,12 @@ with ic4:
     st.markdown(f"**BCR (Economic-Only):** `{c_econ_bcr:.1f} : 1`")
 
 st.caption(
-    f"Efficiency: Cost per KSI Averted = {cost_per_ksi_str} / KSI | Cost per Crash Averted = {cost_per_crash_str} / crash. "
+    f"Efficiency: Cost per KSI Averted = {cost_per_ksi_str} | Cost per Crash Averted = {cost_per_crash_str}. "
     "Lower cost per KSI averted indicates higher relative efficiency at preventing the most severe crashes."
 )
 
 st.markdown("---")
 st.subheader("3. Selected projects export table")
-
 
 df_export = df_sel_benefits[[
     "portfolio_id",
@@ -246,7 +250,7 @@ df_export = df_sel_benefits[[
     "physical_applicability_status",
 ]].copy()
 
-df_export["equity_area_flag"] = df_export["equity_area_flag"].apply(lambda x: "Yes" if x else "No")
+df_export["equity_area_flag"] = df_export["equity_area_flag"].apply(format_equity_flag)
 df_export["ksi_averted"] = df_export["crashes_averted_k"] + df_export["crashes_averted_a"]
 df_export["cost_per_ksi_averted"] = df_export["capital_project_cost"] / df_export["ksi_averted"].replace(0, float("nan"))
 df_export["cost_per_crash_averted"] = df_export["capital_project_cost"] / df_export["crashes_averted_total"].replace(0, float("nan"))
@@ -309,4 +313,4 @@ st.download_button(
 )
 
 render_engineering_review_banner()
-
+render_economic_caveat_banner()

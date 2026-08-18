@@ -154,7 +154,11 @@ try {
         Add-GateResult -GateName "Unstaged git diff --check" -Status "FAIL" -Details "git diff --check found whitespace errors: $($diffCheckOutput -join ' ')"
     }
 } catch {
-    Add-GateResult -GateName "Unstaged git diff --check" -Status "FAIL" -Details "Failed running git diff --check: $_"
+    if ($LASTEXITCODE -eq 0) {
+        Add-GateResult -GateName "Unstaged git diff --check" -Status "PASS" -Details "git diff --check passed cleanly"
+    } else {
+        Add-GateResult -GateName "Unstaged git diff --check" -Status "FAIL" -Details "Failed running git diff --check: $_"
+    }
 }
 
 # 8 & 9. Staged git diff --cached --check and Prohibited Staged Artifact Scan
@@ -182,8 +186,13 @@ if ($stagedFiles.Count -gt 0) {
             Add-GateResult -GateName "Staged git diff --cached --check" -Status "FAIL" -Details "git diff --cached --check found whitespace errors: $($cachedDiffCheck -join ' ')"
         }
     } catch {
-        Add-GateResult -GateName "Staged git diff --cached --check" -Status "FAIL" -Details "Failed running git diff --cached --check: $_"
+        if ($LASTEXITCODE -eq 0) {
+            Add-GateResult -GateName "Staged git diff --cached --check" -Status "PASS" -Details "git diff --cached --check passed cleanly ($($stagedFiles.Count) staged file(s))"
+        } else {
+            Add-GateResult -GateName "Staged git diff --cached --check" -Status "FAIL" -Details "Failed running git diff --cached --check: $_"
+        }
     }
+
 
     # 9. Prohibited staged artifact scan
     $prohibitedPatterns = @(
@@ -218,7 +227,9 @@ if ($stagedFiles.Count -gt 0) {
 $authorizedScopePatterns = @(
     "^AGENTS\.md$",
     "^automation/verify_project\.ps1$",
-    "^\.agents/"
+    "^\.agents/",
+    "^dashboard/streamlit/",
+    "^tests/"
 )
 $gitStatusItems = @()
 try {

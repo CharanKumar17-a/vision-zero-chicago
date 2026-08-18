@@ -341,7 +341,9 @@ def get_selected_portfolio_benefits(
     )
     if len(df_merged) != len(df_sel):
         raise ValueError(f"Join expansion detected during benefit panel merge for '{portfolio_id}'.")
+    df_merged["crashes_averted_ksi"] = df_merged["crashes_averted_k"] + df_merged["crashes_averted_a"]
     return df_merged
+
 
 
 def get_selected_corridors_geodataframe(

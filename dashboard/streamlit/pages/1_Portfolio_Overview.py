@@ -20,6 +20,7 @@ import streamlit as st
 
 from dashboard.streamlit.components import (
     format_currency,
+    format_equity_flag,
     format_percent,
     render_engineering_review_banner,
     render_governance_header_banner,
@@ -69,9 +70,8 @@ st.subheader("1. Core portfolio metrics")
 # Hero KPI Cards (4 primary decision metrics)
 col1, col2, col3, col4 = st.columns(4)
 
-annual_k = df_sel_benefits["crashes_averted_k"].sum()
-annual_a = df_sel_benefits["crashes_averted_a"].sum()
-annual_ksi = annual_k + annual_a
+total_corridors_count = len(df_master)
+annual_ksi = df_sel_benefits["crashes_averted_ksi"].sum()
 
 with col1:
     st.metric(
@@ -83,7 +83,7 @@ with col1:
 with col2:
     st.metric(
         "Corridors funded",
-        f"{int(s_row['selected_project_count'])} / 43",
+        f"{int(s_row['selected_project_count'])} / {total_corridors_count}",
         help="Count of candidate corridors selected for capital investment in this scenario.",
     )
 
@@ -247,7 +247,7 @@ df_table = df_sel_benefits[[
     "physical_applicability_status",
 ]].copy()
 
-df_table["equity_area_flag"] = df_table["equity_area_flag"].apply(lambda x: "Yes" if x else "No")
+df_table["equity_area_flag"] = df_table["equity_area_flag"].apply(format_equity_flag)
 df_table.columns = [
     "Corridor ID",
     "Corridor Name",
@@ -309,9 +309,7 @@ wif_s_row, is_exact = find_what_if_grid_portfolio(
 target_portfolio_id = str(wif_s_row["portfolio_id"])
 wif_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, target_portfolio_id)
 
-wif_k = wif_sel_benefits["crashes_averted_k"].sum()
-wif_a = wif_sel_benefits["crashes_averted_a"].sum()
-wif_ksi = wif_k + wif_a
+wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum()
 
 exact_note = "" if is_exact else f" *(Nearest precomputed match shown for ${user_budget_m}M / {user_equity_pct}% equity)*"
 
@@ -325,7 +323,7 @@ wc1, wc2, wc3, wc4 = st.columns(4)
 with wc1:
     st.metric("Modeled capital cost", format_currency(wif_s_row["selected_capital_cost"]))
 with wc2:
-    st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} / 43")
+    st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} / {total_corridors_count}")
 with wc3:
     st.metric("Annual KSI averted", f"~{wif_ksi:,.1f} / yr")
 with wc4:
@@ -342,7 +340,7 @@ wif_table = wif_sel_benefits[[
     "equity_area_flag",
     "physical_applicability_status",
 ]].copy()
-wif_table["equity_area_flag"] = wif_table["equity_area_flag"].apply(lambda x: "Yes" if x else "No")
+wif_table["equity_area_flag"] = wif_table["equity_area_flag"].apply(format_equity_flag)
 wif_table.columns = [
     "Corridor ID",
     "Corridor Name",
@@ -376,5 +374,3 @@ st.download_button(
 )
 
 render_engineering_review_banner()
-
-

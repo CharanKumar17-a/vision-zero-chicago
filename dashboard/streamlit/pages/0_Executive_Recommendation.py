@@ -21,8 +21,13 @@ import pandas as pd
 import streamlit as st
 
 from dashboard.streamlit.components import (
+    format_cost_per_unit,
     format_currency,
+    format_equity_flag,
     format_percent,
+    format_plural,
+    render_economic_caveat_banner,
+    render_engineering_review_banner,
 )
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
@@ -70,7 +75,7 @@ annual_a_averted = float(rec_benefits["crashes_averted_a"].sum())
 annual_b_averted = float(rec_benefits["crashes_averted_b"].sum())
 annual_c_averted = float(rec_benefits["crashes_averted_c"].sum())
 annual_o_averted = float(rec_benefits["crashes_averted_o"].sum())
-annual_ksi_averted = annual_k_averted + annual_a_averted
+annual_ksi_averted = float(rec_benefits["crashes_averted_ksi"].sum())
 
 # -----------------------------------------------------------------------------
 # Landing Header & 4 Key Decision Metrics Hero
@@ -204,22 +209,17 @@ for cid in unselected_ids:
     cand_ksi_averted = float(best_cand["crashes_averted_k"] + best_cand["crashes_averted_a"])
     cand_tot_averted = float(best_cand["crashes_averted_total"])
 
-    cost_per_ksi_str = format_currency(cand_cost / cand_ksi_averted) if cand_ksi_averted > 0 else "N/A"
-    cost_per_crash_str = format_currency(cand_cost / cand_tot_averted) if cand_tot_averted > 0 else "N/A"
-
-    is_equity = best_cand.get("equity_area_flag", False)
-    if isinstance(is_equity, (bool, int)):
-        equity_str = "Yes" if is_equity else "No"
-    else:
-        equity_str = str(is_equity)
+    cost_per_ksi_str = format_cost_per_unit(cand_cost, cand_ksi_averted, "KSI")
+    cost_per_crash_str = format_cost_per_unit(cand_cost, cand_tot_averted, "crash")
+    equity_str = format_equity_flag(best_cand.get("equity_area_flag", False))
 
     deferred_list.append({
         "Corridor ID": cid,
         "Corridor Name": c_master["corridor_name"],
         "Best Applicable Treatment": best_cand["treatment_name"],
         "Estimated Capital Cost": format_currency(cand_cost),
-        "Cost per KSI Averted": f"{cost_per_ksi_str} / KSI" if cost_per_ksi_str != "N/A" else "N/A",
-        "Cost per Crash Averted": f"{cost_per_crash_str} / crash" if cost_per_crash_str != "N/A" else "N/A",
+        "Cost per KSI Averted": cost_per_ksi_str,
+        "Cost per Crash Averted": cost_per_crash_str,
         "Benefit-Cost Ratio (BCR)": f"{float(best_cand['benefit_cost_ratio']):.1f}",
         "PV Safety Benefit": format_currency(float(best_cand["present_value_benefit"])),
         "Equity Priority Area": equity_str,
@@ -227,11 +227,12 @@ for cid in unselected_ids:
 
 df_deferred = pd.DataFrame(deferred_list).sort_values("Benefit-Cost Ratio (BCR)", ascending=False)
 
+deferred_count_str = format_plural(len(df_deferred), "corridor")
 st.markdown(
-    f"Under the **\\$15M budget ceiling**, **{len(df_deferred)} corridor** is deferred. "
-    f"This corridor has a viable safety project (BCR > 1.0), but could not be accommodated "
-    f"within the \\$15M ceiling because its cost exceeds the remaining budget slack ({format_currency(budget_slack)}) "
-    f"or higher-ROI alternatives took precedence."
+    f"Under the **\\$15M budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred. "
+    f"{'This corridor has a viable safety project' if len(df_deferred) == 1 else 'These corridors have viable safety projects'} (BCR > 1.0), "
+    f"but could not be accommodated within the \\$15M ceiling because costs exceed the remaining budget slack ({format_currency(budget_slack)}) "
+    f"or higher-ROI alternatives took precedence under portfolio diversification constraints."
 )
 
 st.dataframe(df_deferred, use_container_width=True, hide_index=True)
@@ -288,7 +289,7 @@ for _, row in pd.concat([sens_stress, sens_official]).sort_values("budget_usd").
     p_econ = compute_economic_only_benefits(p_benefits)
     pv_econ = float(p_econ["pv_economic_benefit"].sum())
     tot_crashes_av = float(p_benefits["crashes_averted_total"].sum())
-    ksi_av = float(p_benefits["crashes_averted_k"].sum() + p_benefits["crashes_averted_a"].sum())
+    ksi_av = float(p_benefits["crashes_averted_ksi"].sum())
 
     tier_type = "Diagnostic stress" if "STR" in pid else ("Official (binding)" if b_val == 15e6 else "Official (nonbinding)")
     display_label = f"{b_str} ({tier_type})"
@@ -346,8 +347,8 @@ with col_sens_chart:
     st.bar_chart(df_chart, height=220)
 
 st.info(
-    "**Budget finding**: At the **\\$15M** budget ceiling, **42 of 43 corridors** are funded. "
-    "Expanding to **\\$25M** adds the remaining deferred corridor, funding 100% of the network."
+    f"**Budget finding**: At the **\\$15M** budget ceiling, **{selected_corridors_count} of {total_corridors_count} corridors** are funded. "
+    f"Expanding to **\\$25M** funds all {total_corridors_count} corridors (100% network coverage)."
 )
 
 # Interactive Stress-Scenario Drilldown
@@ -378,21 +379,17 @@ with sc5:
 st.markdown(f"**Selected corridors for {selected_tier_label} ({sel_tier['n_sel']} corridors):**")
 
 tier_sel_benefits = sel_tier["benefits_df"].copy()
-tier_sel_benefits["ksi_averted"] = tier_sel_benefits["crashes_averted_k"] + tier_sel_benefits["crashes_averted_a"]
 
 tier_roster = []
 for _, crow in tier_sel_benefits.iterrows():
     cid = crow["corridor_id"]
     cm = df_master[df_master["corridor_id"] == cid].iloc[0]
     c_cost = float(crow["capital_project_cost"])
-    c_ksi = float(crow["ksi_averted"])
+    c_ksi = float(crow["crashes_averted_ksi"])
     c_tot = float(crow["crashes_averted_total"])
     c_bcr = float(crow["benefit_cost_ratio"])
-
-    is_eq = crow.get("equity_area_flag", False)
-    eq_str = "Yes" if (isinstance(is_eq, (bool, int)) and is_eq) else ("No" if isinstance(is_eq, (bool, int)) else str(is_eq))
-
-    cost_per_ksi_str = format_currency(c_cost / c_ksi) if c_ksi > 0 else "N/A"
+    eq_str = format_equity_flag(crow.get("equity_area_flag", False))
+    cost_per_ksi_str = format_cost_per_unit(c_cost, c_ksi, "KSI")
 
     tier_roster.append({
         "Corridor ID": cid,
@@ -402,7 +399,7 @@ for _, crow in tier_sel_benefits.iterrows():
         "Benefit-Cost Ratio": f"{c_bcr:.1f}",
         "Annual Total Crashes Averted": f"{c_tot:.2f} / yr",
         "Annual KSI Averted": f"{c_ksi:.2f} / yr",
-        "Cost per KSI Averted": f"{cost_per_ksi_str} / KSI" if cost_per_ksi_str != "N/A" else "N/A",
+        "Cost per KSI Averted": cost_per_ksi_str,
         "Equity Priority": eq_str,
     })
 
@@ -433,6 +430,9 @@ with st.expander("Review critical governance and engineering limitations", expan
           Portfolio scenarios represent decision-support alternatives. They do not constitute official City of Chicago capital budget commitments.
         """
     )
+
+render_engineering_review_banner()
+render_economic_caveat_banner()
 
 # -----------------------------------------------------------------------------
 # Footer

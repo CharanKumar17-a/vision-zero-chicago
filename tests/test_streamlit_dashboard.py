@@ -309,3 +309,52 @@ class TestStreamlitDashboard:
         assert not at.exception
         captions = [c.value for c in at.caption]
         assert any("PORT_OFF_BASE_B25M_EQ20" in text for text in captions)
+
+    def test_shared_formatting_helpers(self):
+        """Verify format_equity_flag, format_cost_per_unit, and format_plural behave correctly."""
+        from dashboard.streamlit.components import (
+            format_cost_per_unit,
+            format_equity_flag,
+            format_plural,
+        )
+
+        # Equity flag formatting
+        assert format_equity_flag(True) == "Yes"
+        assert format_equity_flag(False) == "No"
+        assert format_equity_flag(1) == "Yes"
+        assert format_equity_flag(0) == "No"
+        assert format_equity_flag("true") == "Yes"
+        assert format_equity_flag("No") == "No"
+
+        # Cost per unit formatting
+        assert format_cost_per_unit(100000.0, 2.0, "KSI") == "$50,000 / KSI"
+        assert format_cost_per_unit(100000.0, 0.0, "KSI") == "N/A"
+        assert format_cost_per_unit(100000.0, None, "KSI") == "N/A"
+
+        # Plural formatting
+        assert format_plural(1, "corridor") == "1 corridor"
+        assert format_plural(4, "corridor") == "4 corridors"
+        assert format_plural(0, "corridor") == "0 corridors"
+
+    def test_crashes_averted_ksi_in_selected_benefits(self):
+        """get_selected_portfolio_benefits includes crashes_averted_ksi column strictly equaling K + A."""
+        df_selections = load_project_selections()
+        df_benefits = load_treatment_benefits()
+
+        df_b = get_selected_portfolio_benefits(df_selections, df_benefits, DEFAULT_PORTFOLIO_ID)
+        assert "crashes_averted_ksi" in df_b.columns
+        expected_ksi = df_b["crashes_averted_k"] + df_b["crashes_averted_a"]
+        np.testing.assert_allclose(df_b["crashes_averted_ksi"], expected_ksi, rtol=1e-5)
+
+    def test_all_pages_render_without_exception_in_apptest(self):
+        """AppTest renders all 4 pages cleanly with zero exceptions."""
+        pages = [
+            "dashboard/streamlit/pages/0_Executive_Recommendation.py",
+            "dashboard/streamlit/pages/1_Portfolio_Overview.py",
+            "dashboard/streamlit/pages/2_Corridor_Explorer.py",
+            "dashboard/streamlit/pages/3_Governance_and_Methodology.py",
+        ]
+        for page_path in pages:
+            at = AppTest.from_file(page_path, default_timeout=30)
+            at.run()
+            assert not at.exception, f"Rendering failed for page: {page_path}"

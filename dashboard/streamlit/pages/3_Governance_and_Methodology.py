@@ -17,6 +17,7 @@ import pandas as pd
 import streamlit as st
 
 from dashboard.streamlit.components import (
+    render_economic_caveat_banner,
     render_engineering_review_banner,
     render_page_header,
     render_sidebar_controls,
@@ -89,15 +90,14 @@ with st.expander("Decision mart serving governance warnings (Phase 5A evidence)"
 st.markdown("---")
 st.subheader("3. Decision-support contracts and methodological boundaries")
 
-
 st.markdown("""
 #### Final decision authority
 > **City staff and engineering reviewers preserve final authority.**
 > The Vision Zero Chicago decision-support system provides transparent, reproducible analytical findings to inform planning. It does not automatically approve or program projects.
 
 #### Analytical grains and lineage
-- **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 runs total: 27 Official, 9 Stress).
-- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,362 detail rows across 36 runs).
+- **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 canonical optimization runs: 27 Official, 9 Stress; 192 total serving mart scenarios including What-If grid).
+- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,362 detail rows across 36 canonical runs; 6,999 detail rows across all serving mart scenarios).
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
 
@@ -105,7 +105,7 @@ st.markdown("""
 - **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
 
 #### Scenario definitions
-- **OFFICIAL (27 runs)**: Scenarios evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 42 corridors in BASE scenario), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
+- **OFFICIAL (27 runs)**: Scenarios evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 39 corridors in BASE scenario under D026/D027 Road Diet diversification and screening), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
 - **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \\$2M, \\$4M, and \\$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 #### Model horizon and threshold policy
@@ -115,4 +115,4 @@ st.markdown("""
 """)
 
 render_engineering_review_banner()
-
+render_economic_caveat_banner()

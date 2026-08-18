@@ -5,6 +5,8 @@ Contract: docs/data_quality/decision_output_mart_contract.md
 
 from __future__ import annotations
 
+from typing import Any
+
 import pandas as pd
 import streamlit as st
 
@@ -90,8 +92,9 @@ def render_governance_header_banner(run_group: str, is_official: bool) -> None:
     if is_official:
         st.info(
             "**Official planning scenario**: Under sourced planning-level treatment costs (D024), "
-            "the full 43-corridor network costs approx. \\$20–27M depending on scenario. The \\$15M planning budget is binding "
-            "(selects 42 of 43 corridors in BASE); \\$25M and \\$40M remain nonbinding (all eligible corridors fit). "
+            "the full 43-corridor network costs approx. \\$17.5M–\\$18.8M under Road Diet caps (D026/D027). "
+            "The \\$15M planning budget ceiling is binding (funding \\$14.99M of \\$15M in BASE scenario); "
+            "\\$25M and \\$40M remain nonbinding (all eligible corridors fit). "
             "Budget and equity scenarios are planning-level, not official City appropriations. "
             "Physical applicability remains UNKNOWN pending engineering field review."
         )
@@ -126,3 +129,27 @@ def format_currency(val: float) -> str:
 def format_percent(val: float) -> str:
     """Format decimal float as percentage string."""
     return f"{val * 100:.1f}%"
+
+
+def format_equity_flag(val: Any) -> str:
+    """Format boolean or numeric equity indicator as 'Yes' or 'No'."""
+    if isinstance(val, bool):
+        return "Yes" if val else "No"
+    if isinstance(val, (int, float)):
+        return "Yes" if val > 0 else "No"
+    if isinstance(val, str):
+        return "Yes" if val.strip().lower() in ("true", "1", "yes", "y") else "No"
+    return "No"
+
+
+def format_cost_per_unit(cost: float, units: float, unit_label: str = "KSI") -> str:
+    """Format cost per averted unit with safe zero-division handling."""
+    if units is not None and units > 0 and pd.notnull(units) and cost is not None and pd.notnull(cost):
+        return f"${cost / units:,.0f} / {unit_label}"
+    return "N/A"
+
+
+def format_plural(count: int, singular: str, plural: str | None = None) -> str:
+    """Format count with correct singular or plural noun."""
+    noun = singular if count == 1 else (plural or f"{singular}s")
+    return f"{count} {noun}"
