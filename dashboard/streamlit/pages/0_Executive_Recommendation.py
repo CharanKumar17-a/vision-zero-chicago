@@ -21,9 +21,13 @@ import pandas as pd
 import streamlit as st
 
 from dashboard.streamlit.components import (
+    format_bcr_compact,
     format_cost_per_unit,
+    format_count_compact,
     format_currency,
+    format_currency_compact,
     format_equity_flag,
+    format_ksi_compact,
     format_percent,
     format_plural,
     render_economic_caveat_banner,
@@ -97,27 +101,27 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric(
         "Estimated capital cost",
-        format_currency(selected_capital_cost),
-        help="Planning-level estimate of initial capital cost for shortlisted corridor projects.",
+        format_currency_compact(selected_capital_cost),
+        help=f"Planning-level estimate: {format_currency(selected_capital_cost)} initial capital cost across {selected_corridors_count} shortlisted corridors.",
     )
 with col2:
     st.metric(
         "Corridors funded",
         f"{selected_corridors_count} of {total_corridors_count}",
-        help="High-crash corridors shortlisted under the $15M planning budget scenario. Subject to engineering review and implementation approval.",
+        help=f"Denominator: {total_corridors_count} candidate corridors in the high-crash network. Numerator: {selected_corridors_count} corridors funded under $15M budget. Subject to engineering review.",
     )
 with col3:
     st.metric(
-        "Estimated annual KSI avoided",
-        f"~{annual_ksi_averted:,.1f} / yr",
-        help="Planning-level estimate of annual fatal (K) and serious injury (A) crashes avoided across shortlisted corridors.",
+        "Estimated KSI avoided / year",
+        f"{format_ksi_compact(annual_ksi_averted)} / yr",
+        help=f"Denominator: {selected_corridors_count} shortlisted corridors. Severity scope: Fatal (K) + Serious/Incapacitating injury (A) crashes. Planning-level estimate: ~{annual_ksi_averted:,.1f} KSI avoided / yr.",
     )
 with col4:
     st.metric(
         "Equity spend share",
         f"{achieved_equity_pct:.1f}%",
         delta=f"Floor: {format_percent(rec_summary['equity_floor'])}",
-        help="Percentage of planning capital investment allocated to high-SVI equity priority areas.",
+        help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI equity priority areas.",
     )
 
 st.markdown("")
@@ -126,10 +130,10 @@ st.markdown("")
 st.success(
     f"**Planning Recommendation:** Under the Baseline Scenario ($15M budget, 20% equity floor), "
     f"the optimized planning portfolio funds **{selected_corridors_count} of {total_corridors_count}** "
-    f"corridors for **{format_currency(selected_capital_cost)}**, with an estimated **{annual_crashes_averted:,.0f}** crashes avoided / yr "
-    f"(including **{annual_ksi_averted:,.1f}** fatal and serious injury crashes avoided), with "
+    f"corridors for **{format_currency_compact(selected_capital_cost)}** ({format_currency(selected_capital_cost)}), with an estimated **{format_count_compact(annual_crashes_averted)}** all-severity crashes avoided / year "
+    f"(including **{format_ksi_compact(annual_ksi_averted)}** KSI crashes avoided / year), with "
     f"**{achieved_equity_pct:.1f}%** of spend directed to high-SVI equity-priority areas. "
-    f"Subject to engineering review and implementation approval."
+    f"Planning-level estimates subject to engineering review and implementation approval."
 )
 
 st.caption(
@@ -144,7 +148,8 @@ st.subheader("1. What this planning investment buys")
 
 st.markdown(
     "Over a 20-year project lifecycle with standard federal discount rates (3.0% real), "
-    "this capital program delivers substantial and measurable life-safety reductions across Chicago's highest-risk roadways."
+    "this capital program delivers substantial and measurable life-safety reductions across Chicago's highest-risk roadways. "
+    "All figures represent planning-level estimates."
 )
 
 col_benefit1, col_benefit2 = st.columns([3, 2])
@@ -152,12 +157,12 @@ col_benefit1, col_benefit2 = st.columns([3, 2])
 with col_benefit1:
     st.markdown("#### Estimated annual safety impact by severity")
     severity_data = [
-        {"Severity category": "Fatal crashes (K)", "Estimated crashes avoided / year": f"{annual_k_averted:.2f}", "Share of total": f"{(annual_k_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Incapacitating injury crashes (A)", "Estimated crashes avoided / year": f"{annual_a_averted:.2f}", "Share of total": f"{(annual_a_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Non-incapacitating injury crashes (B)", "Estimated crashes avoided / year": f"{annual_b_averted:.2f}", "Share of total": f"{(annual_b_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Possible injury crashes (C)", "Estimated crashes avoided / year": f"{annual_c_averted:.2f}", "Share of total": f"{(annual_c_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Property damage only (O)", "Estimated crashes avoided / year": f"{annual_o_averted:.2f}", "Share of total": f"{(annual_o_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Total crashes (all severities)", "Estimated crashes avoided / year": f"{annual_crashes_averted:,.2f}", "Share of total": "100.00%"},
+        {"Severity category": "Fatal crashes (K)", "Estimated crashes avoided / year": f"{annual_k_averted:.2f}", "Share of all-severity total": f"{(annual_k_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Severity category": "Serious injury crashes (A)", "Estimated crashes avoided / year": f"{annual_a_averted:.2f}", "Share of all-severity total": f"{(annual_a_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Severity category": "Minor injury crashes (B)", "Estimated crashes avoided / year": f"{annual_b_averted:.2f}", "Share of all-severity total": f"{(annual_b_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Severity category": "Possible injury crashes (C)", "Estimated crashes avoided / year": f"{annual_c_averted:.2f}", "Share of all-severity total": f"{(annual_c_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Severity category": "Property damage only crashes (PDO / O)", "Estimated crashes avoided / year": f"{annual_o_averted:.2f}", "Share of all-severity total": f"{(annual_o_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Severity category": "All-severity crashes (Total)", "Estimated crashes avoided / year": f"{annual_crashes_averted:,.2f}", "Share of all-severity total": "100.00%"},
     ]
     st.dataframe(pd.DataFrame(severity_data), use_container_width=True, hide_index=True)
 
@@ -165,11 +170,11 @@ with col_benefit2:
     st.markdown("#### Economic and equity return summary")
     st.markdown(
         f"""
-        - **Present value safety benefit (planning-level):** `{format_currency(total_pv_benefit)}`
-        - **Portfolio benefit-cost ratio (BCR):** `{portfolio_bcr:.1f} : 1`
+        - **Present value safety benefit (planning-level estimate):** `{format_currency_compact(total_pv_benefit)}` ({format_currency(total_pv_benefit)})
+        - **Portfolio benefit-cost ratio (BCR, planning-level estimate):** `{format_bcr_compact(portfolio_bcr)}` ({portfolio_bcr:.1f} : 1)
         - **Achieved equity share:** `{achieved_equity_pct:.1f}%` (Policy floor: `20.0%`)
         - **Physical applicability:** `UNKNOWN` (Subject to engineering review and implementation approval)
-        - **Eligibility criteria:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0.
+        - **Eligibility criteria:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0 (planning-level estimate).
         """
     )
 
@@ -181,11 +186,11 @@ with st.expander("View conservative economic-only cost scenario", expanded=False
     )
     econ_col1, econ_col2, econ_col3 = st.columns(3)
     with econ_col1:
-        st.metric("Economic-only PV benefit", format_currency(total_pv_econ), help="Present value benefit using direct tangible economic costs.")
+        st.metric("Economic-only PV benefit", format_currency_compact(total_pv_econ), help=f"Planning-level estimate: {format_currency(total_pv_econ)} using direct tangible economic costs.")
     with econ_col2:
-        st.metric("Economic-only portfolio BCR", f"{bcr_econ_portfolio:.1f} : 1", help="Benefit-Cost Ratio under conservative economic-only costs.")
+        st.metric("Economic-only portfolio BCR", format_bcr_compact(bcr_econ_portfolio), help=f"Planning-level estimate: {bcr_econ_portfolio:.1f} : 1 Benefit-Cost Ratio under conservative economic-only costs.")
     with econ_col3:
-        st.metric("Annual economic savings", f"{format_currency(total_annual_econ)} / yr", help="Estimated annual direct economic crash costs prevented.")
+        st.metric("Annual economic savings", f"{format_currency_compact(total_annual_econ)} / yr", help=f"Planning-level estimate: {format_currency(total_annual_econ)} / yr direct economic crash costs prevented.")
 
 # -----------------------------------------------------------------------------
 # Section 2 — Deferred Corridors
@@ -375,17 +380,23 @@ sc1, sc2, sc3, sc4, sc5 = st.columns(5)
 with sc1:
     st.metric("Corridors funded", f"{sel_tier['n_sel']} of {total_corridors_count}", f"{(sel_tier['n_sel']/total_corridors_count)*100:.1f}% of network")
 with sc2:
-    st.metric("Estimated capital cost", format_currency(sel_tier["c_cost"]), f"Budget: {sel_tier['budget_str']}")
+    st.metric("Estimated capital cost", format_currency_compact(sel_tier["c_cost"]), f"Budget: {sel_tier['budget_str']}")
 with sc3:
-    st.metric("PV safety benefit (comp)", format_currency(sel_tier["pv_comp"]), f"BCR: {sel_tier['bcr_comp']:.1f} : 1")
+    st.metric("PV safety benefit (comp)", format_currency_compact(sel_tier["pv_comp"]), f"BCR: {format_bcr_compact(sel_tier['bcr_comp'])}")
 with sc4:
     econ_bcr_val = sel_tier["pv_econ"] / sel_tier["c_cost"] if sel_tier["c_cost"] > 0 else 0.0
-    st.metric("PV benefit (economic-only)", format_currency(sel_tier["pv_econ"]), f"Econ BCR: {econ_bcr_val:.1f} : 1")
+    st.metric("PV benefit (economic-only)", format_currency_compact(sel_tier["pv_econ"]), f"Econ BCR: {format_bcr_compact(econ_bcr_val)}")
 with sc5:
-    st.metric("Estimated crashes avoided", f"{sel_tier['crashes_averted']:,.1f} / yr", f"KSI: {sel_tier['ksi_averted']:.2f} / yr")
+    st.metric(
+        "Estimated all-severity crashes avoided / year",
+        f"{format_count_compact(sel_tier['crashes_averted'])} / yr",
+        f"KSI: {format_ksi_compact(sel_tier['ksi_averted'])} / yr",
+        help=f"Denominator: {sel_tier['n_sel']} shortlisted corridors in this scenario. Severity scope: All-severity crashes (K, A, B, C, O) with KSI sub-breakdown.",
+    )
 
 # Display corridor roster table for this scenario
 st.markdown(f"**Shortlisted corridors for {selected_tier_label} ({sel_tier['n_sel']} corridors):**")
+st.caption("Planning-level treatment recommendations subject to engineering review and implementation approval.")
 
 tier_sel_benefits = sel_tier["benefits_df"].copy()
 
@@ -399,6 +410,7 @@ for _, crow in tier_sel_benefits.iterrows():
     c_bcr = float(crow["benefit_cost_ratio"])
     eq_str = format_equity_flag(crow.get("equity_area_flag", False))
     cost_per_ksi_str = format_cost_per_unit(c_cost, c_ksi, "KSI")
+    cost_per_crash_str = format_cost_per_unit(c_cost, c_tot, "crash")
 
     tier_roster.append({
         "Corridor ID": cid,
@@ -406,9 +418,10 @@ for _, crow in tier_sel_benefits.iterrows():
         "Recommended Treatment": crow["treatment_name"],
         "Estimated Capital Cost": format_currency(c_cost),
         "Benefit-Cost Ratio": f"{c_bcr:.1f}",
-        "Estimated Annual Crashes Avoided": f"{c_tot:.2f} / yr",
-        "Estimated Annual KSI Avoided": f"{c_ksi:.2f} / yr",
+        "Estimated All-Severity Crashes Avoided / Yr": f"{c_tot:.2f} / yr",
+        "Estimated KSI Avoided / Yr": f"{c_ksi:.2f} / yr",
         "Cost per KSI Avoided": cost_per_ksi_str,
+        "Cost per All-Severity Crash Avoided": cost_per_crash_str,
         "Equity Priority Area": eq_str,
     })
 

@@ -29,6 +29,17 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from dashboard.streamlit.components import (
+    format_bcr_compact,
+    format_cost_per_unit,
+    format_count_compact,
+    format_currency,
+    format_currency_compact,
+    format_equity_flag,
+    format_ksi_compact,
+    format_percent,
+    format_plural,
+)
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
     find_what_if_grid_portfolio,
@@ -311,13 +322,7 @@ class TestStreamlitDashboard:
         assert any("PORT_OFF_BASE_B25M_EQ20" in text for text in captions)
 
     def test_shared_formatting_helpers(self):
-        """Verify format_equity_flag, format_cost_per_unit, and format_plural behave correctly."""
-        from dashboard.streamlit.components import (
-            format_cost_per_unit,
-            format_equity_flag,
-            format_plural,
-        )
-
+        """Verify format_equity_flag, format_cost_per_unit, format_plural, and compact formatters behave correctly."""
         # Equity flag formatting
         assert format_equity_flag(True) == "Yes"
         assert format_equity_flag(False) == "No"
@@ -335,6 +340,23 @@ class TestStreamlitDashboard:
         assert format_plural(1, "corridor") == "1 corridor"
         assert format_plural(4, "corridor") == "4 corridors"
         assert format_plural(0, "corridor") == "0 corridors"
+
+        # Compact executive formatters (False Precision Remediation)
+        assert format_currency_compact(14988510.0) == "$15.0M"
+        assert format_currency_compact(14988900.0) == "$15.0M"
+        assert format_currency_compact(4003734895.7) == "$4.00B"
+        assert format_currency_compact(400000.0) == "$400k"
+        assert format_currency_compact(500.0) == "$500"
+
+        assert format_bcr_compact(275.0) == "~275:1"
+        assert format_bcr_compact(267.12) == "~267:1"
+        assert format_bcr_compact(2.67) == "~2.7:1"
+
+        assert format_count_compact(2384.6) == "~2,385"
+        assert format_count_compact(2170.2) == "~2,170"
+
+        assert format_ksi_compact(48.8) == "~49"
+        assert format_ksi_compact(48.04) == "~48"
 
     def test_crashes_averted_ksi_in_selected_benefits(self):
         """get_selected_portfolio_benefits includes crashes_averted_ksi column strictly equaling K + A."""
@@ -446,3 +468,56 @@ class TestStreamlitDashboard:
         # Mathematically optimal under stated assumptions qualification
         caption_texts = [c.value for c in at.caption]
         assert any("Mathematically optimal under stated assumptions" in text for text in caption_texts)
+
+    def test_false_precision_remediation_and_planning_estimate_labels(self):
+        """Verify that executive cards use decision-relevant rounded formats and include planning-level estimate notes."""
+        at = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at.run()
+        assert not at.exception
+
+        # Check metric values on Page 0
+        metric_values = [m.value for m in at.metric]
+        # Executive cards: $15.0M, 39 of 43, ~48 / yr, 47.4%
+        assert "$15.0M" in metric_values
+        assert "39 of 43" in metric_values
+        assert "~48 / yr" in metric_values
+
+        # Check that metric tooltips contain "Planning-level estimate"
+        metric_helps = [m.help for m in at.metric if m.help is not None]
+        assert any("Planning-level estimate" in h for h in metric_helps)
+
+        # Check Page 1 (Portfolio Overview) metric cards
+        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1.run()
+        assert not at1.exception
+
+        metric1_values = [m.value for m in at1.metric]
+        assert "$15.0M" in metric1_values
+        assert "~48 / yr" in metric1_values
+
+    def test_severity_and_denominator_clarity(self):
+        """Verify that KPI labels explicitly distinguish all-severity crashes, KSI, and baseline forecasts with tooltips."""
+        at = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at.run()
+        assert not at.exception
+
+        # Check metric labels on Page 0
+        labels0 = [m.label for m in at.metric]
+        assert "Estimated KSI avoided / year" in labels0
+
+        # Check tooltips for denominator and severity scope explanations
+        helps0 = [m.help for m in at.metric if m.help is not None]
+        assert any("Denominator:" in h and "Severity scope:" in h for h in helps0)
+
+        # Check Page 1 (Portfolio Overview)
+        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1.run()
+        assert not at1.exception
+
+        labels1 = [m.label for m in at1.metric]
+        assert "Estimated KSI avoided / year" in labels1
+        assert "Estimated all-severity crashes avoided / year" in labels1
+        assert "Baseline KSI / year" in labels1
+
+        helps1 = [m.help for m in at1.metric if m.help is not None]
+        assert any("Denominator:" in h and "Severity scope:" in h for h in helps1)

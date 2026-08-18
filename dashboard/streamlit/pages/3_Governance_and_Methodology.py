@@ -111,10 +111,14 @@ st.markdown("""
 - **OFFICIAL (27 runs)**: Approved planning scenario group evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 39 corridors in the Baseline Scenario under D026/D027 Road Diet diversification and screening), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
 - **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \\$2M, \\$4M, and \\$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
-#### Model horizon and threshold policy
-- **Risk Horizon**: 2026 Annual Crash Forecast (Beta-Binomial conjugate shrinkage, Empirical Bayes KSI calibration).
-- **Corridor Inclusion**: Top 43 High-Crash Corridors (Tier 1 & Tier 2).
-- **Capital Discounting**: Real discount rate 3.0%, 20-year useful life for Road Diet (`TRT_002`) and Location Treatments (`TRT_001`, `TRT_004`).
+#### Crash severity definitions and analytical denominators
+- **All-Severity Crashes**: Comprehensive sum of all police-reported crash severities under the KABCO scale (`K` + `A` + `B` + `C` + `O`).
+- **KSI Crashes (Life-Safety Metric)**: Fatal crashes (`K`) plus Serious / Incapacitating injury crashes (`A`). Evaluated as the primary life-safety objective.
+- **Minor & Possible Injury Crashes**: Non-incapacitating injury crashes (`B`) and Possible / complaint-of-injury crashes (`C`).
+- **Property Damage Only (PDO / O)**: Non-injury property damage crashes.
+- **Analytical Denominators**:
+  - *Network Baseline*: Evaluated across all 43 candidate high-crash corridors (~78.8 Baseline KSI / yr).
+  - *Portfolio Averted Metrics*: Aggregated strictly over the subset of shortlisted corridors funded within each active scenario (e.g., 39 funded corridors in the $15M Baseline Scenario).
 """)
 
 render_engineering_review_banner()

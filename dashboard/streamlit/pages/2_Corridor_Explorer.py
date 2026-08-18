@@ -20,9 +20,13 @@ import pydeck as pdk
 import streamlit as st
 
 from dashboard.streamlit.components import (
+    format_bcr_compact,
     format_cost_per_unit,
+    format_count_compact,
     format_currency,
+    format_currency_compact,
     format_equity_flag,
+    format_ksi_compact,
     format_percent,
     render_economic_caveat_banner,
     render_engineering_review_banner,
@@ -165,7 +169,7 @@ deck = pdk.Deck(
                 "<b>Limits:</b> {from_street} to {to_street}<br/>"
                 "<b>Recommended Planning Treatment:</b> {treatment_name}<br/>"
                 "<b>Estimated Capital Cost (Planning-Level):</b> ${capital_cost:,.0f}<br/>"
-                "<b>2026 Baseline Forecast Crashes:</b> {forecast_total:.1f}/yr (KSI: {forecast_ksi:.1f})<br/>"
+                "<b>2026 Baseline Forecast:</b> {forecast_total:.1f} all-severity crashes/yr (Baseline KSI: {forecast_ksi:.1f}/yr)<br/>"
                 "<b>SVI Weighted Score (Planning Proxy):</b> {svi_score:.3f}",
         "style": {"backgroundColor": "steelblue", "color": "white"},
     },
@@ -213,21 +217,21 @@ with ic1:
     st.markdown(f"**Length:** {m_row['spatial_total_length_miles']:.2f} miles")
     st.markdown(f"**SVI Weighted Index:** {m_row['corridor_length_weighted_svi']:.3f}")
 with ic2:
-    st.markdown(f"**2026 Forecast Total Crashes:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr")
-    st.markdown(f"**2026 Forecast KSI Crashes:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr")
+    st.markdown(f"**Baseline Total Crashes / Year:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr (All-severity planning estimate)")
+    st.markdown(f"**Baseline KSI / Year:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr (Fatal K + Serious injury A planning estimate)")
     st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
 with ic3:
     st.markdown(f"**Recommended Treatment:** {c_row['treatment_name']}")
-    st.markdown(f"**Estimated Capital Cost:** {format_currency(c_row['capital_project_cost'])}")
+    st.markdown(f"**Estimated Capital Cost:** {format_currency_compact(c_row['capital_project_cost'])} ({format_currency(c_row['capital_project_cost'])})")
     st.markdown(f"**Physical Applicability:** `:orange[{c_row['physical_applicability_status']} - Review Required]`")
 with ic4:
-    st.markdown(f"**Estimated Crashes Avoided:** {c_tot_averted:.2f} / yr (KSI: {c_ksi_averted:.2f})")
-    st.markdown(f"**BCR (Comprehensive):** `{c_comp_bcr:.1f} : 1`")
-    st.markdown(f"**BCR (Economic-Only):** `{c_econ_bcr:.1f} : 1`")
+    st.markdown(f"**Estimated Avoided Crashes:** {format_count_compact(c_tot_averted)} all-severity / yr (KSI: {format_ksi_compact(c_ksi_averted)} / yr)")
+    st.markdown(f"**BCR (Comprehensive, Planning-Level):** `{format_bcr_compact(c_comp_bcr)}` ({c_comp_bcr:.1f} : 1)")
+    st.markdown(f"**BCR (Economic-Only, Planning-Level):** `{format_bcr_compact(c_econ_bcr)}` ({c_econ_bcr:.1f} : 1)")
 
 st.caption(
-    f"Efficiency: Cost per KSI Avoided = {cost_per_ksi_str} | Cost per Crash Avoided = {cost_per_crash_str}. "
-    "Lower cost per KSI avoided indicates higher relative efficiency at preventing the most severe crashes. Subject to engineering review."
+    f"Planning-level estimate: Cost per KSI Avoided (Fatal K + Serious injury A) = {cost_per_ksi_str} | Cost per All-Severity Crash Avoided = {cost_per_crash_str}. "
+    f"Denominator: Single corridor ({c_row['corridor_id']}). Lower cost per KSI avoided indicates higher relative efficiency at preventing the most severe crashes. Subject to engineering review."
 )
 
 st.markdown("---")
@@ -278,11 +282,11 @@ df_export_display.columns = [
     "Estimated Capital Cost",
     "BCR (Comp)",
     "BCR (Econ)",
-    "Estimated Total Crashes Avoided / Yr",
+    "Estimated All-Severity Crashes Avoided / Yr",
     "Estimated Fatal (K) Avoided / Yr",
     "Estimated Serious Injury (A) Avoided / Yr",
     "Cost / KSI Avoided",
-    "Cost / Crash Avoided",
+    "Cost / All-Severity Crash Avoided",
     "Equity Priority Area",
     "Physical Applicability",
 ]
@@ -292,11 +296,11 @@ st.dataframe(
         "Estimated Capital Cost": "${:,.0f}",
         "BCR (Comp)": "{:,.1f}",
         "BCR (Econ)": "{:,.1f}",
-        "Estimated Total Crashes Avoided / Yr": "{:,.2f}",
+        "Estimated All-Severity Crashes Avoided / Yr": "{:,.2f}",
         "Estimated Fatal (K) Avoided / Yr": "{:,.2f}",
         "Estimated Serious Injury (A) Avoided / Yr": "{:,.2f}",
         "Cost / KSI Avoided": "${:,.0f}",
-        "Cost / Crash Avoided": "${:,.0f}",
+        "Cost / All-Severity Crash Avoided": "${:,.0f}",
     }),
     use_container_width=True,
     hide_index=True,

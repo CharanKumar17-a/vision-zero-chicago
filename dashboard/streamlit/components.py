@@ -130,6 +130,43 @@ def format_currency(val: float) -> str:
     return f"${val:,.0f}"
 
 
+def format_currency_compact(val: float) -> str:
+    """Format float as compact planning-level currency string (e.g., $15.0M, $400k)."""
+    if pd.isnull(val) or val is None:
+        return "N/A"
+    abs_val = abs(val)
+    if abs_val >= 1e9:
+        return f"${val / 1e9:.2f}B"
+    if abs_val >= 1e6:
+        return f"${val / 1e6:.1f}M"
+    if abs_val >= 1e3:
+        return f"${val / 1e3:.0f}k"
+    return f"${val:,.0f}"
+
+
+def format_bcr_compact(val: float) -> str:
+    """Format Benefit-Cost Ratio rounded to integer or 1-decimal decision relevance (e.g., ~267:1, ~2.7:1)."""
+    if pd.isnull(val) or val is None:
+        return "N/A"
+    if val >= 10:
+        return f"~{int(round(val))}:1"
+    return f"~{val:.1f}:1"
+
+
+def format_count_compact(val: float) -> str:
+    """Format crash counts rounded to whole numbers with tilde (e.g., ~2,170, ~2,385)."""
+    if pd.isnull(val) or val is None:
+        return "N/A"
+    return f"~{int(round(val)):,}"
+
+
+def format_ksi_compact(val: float) -> str:
+    """Format KSI counts rounded to whole numbers with tilde (e.g., ~48, ~49)."""
+    if pd.isnull(val) or val is None:
+        return "N/A"
+    return f"~{int(round(val))}"
+
+
 def format_percent(val: float) -> str:
     """Format decimal float as percentage string."""
     return f"{val * 100:.1f}%"

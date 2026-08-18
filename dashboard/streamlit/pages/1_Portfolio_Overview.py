@@ -19,8 +19,12 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from dashboard.streamlit.components import (
+    format_bcr_compact,
+    format_count_compact,
     format_currency,
+    format_currency_compact,
     format_equity_flag,
+    format_ksi_compact,
     format_percent,
     render_economic_caveat_banner,
     render_engineering_review_banner,
@@ -77,22 +81,22 @@ annual_ksi = df_sel_benefits["crashes_averted_ksi"].sum()
 with col1:
     st.metric(
         "Estimated capital cost",
-        format_currency(s_row["selected_capital_cost"]),
-        help="Planning-level estimate of total initial construction cost for all shortlisted corridor projects.",
+        format_currency_compact(s_row["selected_capital_cost"]),
+        help=f"Planning-level estimate: {format_currency(s_row['selected_capital_cost'])} total initial construction cost for all shortlisted corridor projects.",
     )
 
 with col2:
     st.metric(
         "Corridors funded",
         f"{int(s_row['selected_project_count'])} / {total_corridors_count}",
-        help="Count of candidate corridors selected for capital investment in this scenario. Subject to engineering review and implementation approval.",
+        help=f"Denominator: {total_corridors_count} candidate corridors in the network. Numerator: {int(s_row['selected_project_count'])} corridors selected for funding. Subject to engineering review.",
     )
 
 with col3:
     st.metric(
-        "Estimated annual KSI avoided",
-        f"~{annual_ksi:,.1f} / yr",
-        help="Planning-level estimate of annual fatal (K) and serious injury (A) crashes avoided across funded corridors.",
+        "Estimated KSI avoided / year",
+        f"{format_ksi_compact(annual_ksi)} / yr",
+        help=f"Denominator: {int(s_row['selected_project_count'])} funded corridors in this scenario. Severity scope: Fatal (K) + Serious injury (A) crashes. Planning-level estimate: ~{annual_ksi:,.1f} KSI avoided / yr.",
     )
 
 with col4:
@@ -100,7 +104,7 @@ with col4:
         "Achieved equity share",
         format_percent(s_row["achieved_equity_share"]),
         delta=f"Floor: {format_percent(s_row['equity_floor'])}",
-        help="Percentage of capital investment allocated to high-SVI equity priority areas.",
+        help=f"Denominator: Selected portfolio capital cost ({format_currency(s_row['selected_capital_cost'])}). Numerator: Capital allocated to high-SVI equity priority areas.",
     )
 
 # Secondary Metrics Expander
@@ -112,13 +116,13 @@ with st.expander("View secondary metrics and economic indicators", expanded=Fals
     sec1, sec2, sec3 = st.columns(3)
     with sec1:
         st.metric("Budget utilization", format_percent(utilization_ratio), help="Selected capital cost divided by planning budget ceiling.")
-        st.metric("Estimated total crashes avoided", f"{tot_averted:,.1f} / yr", help="Model-estimated annual reduction in total crashes across funded corridors.")
+        st.metric("Estimated all-severity crashes avoided / year", f"{format_count_compact(tot_averted)} / yr", help=f"Denominator: {int(s_row['selected_project_count'])} funded corridors. Severity scope: All police-reported crash severities (K, A, B, C, O). Planning-level estimate: ~{tot_averted:,.1f} crashes avoided / yr.")
     with sec2:
-        st.metric("2026 baseline KSI forecast", f"{tot_ksi_2026:,.1f} / yr", help="Calibrated 2026 baseline KSI forecast across all 43 corridors.")
-        st.metric("Total present value benefit", format_currency(s_row["total_present_value_benefit"]), help="Comprehensive 20-year present value benefit (planning-level estimate).")
+        st.metric("Baseline KSI / year", f"{format_ksi_compact(tot_ksi_2026)} / yr", help=f"Denominator: Entire 43-corridor network. Severity scope: Calibrated 2026 pre-treatment baseline fatal (K) + serious injury (A) crashes (~{tot_ksi_2026:,.1f} KSI / yr).")
+        st.metric("Total present value benefit", format_currency_compact(s_row["total_present_value_benefit"]), help=f"Planning-level estimate: {format_currency(s_row['total_present_value_benefit'])} comprehensive 20-year present value benefit.")
     with sec3:
-        st.metric("Total net present benefit", format_currency(s_row["total_net_present_benefit"]), help="Present value benefit minus initial capital cost (planning-level estimate).")
-        st.metric("Portfolio BCR (comprehensive)", f"{s_row['portfolio_bcr']:,.1f} : 1", help="Planning-level benefit-cost ratio from comprehensive crash costs.")
+        st.metric("Total net present benefit", format_currency_compact(s_row["total_net_present_benefit"]), help=f"Planning-level estimate: {format_currency(s_row['total_net_present_benefit'])} net present value benefit.")
+        st.metric("Portfolio BCR (comprehensive)", format_bcr_compact(s_row["portfolio_bcr"]), help=f"Planning-level estimate: {s_row['portfolio_bcr']:,.1f} : 1 benefit-cost ratio from comprehensive crash costs.")
 
 st.markdown("---")
 st.subheader("2. Scenario visual analytics")
@@ -206,9 +210,9 @@ with c3:
     st.plotly_chart(fig_dist, use_container_width=True)
 
 with c4:
-    st.markdown("#### Estimated annual avoided crashes by severity")
+    st.markdown("#### Estimated annual avoided crashes by severity category")
     sev_data = {
-        "Severity": ["Fatal (K)", "Serious injury (A)", "Minor injury (B)", "Possible injury (C)", "Property damage (O)"],
+        "Severity category": ["Fatal crashes (K)", "Serious injury crashes (A)", "Minor injury crashes (B)", "Possible injury crashes (C)", "Property damage only crashes (PDO / O)"],
         "Annual avoided crashes": [
             df_sel_benefits["crashes_averted_k"].sum(),
             df_sel_benefits["crashes_averted_a"].sum(),
@@ -219,10 +223,10 @@ with c4:
     }
     fig_sev = px.bar(
         pd.DataFrame(sev_data),
-        x="Severity",
+        x="Severity category",
         y="Annual avoided crashes",
         text_auto=".1f",
-        color="Severity",
+        color="Severity category",
         color_discrete_sequence=px.colors.qualitative.Set2,
     )
     fig_sev.update_layout(
@@ -255,7 +259,7 @@ df_table.columns = [
     "Corridor Name",
     "Recommended Treatment",
     "Estimated Capital Cost",
-    "Estimated Total Crashes Avoided / Yr",
+    "Estimated All-Severity Crashes Avoided / Yr",
     "Estimated Fatal (K) Avoided / Yr",
     "Estimated Serious Injury (A) Avoided / Yr",
     "Equity Priority Area",
@@ -265,7 +269,7 @@ df_table.columns = [
 st.dataframe(
     df_table.style.format({
         "Estimated Capital Cost": "${:,.0f}",
-        "Estimated Total Crashes Avoided / Yr": "{:,.2f}",
+        "Estimated All-Severity Crashes Avoided / Yr": "{:,.2f}",
         "Estimated Fatal (K) Avoided / Yr": "{:,.2f}",
         "Estimated Serious Injury (A) Avoided / Yr": "{:,.2f}",
     }),
@@ -323,11 +327,11 @@ st.info(
 
 wc1, wc2, wc3, wc4 = st.columns(4)
 with wc1:
-    st.metric("Estimated capital cost", format_currency(wif_s_row["selected_capital_cost"]))
+    st.metric("Estimated capital cost", format_currency_compact(wif_s_row["selected_capital_cost"]), help=f"Planning-level estimate: {format_currency(wif_s_row['selected_capital_cost'])}")
 with wc2:
     st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} / {total_corridors_count}")
 with wc3:
-    st.metric("Estimated annual KSI avoided", f"~{wif_ksi:,.1f} / yr")
+    st.metric("Estimated KSI avoided / year", f"{format_ksi_compact(wif_ksi)} / yr", help=f"Denominator: {int(wif_s_row['selected_project_count'])} funded corridors in what-if portfolio. Severity scope: Fatal (K) + Serious injury (A) crashes. Planning-level estimate: ~{wif_ksi:,.1f} / yr")
 with wc4:
     st.metric("Achieved equity share", format_percent(wif_s_row["achieved_equity_share"]))
 
@@ -348,7 +352,7 @@ wif_table.columns = [
     "Corridor Name",
     "Recommended Treatment",
     "Estimated Capital Cost",
-    "Estimated Total Crashes Avoided / Yr",
+    "Estimated All-Severity Crashes Avoided / Yr",
     "Estimated Fatal (K) Avoided / Yr",
     "Estimated Serious Injury (A) Avoided / Yr",
     "Equity Priority Area",
@@ -358,7 +362,7 @@ wif_table.columns = [
 st.dataframe(
     wif_table.style.format({
         "Estimated Capital Cost": "${:,.0f}",
-        "Estimated Total Crashes Avoided / Yr": "{:,.2f}",
+        "Estimated All-Severity Crashes Avoided / Yr": "{:,.2f}",
         "Estimated Fatal (K) Avoided / Yr": "{:,.2f}",
         "Estimated Serious Injury (A) Avoided / Yr": "{:,.2f}",
     }),
