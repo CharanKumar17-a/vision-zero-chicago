@@ -163,10 +163,10 @@ deck = pdk.Deck(
     tooltip={
         "html": "<b>Corridor:</b> {corridor_name} ({corridor_id})<br/>"
                 "<b>Limits:</b> {from_street} to {to_street}<br/>"
-                "<b>Recommended Treatment:</b> {treatment_name}<br/>"
-                "<b>Capital Cost:</b> ${capital_cost:,.0f}<br/>"
-                "<b>2026 Forecast Crashes:</b> {forecast_total:.1f}/yr (KSI: {forecast_ksi:.1f})<br/>"
-                "<b>SVI Weighted Score:</b> {svi_score:.3f}",
+                "<b>Recommended Planning Treatment:</b> {treatment_name}<br/>"
+                "<b>Estimated Capital Cost (Planning-Level):</b> ${capital_cost:,.0f}<br/>"
+                "<b>2026 Baseline Forecast Crashes:</b> {forecast_total:.1f}/yr (KSI: {forecast_ksi:.1f})<br/>"
+                "<b>SVI Weighted Score (Planning Proxy):</b> {svi_score:.3f}",
         "style": {"backgroundColor": "steelblue", "color": "white"},
     },
 )
@@ -174,8 +174,8 @@ deck = pdk.Deck(
 st.pydeck_chart(deck, use_container_width=True)
 
 st.caption(
-    "Note: Equity classification uses CDC/ATSDR Social Vulnerability Index (SVI) as a project-defined planning proxy, "
-    "not the City of Chicago's official equity definition."
+    "Planning-level decision support. Equity classification uses CDC/ATSDR Social Vulnerability Index (SVI) as a project-defined planning proxy, "
+    "not the City of Chicago's official equity definition. Subject to engineering review and implementation approval."
 )
 
 st.markdown("---")
@@ -218,16 +218,16 @@ with ic2:
     st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
 with ic3:
     st.markdown(f"**Recommended Treatment:** {c_row['treatment_name']}")
-    st.markdown(f"**Provisional Capital Cost:** {format_currency(c_row['capital_project_cost'])}")
+    st.markdown(f"**Estimated Capital Cost:** {format_currency(c_row['capital_project_cost'])}")
     st.markdown(f"**Physical Applicability:** `:orange[{c_row['physical_applicability_status']} - Review Required]`")
 with ic4:
-    st.markdown(f"**Annual Crashes Averted:** {c_tot_averted:.2f} / yr (KSI: {c_ksi_averted:.2f})")
+    st.markdown(f"**Estimated Crashes Avoided:** {c_tot_averted:.2f} / yr (KSI: {c_ksi_averted:.2f})")
     st.markdown(f"**BCR (Comprehensive):** `{c_comp_bcr:.1f} : 1`")
     st.markdown(f"**BCR (Economic-Only):** `{c_econ_bcr:.1f} : 1`")
 
 st.caption(
-    f"Efficiency: Cost per KSI Averted = {cost_per_ksi_str} | Cost per Crash Averted = {cost_per_crash_str}. "
-    "Lower cost per KSI averted indicates higher relative efficiency at preventing the most severe crashes."
+    f"Efficiency: Cost per KSI Avoided = {cost_per_ksi_str} | Cost per Crash Avoided = {cost_per_crash_str}. "
+    "Lower cost per KSI avoided indicates higher relative efficiency at preventing the most severe crashes. Subject to engineering review."
 )
 
 st.markdown("---")
@@ -275,28 +275,28 @@ df_export_display.columns = [
     "Corridor ID",
     "Corridor Name",
     "Recommended Treatment",
-    "Capital Cost",
+    "Estimated Capital Cost",
     "BCR (Comp)",
     "BCR (Econ)",
-    "Total Crashes Averted / Yr",
-    "Fatal (K) Averted / Yr",
-    "Serious Injury (A) Averted / Yr",
-    "Cost / KSI Averted",
-    "Cost / Crash Averted",
+    "Estimated Total Crashes Avoided / Yr",
+    "Estimated Fatal (K) Avoided / Yr",
+    "Estimated Serious Injury (A) Avoided / Yr",
+    "Cost / KSI Avoided",
+    "Cost / Crash Avoided",
     "Equity Priority Area",
     "Physical Applicability",
 ]
 
 st.dataframe(
     df_export_display.style.format({
-        "Capital Cost": "${:,.0f}",
+        "Estimated Capital Cost": "${:,.0f}",
         "BCR (Comp)": "{:,.1f}",
         "BCR (Econ)": "{:,.1f}",
-        "Total Crashes Averted / Yr": "{:,.2f}",
-        "Fatal (K) Averted / Yr": "{:,.2f}",
-        "Serious Injury (A) Averted / Yr": "{:,.2f}",
-        "Cost / KSI Averted": "${:,.0f}",
-        "Cost / Crash Averted": "${:,.0f}",
+        "Estimated Total Crashes Avoided / Yr": "{:,.2f}",
+        "Estimated Fatal (K) Avoided / Yr": "{:,.2f}",
+        "Estimated Serious Injury (A) Avoided / Yr": "{:,.2f}",
+        "Cost / KSI Avoided": "${:,.0f}",
+        "Cost / Crash Avoided": "${:,.0f}",
     }),
     use_container_width=True,
     hide_index=True,

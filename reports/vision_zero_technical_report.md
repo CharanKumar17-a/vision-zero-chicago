@@ -8,12 +8,12 @@ Chicago cannot fund every high-crash corridor at once. This project builds a tra
 Headline results (BASE uncertainty scenario):
 
 Total present-value safety benefit $6.55B on $26.75M provisional capital cost across 387 corridor-treatment candidate rows (43 corridors × 3 treatments × 3 scenarios).
-Portfolio selection detail: 1,362 rows across 36 scenarios; 42 of 43 corridors funded at the $15M planning budget (cost ≈ $14.99M, budget binds).
+Portfolio selection detail: 1,362 rows across 36 scenarios; 39 of 43 corridors funded at the $15M planning budget (cost ≈ $14.99M, budget binds under D026/D027).
 Treatment diversity: pedestrian treatments (Refuge Islands TRT_001, RRFB TRT_004) are now valued with pedestrian-specific KSI severity and are selected in portfolios — no longer a 100% Road Diet concentration.
 Equity: spending lands 43–58% in high-SVI equity-priority areas across scenarios, satisfying all tested floors without constraint pressure.
 Critical findings on scenario design:
 
-Under sourced planning-level costs (D024), the full 43-corridor network costs ≈ $20–27M depending on scenario. The $15M planning budget is BINDING (selects ~42 corridors in BASE); $25M and $40M remain nonbinding.
+Under sourced planning-level costs (D024) and Road Diet diversification caps (D026/D027), the full 43-corridor network costs ≈ $17.56M–$26.75M depending on scenario. The $15M planning budget is BINDING (selects 39 corridors in BASE, deferring 4 corridors); $25M and $40M remain nonbinding.
 A methodological audit (2026-08-17) identified and corrected a severity-allocation issue: pedestrian treatments previously used the all-crash KSI share (~2%) instead of the pedestrian-specific KSI share (~17.5%), understating pedestrian fatal/serious-injury benefits ~8×. Corrected in this version; all downstream outputs regenerated.
 2. Business Problem
 Decision question: which combination of corridor-level road-safety projects should be shortlisted for engineering review under a limited capital budget and an equity-spending requirement?
@@ -44,15 +44,15 @@ Severity allocation (corrected 2026-08-17): pedestrian treatments use pedestrian
 BASE totals (verified run 20260817T145547Z): PV benefit $6.55B; capital cost $26.75M; net PV benefit $6.52B. Portfolio-average BCR ≈ 245:1 comprehensive / ≈ 34:1 economic-only (planning-level, not expected City returns).
 Physical applicability: default UNKNOWN (governance-consistent); TRT_002 explicitly NOT_APPLICABLE on divided carriageways (HCC019 Lake Shore Drive) → TRT_001 selected there. Engineering field review required before programming.
 7. Portfolio Optimization
-MILP (scipy.optimize.milp); objective = maximize total present-value benefit; constraints = budget ceiling, equity floor, ≤1 treatment/corridor, ≥1 project, BCR ≥ 1.0 eligibility (D023); repeat-solve determinism verified (3× identical).
+MILP (scipy.optimize.milp); objective = maximize total present-value benefit; constraints = budget ceiling, equity floor, ≤1 treatment/corridor, ≥1 project, BCR ≥ 1.0 eligibility (D023), 70% Road Diet concentration cap (D026), functional-class Road Diet screening (D027); repeat-solve determinism verified (3× identical).
 36 runs = 27 official ($15M/$25M/$40M × 20/30/40% equity × 3 uncertainty) + 9 binding stress ($2M/$4M/$6M).
 Outputs (run 20260817T145559Z): 36 summary rows; 1,362 selection rows; exact summary↔detail reconciliation; exact lineage; all OPTIMAL.
-Verified selection tiers (BASE): $2M → 16 corridors, $4M → 24, $6M → 30, $15M → 42 (binding), $25M/$40M → all eligible. Equity floors never bind (achieved 43–58% > all floors).
+Verified selection tiers (BASE): $2M → 20 corridors, $4M → 18, $6M → 28, $15M → 39 (binding), $25M/$40M → all eligible. Equity floors never bind (achieved 43–58% > all floors).
 Honest limitations: $15M binds but $25M/$40M are nonbinding; equity floors slack; planning-level costs; stress budgets are analyst-defined, not City budgets.
 8. Validation and Governance
-301 tests passed (full pytest -q, 2026-08-17), 0 Git side effects; 11-gate verifier PASS.
+306 tests passed (full pytest -q, 2026-08-18), 0 Git side effects; 11-gate verifier PASS.
 Committed validation reports (PASS_WITH_WARNINGS), run IDs: treatment benefits 20260817T145547Z; optimization 20260817T145559Z; decision mart 20260817T145601Z / 150635Z; dashboard 20260817T145605Z.
-Decision log through D025 (config discount reconciliation to approved 3%); assumption register maintained; deployment served from checksum-verified snapshots (1,362 selections).
+Decision log through D027 (D026 Road Diet 70% cap, D027 functional-class screening proxy); assumption register maintained; deployment served from checksum-verified snapshots (1,362 selections).
 Final authority: City staff and engineering teams.
 9. Known Limitations
 $15M binds; $25M/$40M nonbinding (all eligible corridors fit) — real trade-offs shown in stress tiers.

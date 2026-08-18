@@ -358,3 +358,91 @@ class TestStreamlitDashboard:
             at = AppTest.from_file(page_path, default_timeout=30)
             at.run()
             assert not at.exception, f"Rendering failed for page: {page_path}"
+
+    def test_canonical_portfolio_scenario_consistency_across_views(self):
+        """Verify that all views, data access functions, and What-If lookups consistently consume the canonical $15M official scenario."""
+        df_summary = load_portfolio_summary()
+        df_selections = load_project_selections()
+        df_benefits = load_treatment_benefits()
+        df_master = load_corridor_master()
+
+        # 1. Canonical Default Portfolio ID is PORT_OFF_BASE_B15M_EQ20
+        assert DEFAULT_PORTFOLIO_ID == "PORT_OFF_BASE_B15M_EQ20"
+        assert DEFAULT_PORTFOLIO_ID in df_summary["portfolio_id"].values
+
+        # 2. Extract single canonical summary row
+        s_row = get_single_portfolio_summary(df_summary, DEFAULT_PORTFOLIO_ID)
+        assert s_row["run_group"] == "OFFICIAL"
+        assert s_row["uncertainty_scenario"] == "BASE"
+        assert s_row["budget"] == 15000000.0
+        assert s_row["equity_floor"] == 0.20
+        assert s_row["selected_project_count"] == 39
+        assert s_row["selected_corridor_count"] == 39
+        assert s_row["selected_capital_cost"] == 14988510.0
+        assert s_row["budget_slack"] == 11490.0
+        assert s_row["budget_utilization_pct"] == pytest.approx(99.9234, abs=0.01)
+        assert s_row["achieved_equity_share"] == pytest.approx(0.473533, abs=1e-4)
+
+        # 3. Selections and Benefits line up exactly to 39 corridors
+        rec_selections = get_single_portfolio_selections(df_selections, DEFAULT_PORTFOLIO_ID)
+        assert len(rec_selections) == 39
+        assert rec_selections["corridor_id"].nunique() == 39
+
+        rec_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, DEFAULT_PORTFOLIO_ID)
+        assert len(rec_benefits) == 39
+        assert rec_benefits["capital_project_cost"].sum() == 14988510.0
+
+        # 4. Exactly 4 deferred corridors
+        all_cids = set(df_master["corridor_id"])
+        selected_cids = set(rec_selections["corridor_id"])
+        deferred_cids = all_cids - selected_cids
+        assert len(deferred_cids) == 4
+        assert deferred_cids == {"HCC019", "HCC020", "HCC022", "HCC028"}
+
+        # 5. What-If Planner lookup at $15M and 20% equity yields identical 39-corridor scenario
+        wif_row, is_exact = find_what_if_grid_portfolio(df_summary, 15e6, 0.20)
+        assert is_exact is True
+        assert wif_row["selected_project_count"] == 39
+        assert wif_row["selected_capital_cost"] == 14988510.0
+        assert wif_row["selection_hash"] == s_row["selection_hash"]
+
+    def test_budget_sensitivity_scenario_consistency(self):
+        """Verify the exact corridor selection counts and costs across all budget sensitivity tiers in BASE scenario."""
+        df_summary = load_portfolio_summary()
+
+        expected_tiers = {
+            "PORT_STR_BASE_B2M_EQ20": {"budget": 2000000.0, "count": 20, "cost": 1992930.0},
+            "PORT_STR_BASE_B4M_EQ20": {"budget": 4000000.0, "count": 18, "cost": 3996840.0},
+            "PORT_STR_BASE_B6M_EQ20": {"budget": 6000000.0, "count": 28, "cost": 5999280.0},
+            "PORT_OFF_BASE_B15M_EQ20": {"budget": 15000000.0, "count": 39, "cost": 14988510.0},
+            "PORT_OFF_BASE_B25M_EQ20": {"budget": 25000000.0, "count": 43, "cost": 17564580.0},
+            "PORT_OFF_BASE_B40M_EQ20": {"budget": 40000000.0, "count": 43, "cost": 17564580.0},
+        }
+
+        for pid, exp in expected_tiers.items():
+            row = get_single_portfolio_summary(df_summary, pid)
+            assert row["budget"] == exp["budget"]
+            assert row["selected_project_count"] == exp["count"]
+            assert row["selected_capital_cost"] == exp["cost"]
+
+    def test_governance_authority_statement_and_language_compliance(self):
+        """Verify that Page 0 renders the mandatory authority statement and standard planning-level language."""
+        at = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at.run()
+        assert not at.exception
+
+        # Mandatory Authority Statement on Page 0
+        info_texts = [i.value for i in at.info]
+        assert any(
+            "This tool provides planning-level decision support. It does not authorize projects, establish construction scope, or replace engineering review."
+            in text
+            for text in info_texts
+        )
+
+        # Planning recommendation callout
+        success_texts = [s.value for s in at.success]
+        assert any("Planning Recommendation" in text for text in success_texts)
+
+        # Mathematically optimal under stated assumptions qualification
+        caption_texts = [c.value for c in at.caption]
+        assert any("Mathematically optimal under stated assumptions" in text for text in caption_texts)

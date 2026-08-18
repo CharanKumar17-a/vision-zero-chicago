@@ -92,8 +92,11 @@ st.subheader("3. Decision-support contracts and methodological boundaries")
 
 st.markdown("""
 #### Final decision authority
-> **City staff and engineering reviewers preserve final authority.**
-> The Vision Zero Chicago decision-support system provides transparent, reproducible analytical findings to inform planning. It does not automatically approve or program projects.
+> **This tool provides planning-level decision support. It does not authorize projects, establish construction scope, or replace engineering review.**
+> City staff and engineering reviewers preserve final capital programming authority.
+
+#### Optimization qualification
+- **Mathematical Optimization**: Status values of `OPTIMAL` indicate that the Mixed-Integer Linear Program (MILP) solved to mathematical optimality under the stated constraints and planning-level cost/benefit assumptions. It does not guarantee field constructibility.
 
 #### Analytical grains and lineage
 - **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 canonical optimization runs: 27 Official, 9 Stress; 192 total serving mart scenarios including What-If grid).
@@ -105,7 +108,7 @@ st.markdown("""
 - **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
 
 #### Scenario definitions
-- **OFFICIAL (27 runs)**: Scenarios evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE, and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 39 corridors in BASE scenario under D026/D027 Road Diet diversification and screening), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
+- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 39 corridors in the Baseline Scenario under D026/D027 Road Diet diversification and screening), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
 - **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \\$2M, \\$4M, and \\$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 #### Model horizon and threshold policy
