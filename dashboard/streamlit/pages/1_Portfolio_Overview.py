@@ -23,6 +23,7 @@ from dashboard.streamlit.components import (
     format_count_compact,
     format_currency,
     format_currency_compact,
+    format_engineering_status,
     format_equity_flag,
     format_ksi_compact,
     format_percent,
@@ -78,6 +79,10 @@ col1, col2, col3, col4 = st.columns(4)
 total_corridors_count = len(df_master)
 annual_ksi = df_sel_benefits["crashes_averted_ksi"].sum()
 
+svi_mask = df_sel_benefits["equity_area_flag"] == True
+high_svi_ksi = float(df_sel_benefits[svi_mask]["crashes_averted_ksi"].sum())
+high_svi_ksi_share = (high_svi_ksi / annual_ksi * 100) if annual_ksi > 0 else 0.0
+
 with col1:
     st.metric(
         "Estimated capital cost",
@@ -101,10 +106,10 @@ with col3:
 
 with col4:
     st.metric(
-        "Achieved equity share",
+        "High-SVI capital share",
         format_percent(s_row["achieved_equity_share"]),
         delta=f"Floor: {format_percent(s_row['equity_floor'])}",
-        help=f"Denominator: Selected portfolio capital cost ({format_currency(s_row['selected_capital_cost'])}). Numerator: Capital allocated to high-SVI equity priority areas.",
+        help=f"Denominator: Selected portfolio capital cost ({format_currency(s_row['selected_capital_cost'])}). Numerator: Capital allocated to high-SVI corridors. Measures capital spending input only; not proof of equitable safety outcomes.",
     )
 
 # Secondary Metrics Expander
@@ -123,6 +128,7 @@ with st.expander("View secondary metrics and economic indicators", expanded=Fals
     with sec3:
         st.metric("Total net present benefit", format_currency_compact(s_row["total_net_present_benefit"]), help=f"Planning-level estimate: {format_currency(s_row['total_net_present_benefit'])} net present value benefit.")
         st.metric("Portfolio BCR (comprehensive)", format_bcr_compact(s_row["portfolio_bcr"]), help=f"Planning-level estimate: {s_row['portfolio_bcr']:,.1f} : 1 benefit-cost ratio from comprehensive crash costs.")
+        st.metric("KSI benefit share in high-SVI areas", f"{high_svi_ksi_share:.1f}%", help=f"Denominator: Total annual KSI crashes avoided across funded corridors (~{annual_ksi:.1f}/yr). Numerator: Annual KSI avoided in high-SVI corridors (~{high_svi_ksi:.1f}/yr). SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
 st.markdown("---")
 st.subheader("2. Scenario visual analytics")
@@ -158,10 +164,10 @@ with c1:
     st.plotly_chart(fig_cost, use_container_width=True)
 
 with c2:
-    st.markdown("#### Achieved equity share versus required floor")
+    st.markdown("#### High-SVI capital share versus required floor")
     fig_eq = go.Figure()
     fig_eq.add_trace(go.Bar(
-        x=["Achieved spending share", "Required equity floor"],
+        x=["High-SVI capital share", "Required equity floor"],
         y=[s_row["achieved_equity_share"] * 100, s_row["equity_floor"] * 100],
         marker_color=["#2ca02c", "#ff7f0e"],
         text=[f"{s_row['achieved_equity_share']*100:.1f}%", f"{s_row['equity_floor']*100:.1f}%"],
@@ -173,6 +179,7 @@ with c2:
         yaxis=dict(ticksuffix="%", title="Spending share (%)"),
     )
     st.plotly_chart(fig_eq, use_container_width=True)
+    st.caption("Methodology note: SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
 c3, c4 = st.columns(2)
 
@@ -209,37 +216,70 @@ with c3:
     )
     st.plotly_chart(fig_dist, use_container_width=True)
 
+from plotly.subplots import make_subplots
+
 with c4:
-    st.markdown("#### Estimated annual avoided crashes by severity category")
-    sev_data = {
-        "Severity category": ["Fatal crashes (K)", "Serious injury crashes (A)", "Minor injury crashes (B)", "Possible injury crashes (C)", "Property damage only crashes (PDO / O)"],
-        "Annual avoided crashes": [
-            df_sel_benefits["crashes_averted_k"].sum(),
-            df_sel_benefits["crashes_averted_a"].sum(),
-            df_sel_benefits["crashes_averted_b"].sum(),
-            df_sel_benefits["crashes_averted_c"].sum(),
-            df_sel_benefits["crashes_averted_o"].sum(),
+    st.markdown("#### Estimated annual avoided crashes by severity")
+    st.caption("Primary Vision Zero life-safety outcomes (Fatalities & Serious Injuries) vs. secondary outcomes.")
+
+    k_val = float(df_sel_benefits["crashes_averted_k"].sum())
+    a_val = float(df_sel_benefits["crashes_averted_a"].sum())
+    ksi_val = float(df_sel_benefits["crashes_averted_ksi"].sum())
+    b_val = float(df_sel_benefits["crashes_averted_b"].sum())
+    c_val = float(df_sel_benefits["crashes_averted_c"].sum())
+    o_val = float(df_sel_benefits["crashes_averted_o"].sum())
+
+    fig_sev = make_subplots(
+        rows=1,
+        cols=2,
+        subplot_titles=[
+            "Primary: Life-Safety (KSI)",
+            "Secondary: Non-Severe & PDO",
         ],
-    }
-    fig_sev = px.bar(
-        pd.DataFrame(sev_data),
-        x="Severity category",
-        y="Annual avoided crashes",
-        text_auto=".1f",
-        color="Severity category",
-        color_discrete_sequence=px.colors.qualitative.Set2,
+        horizontal_spacing=0.18,
     )
+
+    # Subplot 1: Life-Safety (Fatal K, Serious A, Combined KSI)
+    fig_sev.add_trace(
+        go.Bar(
+            x=["Fatal (K)", "Serious (A)", "Combined KSI"],
+            y=[k_val, a_val, ksi_val],
+            text=[f"{k_val:.1f}", f"{a_val:.1f}", f"{ksi_val:.1f}"],
+            textposition="auto",
+            marker_color=["#d62728", "#ff7f0e", "#9467bd"],
+            name="Life-Safety (KSI)",
+            showlegend=False,
+        ),
+        row=1,
+        col=1,
+    )
+
+    # Subplot 2: Secondary Outcomes (Minor B, Possible C, PDO O)
+    fig_sev.add_trace(
+        go.Bar(
+            x=["Minor (B)", "Possible (C)", "PDO (O)"],
+            y=[b_val, c_val, o_val],
+            text=[f"{b_val:.0f}", f"{c_val:.0f}", f"{o_val:.0f}"],
+            textposition="auto",
+            marker_color=["#1f77b4", "#17becf", "#7f7f7f"],
+            name="Secondary (Non-Severe & PDO)",
+            showlegend=False,
+        ),
+        row=1,
+        col=2,
+    )
+
     fig_sev.update_layout(
         height=320,
-        margin=dict(l=20, r=20, t=30, b=20),
-        showlegend=False,
-        yaxis=dict(title="Annual avoided crashes"),
+        margin=dict(l=10, r=10, t=35, b=10),
     )
+    fig_sev.update_yaxes(title_text="Avoided / yr", row=1, col=1)
+    fig_sev.update_yaxes(title_text="Avoided / yr", row=1, col=2)
     st.plotly_chart(fig_sev, use_container_width=True)
 
 st.markdown("---")
 st.subheader("3. Selected projects detail register")
-st.caption("Planning-level treatment recommendations subject to engineering review and implementation approval.")
+st.caption("Analytical planning portfolio; individual project engineering status is provisionally UNKNOWN (Engineering review required). Subject to engineering review and implementation approval.")
 
 df_table = df_sel_benefits[[
     "corridor_id",
@@ -254,6 +294,7 @@ df_table = df_sel_benefits[[
 ]].copy()
 
 df_table["equity_area_flag"] = df_table["equity_area_flag"].apply(format_equity_flag)
+df_table["physical_applicability_status"] = df_table["physical_applicability_status"].apply(format_engineering_status)
 df_table.columns = [
     "Corridor ID",
     "Corridor Name",
@@ -262,8 +303,8 @@ df_table.columns = [
     "Estimated All-Severity Crashes Avoided / Yr",
     "Estimated Fatal (K) Avoided / Yr",
     "Estimated Serious Injury (A) Avoided / Yr",
-    "Equity Priority Area",
-    "Physical Applicability",
+    "High-SVI Priority Area",
+    "Engineering Status",
 ]
 
 st.dataframe(
@@ -333,7 +374,7 @@ with wc2:
 with wc3:
     st.metric("Estimated KSI avoided / year", f"{format_ksi_compact(wif_ksi)} / yr", help=f"Denominator: {int(wif_s_row['selected_project_count'])} funded corridors in what-if portfolio. Severity scope: Fatal (K) + Serious injury (A) crashes. Planning-level estimate: ~{wif_ksi:,.1f} / yr")
 with wc4:
-    st.metric("Achieved equity share", format_percent(wif_s_row["achieved_equity_share"]))
+    st.metric("High-SVI capital share", format_percent(wif_s_row["achieved_equity_share"]), help="Measures capital spending input only; not proof of equitable safety outcomes.")
 
 wif_table = wif_sel_benefits[[
     "corridor_id",
@@ -347,6 +388,7 @@ wif_table = wif_sel_benefits[[
     "physical_applicability_status",
 ]].copy()
 wif_table["equity_area_flag"] = wif_table["equity_area_flag"].apply(format_equity_flag)
+wif_table["physical_applicability_status"] = wif_table["physical_applicability_status"].apply(format_engineering_status)
 wif_table.columns = [
     "Corridor ID",
     "Corridor Name",
@@ -355,8 +397,8 @@ wif_table.columns = [
     "Estimated All-Severity Crashes Avoided / Yr",
     "Estimated Fatal (K) Avoided / Yr",
     "Estimated Serious Injury (A) Avoided / Yr",
-    "Equity Priority Area",
-    "Physical Applicability",
+    "High-SVI Priority Area",
+    "Engineering Status",
 ]
 
 st.dataframe(

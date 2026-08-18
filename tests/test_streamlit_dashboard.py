@@ -521,3 +521,78 @@ class TestStreamlitDashboard:
 
         helps1 = [m.help for m in at1.metric if m.help is not None]
         assert any("Denominator:" in h and "Severity scope:" in h for h in helps1)
+
+    def test_safety_outcome_visualization_prominence(self):
+        """Verify that Vision Zero life-safety outcomes (KSI, Fatal K, Serious Injury A) are prominent on Page 0 and Page 1."""
+        at0 = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at0.run()
+        assert not at0.exception
+
+        labels0 = [m.label for m in at0.metric]
+        assert "Fatal crashes (K) avoided" in labels0
+        assert "Serious injuries (A) avoided" in labels0
+        assert "All-severity crashes avoided" in labels0
+
+        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1.run()
+        assert not at1.exception
+
+    def test_equity_interpretation_and_methodology_distinction(self):
+        """Verify that equity metrics use 'High-SVI capital share', include 'KSI benefit share in high-SVI areas', and state SVI methodology note."""
+        at0 = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at0.run()
+        assert not at0.exception
+
+        # Metric label is "High-SVI capital share"
+        labels0 = [m.label for m in at0.metric]
+        assert "High-SVI capital share" in labels0
+
+        # Tooltip warns against assuming equitable outcomes
+        helps0 = [m.help for m in at0.metric if m.help is not None]
+        assert any("Measures capital spending input only; not proof of equitable safety outcomes." in h for h in helps0)
+
+        # Captions include methodology note
+        captions0 = [c.value for c in at0.caption]
+        assert any("SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity." in c for c in captions0)
+
+        # Check Page 1 (Portfolio Overview)
+        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1.run()
+        assert not at1.exception
+
+        labels1 = [m.label for m in at1.metric]
+        assert "High-SVI capital share" in labels1
+        assert "KSI benefit share in high-SVI areas" in labels1
+
+        captions1 = [c.value for c in at1.caption]
+        assert any("SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity." in c for c in captions1)
+
+    def test_engineering_feasibility_status_and_portfolio_classification(self):
+        """Verify that UNKNOWN physical applicability is communicated as 'Engineering review required' and planning vs implementation portfolios are distinguished."""
+        from dashboard.streamlit.components import format_engineering_status
+
+        # Verify helper behavior
+        assert format_engineering_status("UNKNOWN") == "Engineering review required"
+        assert format_engineering_status("REVIEW_REQUIRED") == "Engineering review required"
+        assert format_engineering_status("ELIGIBLE") == "Eligible (Verified)"
+        assert format_engineering_status("NOT_APPLICABLE") == "Not applicable"
+        assert format_engineering_status(None) == "Engineering review required"
+
+        # Check Page 0 contains planning portfolio and engineering review statements
+        at0 = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at0.run()
+        assert not at0.exception
+
+        page0_markdown_text = " ".join(m.value for m in at0.markdown)
+        assert "Engineering review required" in page0_markdown_text
+        assert "Analytical planning portfolio" in page0_markdown_text
+
+        # Check Page 3 contains engineering hierarchy and future-ready constraint documentation
+        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3.run()
+        assert not at3.exception
+
+        page3_markdown_text = " ".join(m.value for m in at3.markdown)
+        assert "Engineering Status Hierarchy" in page3_markdown_text
+        assert "Analytical Planning Portfolio vs. Implementation-Ready Portfolio" in page3_markdown_text
+        assert "Future-Ready Optimization Architecture" in page3_markdown_text

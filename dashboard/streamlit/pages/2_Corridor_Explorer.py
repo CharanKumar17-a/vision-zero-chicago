@@ -25,6 +25,7 @@ from dashboard.streamlit.components import (
     format_count_compact,
     format_currency,
     format_currency_compact,
+    format_engineering_status,
     format_equity_flag,
     format_ksi_compact,
     format_percent,
@@ -178,7 +179,8 @@ deck = pdk.Deck(
 st.pydeck_chart(deck, use_container_width=True)
 
 st.caption(
-    "Planning-level decision support. Equity classification uses CDC/ATSDR Social Vulnerability Index (SVI) as a project-defined planning proxy, "
+    "Planning-level decision support. SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity. "
+    "Equity classification uses CDC/ATSDR Social Vulnerability Index (SVI) as a project-defined planning proxy, "
     "not the City of Chicago's official equity definition. Subject to engineering review and implementation approval."
 )
 
@@ -223,7 +225,7 @@ with ic2:
 with ic3:
     st.markdown(f"**Recommended Treatment:** {c_row['treatment_name']}")
     st.markdown(f"**Estimated Capital Cost:** {format_currency_compact(c_row['capital_project_cost'])} ({format_currency(c_row['capital_project_cost'])})")
-    st.markdown(f"**Physical Applicability:** `:orange[{c_row['physical_applicability_status']} - Review Required]`")
+    st.markdown(f"**Engineering Status:** `:orange[Engineering review required]` (Provisional: `{c_row['physical_applicability_status']}`)")
 with ic4:
     st.markdown(f"**Estimated Avoided Crashes:** {format_count_compact(c_tot_averted)} all-severity / yr (KSI: {format_ksi_compact(c_ksi_averted)} / yr)")
     st.markdown(f"**BCR (Comprehensive, Planning-Level):** `{format_bcr_compact(c_comp_bcr)}` ({c_comp_bcr:.1f} : 1)")
@@ -275,6 +277,8 @@ df_export_display = df_export[[
     "physical_applicability_status",
 ]].copy()
 
+df_export_display["physical_applicability_status"] = df_export_display["physical_applicability_status"].apply(format_engineering_status)
+
 df_export_display.columns = [
     "Corridor ID",
     "Corridor Name",
@@ -287,8 +291,8 @@ df_export_display.columns = [
     "Estimated Serious Injury (A) Avoided / Yr",
     "Cost / KSI Avoided",
     "Cost / All-Severity Crash Avoided",
-    "Equity Priority Area",
-    "Physical Applicability",
+    "High-SVI Priority Area",
+    "Engineering Status",
 ]
 
 st.dataframe(

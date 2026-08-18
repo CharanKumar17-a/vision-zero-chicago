@@ -104,8 +104,12 @@ st.markdown("""
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
 
-#### Equity definition disclaimer
+#### Equity definition disclaimer and benefit distinction
 - **Equity Classification**: Uses CDC/ATSDR Social Vulnerability Index (SVI) 2022 census-tract data as a project-defined planning proxy. This is an analyst-defined planning proxy and does not constitute the City of Chicago's official equity definition.
+- **Methodology Note**: **SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.**
+- **Spending Equity vs. Benefit Equity**:
+  - *Equity of Spending (`High-SVI capital share`)*: Tracks the percentage of capital project investment allocated to corridors in high-SVI areas (subject to the policy floor, e.g., 20%, 30%, or 40%).
+  - *Equity of Estimated Safety Benefit (`KSI benefit share in high-SVI areas`)*: Tracks the percentage of estimated life-safety crash reductions (Fatal K + Serious Injury A) realized within high-SVI corridors (e.g., 55.9% of portfolio KSI avoided in the $15M Baseline Scenario).
 
 #### Scenario definitions
 - **OFFICIAL (27 runs)**: Approved planning scenario group evaluating \\$15M, \\$25M, and \\$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official \\$15M planning budgets bind strictly under realistic unit costs (\\$14.99M cost, selecting 39 corridors in the Baseline Scenario under D026/D027 Road Diet diversification and screening), while \\$25M and \\$40M budget ceilings allow network-wide coverage.
@@ -119,6 +123,23 @@ st.markdown("""
 - **Analytical Denominators**:
   - *Network Baseline*: Evaluated across all 43 candidate high-crash corridors (~78.8 Baseline KSI / yr).
   - *Portfolio Averted Metrics*: Aggregated strictly over the subset of shortlisted corridors funded within each active scenario (e.g., 39 funded corridors in the $15M Baseline Scenario).
+
+#### Engineering feasibility and portfolio classification
+- **Engineering Status Hierarchy**:
+  - `UNKNOWN`: Default planning status for candidate projects satisfying road classification and centerline screening rules. Communicated in decision support views as **"Engineering review required"**.
+  - `REVIEW_REQUIRED`: Projects flagged for priority field review due to geometric complexity or multimodal transit integration.
+  - `ELIGIBLE`: Field engineering inspection has verified lane geometry, cross-sections, curb alignments, turn pockets, and utility clearances.
+  - `NOT_APPLICABLE`: Project screened out by road classification, lane geometry, speed limits, or transit constraints (e.g., Road Diet on 1-lane streets or freeways).
+- **Analytical Planning Portfolio vs. Implementation-Ready Portfolio**:
+  - *Analytical Planning Portfolio*: The mathematically optimal combination of corridor treatments selected under stated budget, equity floor, and CMF assumptions. All selected projects in the current analytical dataset carry provisional status `UNKNOWN` (*Engineering review required*).
+  - *Implementation-Ready Portfolio*: Projects that have completed formal engineering field review, utility coordination, geometric design, and City departmental approval.
+- **Future-Ready Optimization Architecture**:
+  - The decision support system's optimization engine is architected to ingest verified field engineering data as hard constraints:
+    $$\\begin{aligned}
+    x_{i,t} &= 0 \\quad \\forall (i,t) \\text{ where } \\text{status}(i,t) = \\text{NOT\\_APPLICABLE} \\\\
+    x_{i,t} &\\le \\mathbb{I}(\\text{status}(i,t) = \\text{ELIGIBLE}) \\quad \\text{[For Implementation-Ready Runs]}
+    \\end{aligned}$$
+  - Once CDOT or engineering field surveys produce verified feasibility attributes, the MILP optimization model will automatically enforce engineering eligibility without redesigning the core optimization formulation.
 """)
 
 render_engineering_review_banner()

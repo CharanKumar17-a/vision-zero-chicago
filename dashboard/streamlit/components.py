@@ -194,3 +194,17 @@ def format_plural(count: int, singular: str, plural: str | None = None) -> str:
     """Format count with correct singular or plural noun."""
     noun = singular if count == 1 else (plural or f"{singular}s")
     return f"{count} {noun}"
+
+
+def format_engineering_status(status: str | None) -> str:
+    """Format engineering feasibility status into standardized descriptive label."""
+    if not status or pd.isnull(status):
+        return "Engineering review required"
+    s = str(status).strip().upper()
+    if s in ("UNKNOWN", "REVIEW_REQUIRED"):
+        return "Engineering review required"
+    if s == "ELIGIBLE":
+        return "Eligible (Verified)"
+    if s == "NOT_APPLICABLE":
+        return "Not applicable"
+    return str(status)

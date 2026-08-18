@@ -81,6 +81,12 @@ annual_c_averted = float(rec_benefits["crashes_averted_c"].sum())
 annual_o_averted = float(rec_benefits["crashes_averted_o"].sum())
 annual_ksi_averted = float(rec_benefits["crashes_averted_ksi"].sum())
 
+svi_mask = rec_benefits["equity_area_flag"] == True
+high_svi_ksi = float(rec_benefits[svi_mask]["crashes_averted_ksi"].sum())
+high_svi_cost = float(rec_benefits[svi_mask]["capital_project_cost"].sum())
+high_svi_ksi_share = (high_svi_ksi / annual_ksi_averted * 100) if annual_ksi_averted > 0 else 0.0
+high_svi_capital_share = (high_svi_cost / selected_capital_cost * 100) if selected_capital_cost > 0 else 0.0
+
 # -----------------------------------------------------------------------------
 # Landing Header & 4 Key Decision Metrics Hero
 # -----------------------------------------------------------------------------
@@ -118,10 +124,10 @@ with col3:
     )
 with col4:
     st.metric(
-        "Equity spend share",
-        f"{achieved_equity_pct:.1f}%",
+        "High-SVI capital share",
+        f"{high_svi_capital_share:.1f}%",
         delta=f"Floor: {format_percent(rec_summary['equity_floor'])}",
-        help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI equity priority areas.",
+        help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI corridors ({format_currency(high_svi_cost)}). Measures capital spending input only; not proof of equitable safety outcomes.",
     )
 
 st.markdown("")
@@ -131,8 +137,8 @@ st.success(
     f"**Planning Recommendation:** Under the Baseline Scenario ($15M budget, 20% equity floor), "
     f"the optimized planning portfolio funds **{selected_corridors_count} of {total_corridors_count}** "
     f"corridors for **{format_currency_compact(selected_capital_cost)}** ({format_currency(selected_capital_cost)}), with an estimated **{format_count_compact(annual_crashes_averted)}** all-severity crashes avoided / year "
-    f"(including **{format_ksi_compact(annual_ksi_averted)}** KSI crashes avoided / year), with "
-    f"**{achieved_equity_pct:.1f}%** of spend directed to high-SVI equity-priority areas. "
+    f"(including **{format_ksi_compact(annual_ksi_averted)}** KSI crashes avoided / year), achieving a **{high_svi_capital_share:.1f}%** High-SVI capital share (spending floor: 20.0%) "
+    f"and a **{high_svi_ksi_share:.1f}%** KSI benefit share in high-SVI areas. "
     f"Planning-level estimates subject to engineering review and implementation approval."
 )
 
@@ -152,17 +158,48 @@ st.markdown(
     "All figures represent planning-level estimates."
 )
 
+# Prominent Life-Safety Cards (Vision Zero Primary Focus)
+st.markdown("#### Primary Vision Zero life-safety outcomes (Fatalities & Serious Injuries)")
+ls_col1, ls_col2, ls_col3, ls_col4 = st.columns(4)
+with ls_col1:
+    st.metric(
+        "Estimated KSI avoided / year",
+        f"{format_ksi_compact(annual_ksi_averted)} / yr",
+        help=f"Denominator: {selected_corridors_count} shortlisted corridors. Severity scope: Fatal crashes (K) + Serious injury crashes (A). Exact: {annual_ksi_averted:.2f} / yr.",
+    )
+with ls_col2:
+    st.metric(
+        "Fatal crashes (K) avoided",
+        f"~{annual_k_averted:.1f} / yr",
+        help=f"Denominator: {selected_corridors_count} shortlisted corridors. Exact: {annual_k_averted:.2f} fatal crashes avoided / yr.",
+    )
+with ls_col3:
+    st.metric(
+        "Serious injuries (A) avoided",
+        f"~{annual_a_averted:.1f} / yr",
+        help=f"Denominator: {selected_corridors_count} shortlisted corridors. Exact: {annual_a_averted:.2f} serious injury crashes avoided / yr.",
+    )
+with ls_col4:
+    st.metric(
+        "All-severity crashes avoided",
+        f"{format_count_compact(annual_crashes_averted)} / yr",
+        help=f"Denominator: {selected_corridors_count} shortlisted corridors. Scope: All severities (K, A, B, C, PDO). Exact: {annual_crashes_averted:,.2f} / yr.",
+    )
+
+st.markdown("")
+
 col_benefit1, col_benefit2 = st.columns([3, 2])
 
 with col_benefit1:
-    st.markdown("#### Estimated annual safety impact by severity")
+    st.markdown("#### Comprehensive severity breakdown")
     severity_data = [
-        {"Severity category": "Fatal crashes (K)", "Estimated crashes avoided / year": f"{annual_k_averted:.2f}", "Share of all-severity total": f"{(annual_k_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Serious injury crashes (A)", "Estimated crashes avoided / year": f"{annual_a_averted:.2f}", "Share of all-severity total": f"{(annual_a_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Minor injury crashes (B)", "Estimated crashes avoided / year": f"{annual_b_averted:.2f}", "Share of all-severity total": f"{(annual_b_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Possible injury crashes (C)", "Estimated crashes avoided / year": f"{annual_c_averted:.2f}", "Share of all-severity total": f"{(annual_c_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "Property damage only crashes (PDO / O)", "Estimated crashes avoided / year": f"{annual_o_averted:.2f}", "Share of all-severity total": f"{(annual_o_averted / annual_crashes_averted) * 100:.2f}%"},
-        {"Severity category": "All-severity crashes (Total)", "Estimated crashes avoided / year": f"{annual_crashes_averted:,.2f}", "Share of all-severity total": "100.00%"},
+        {"Outcome tier": "Primary (Life-Safety)", "Severity category": "Fatal crashes (K)", "Estimated crashes avoided / year": f"{annual_k_averted:.2f}", "Share of all-severity total": f"{(annual_k_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Outcome tier": "Primary (Life-Safety)", "Severity category": "Serious injury crashes (A)", "Estimated crashes avoided / year": f"{annual_a_averted:.2f}", "Share of all-severity total": f"{(annual_a_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Outcome tier": "Primary (Life-Safety)", "Severity category": "Combined Vision Zero KSI (K + A)", "Estimated crashes avoided / year": f"{annual_ksi_averted:.2f}", "Share of all-severity total": f"{(annual_ksi_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Outcome tier": "Secondary (Non-Severe)", "Severity category": "Minor injury crashes (B)", "Estimated crashes avoided / year": f"{annual_b_averted:.2f}", "Share of all-severity total": f"{(annual_b_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Outcome tier": "Secondary (Non-Severe)", "Severity category": "Possible injury crashes (C)", "Estimated crashes avoided / year": f"{annual_c_averted:.2f}", "Share of all-severity total": f"{(annual_c_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Outcome tier": "Secondary (Property Damage)", "Severity category": "Property damage only crashes (PDO / O)", "Estimated crashes avoided / year": f"{annual_o_averted:.2f}", "Share of all-severity total": f"{(annual_o_averted / annual_crashes_averted) * 100:.2f}%"},
+        {"Outcome tier": "Total", "Severity category": "All-severity crashes (Total)", "Estimated crashes avoided / year": f"{annual_crashes_averted:,.2f}", "Share of all-severity total": "100.00%"},
     ]
     st.dataframe(pd.DataFrame(severity_data), use_container_width=True, hide_index=True)
 
@@ -172,11 +209,14 @@ with col_benefit2:
         f"""
         - **Present value safety benefit (planning-level estimate):** `{format_currency_compact(total_pv_benefit)}` ({format_currency(total_pv_benefit)})
         - **Portfolio benefit-cost ratio (BCR, planning-level estimate):** `{format_bcr_compact(portfolio_bcr)}` ({portfolio_bcr:.1f} : 1)
-        - **Achieved equity share:** `{achieved_equity_pct:.1f}%` (Policy floor: `20.0%`)
-        - **Physical applicability:** `UNKNOWN` (Subject to engineering review and implementation approval)
+        - **High-SVI capital share (spending equity):** `{high_svi_capital_share:.1f}%` (Policy floor: `20.0%`)
+        - **KSI benefit share in high-SVI areas (safety benefit equity):** `{high_svi_ksi_share:.1f}%` (~{high_svi_ksi:.1f} of ~{annual_ksi_averted:.1f} annual KSI avoided)
+        - **Engineering status:** `:orange[Engineering review required]` (Provisional applicability `UNKNOWN`)
+        - **Portfolio classification:** **Analytical planning portfolio** (Subject to engineering review; not yet an implementation-ready portfolio)
         - **Eligibility criteria:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0 (planning-level estimate).
         """
     )
+    st.caption("Methodology note: SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
 with st.expander("View conservative economic-only cost scenario", expanded=False):
     st.markdown(
@@ -422,7 +462,7 @@ for _, crow in tier_sel_benefits.iterrows():
         "Estimated KSI Avoided / Yr": f"{c_ksi:.2f} / yr",
         "Cost per KSI Avoided": cost_per_ksi_str,
         "Cost per All-Severity Crash Avoided": cost_per_crash_str,
-        "Equity Priority Area": eq_str,
+        "High-SVI Priority Area": eq_str,
     })
 
 df_tier_roster = pd.DataFrame(tier_roster)
@@ -437,6 +477,11 @@ st.subheader("4. Key governance and engineering limitations")
 with st.expander("Review critical governance and engineering limitations", expanded=True):
     st.markdown(
         """
+        - **Analytical planning portfolio versus Implementation-ready portfolio**:
+          This tool generates an **analytical planning portfolio** based on mathematical optimization, statistical crash risk forecasts,
+          and sourced planning-level treatment costs. All selected treatments carry a provisional engineering status of `UNKNOWN`
+          (*"Engineering review required"*). An **implementation-ready portfolio** requires completed field inspections,
+          engineering surveys (cross-sections, signal capacity, utility conflicts, curb radii), and formal City capital authorization.
         - **Physical applicability is provisional (`UNKNOWN`)**:
           Treatments are selected based on corridor road classifications and centerline geometry.
           Specific corridor constraints (curb alignments, turn lanes, utility conflicts, bridge deck widths, transit lanes)
@@ -445,6 +490,7 @@ with st.expander("Review critical governance and engineering limitations", expan
           Unit costs (\\$400k/mi Road Diet, \\$15k/island Refuge Island, \\$22.5k RRFB; `D024`) are planning-level benchmarks.
           Actual construction costs will vary based on procurement, site work, signal integration, and material prices.
         - **CDC Social Vulnerability Index (SVI) as equity proxy**:
+          SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.
           SVI percentile tracks spatial vulnerability across census tracts, but does not substitute for localized community engagement or neighborhood-level equity evaluations.
         - **Statistical crash burden versus deterministic occurrence**:
           Forecast models evaluate multi-year statistical crash risk and regression-to-the-mean tendencies. They identify high-probability corridors, not guarantees of specific crash occurrences.
