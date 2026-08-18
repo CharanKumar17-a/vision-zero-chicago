@@ -596,3 +596,35 @@ class TestStreamlitDashboard:
         assert "Engineering Status Hierarchy" in page3_markdown_text
         assert "Analytical Planning Portfolio vs. Implementation-Ready Portfolio" in page3_markdown_text
         assert "Future-Ready Optimization Architecture" in page3_markdown_text
+
+    def test_lazy_heavy_imports_cold_start_optimization(self):
+        """Verify that heavy packages (geopandas, pydeck) are lazily loaded and not imported on data_access or Page 0/1 load."""
+        import subprocess
+        import sys
+
+        code = """
+import sys
+import dashboard.streamlit.data_access
+assert "geopandas" not in sys.modules, "geopandas should not be imported by data_access"
+assert "pydeck" not in sys.modules, "pydeck should not be imported by data_access"
+
+import importlib.util
+s0 = importlib.util.spec_from_file_location('p0', 'dashboard/streamlit/pages/0_Executive_Recommendation.py')
+m0 = importlib.util.module_from_spec(s0)
+s0.loader.exec_module(m0)
+assert "geopandas" not in sys.modules, "geopandas should not be imported by Page 0"
+assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 0"
+
+s1 = importlib.util.spec_from_file_location('p1', 'dashboard/streamlit/pages/1_Portfolio_Overview.py')
+m1 = importlib.util.module_from_spec(s1)
+s1.loader.exec_module(m1)
+assert "geopandas" not in sys.modules, "geopandas should not be imported by Page 1"
+assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
+"""
+        res = subprocess.run(
+            [sys.executable, "-c", code],
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+        )
+        assert res.returncode == 0, f"Lazy import check failed:\n{res.stderr}\n{res.stdout}"

@@ -17,10 +17,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-import geopandas as gpd
 import pandas as pd
 import streamlit as st
-from shapely.wkt import loads
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -223,8 +221,11 @@ def load_treatment_benefits(path: Path = BENEFITS_PATH) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_corridor_geodataframe(path: Path = CORRIDORS_GEO_PATH) -> gpd.GeoDataFrame:
+def load_corridor_geodataframe(path: Path = CORRIDORS_GEO_PATH) -> Any:
     """Load spatial linework geometry and re-project to EPSG:4326 WGS84 for mapping."""
+    import geopandas as gpd
+    from shapely.wkt import loads
+
     mode = get_data_mode()
 
     if mode == "local":
@@ -348,9 +349,9 @@ def get_selected_portfolio_benefits(
 
 def get_selected_corridors_geodataframe(
     df_selections: pd.DataFrame,
-    gdf_corridors: gpd.GeoDataFrame,
+    gdf_corridors: Any,
     portfolio_id: str,
-) -> gpd.GeoDataFrame:
+) -> Any:
     """Filter spatial linework to selected corridors for exactly one portfolio_id without row expansion."""
     df_sel = get_single_portfolio_selections(df_selections, portfolio_id)
     selected_corridors = df_sel["corridor_id"].unique()

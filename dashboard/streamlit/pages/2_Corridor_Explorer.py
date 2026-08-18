@@ -14,9 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import geopandas as gpd
 import pandas as pd
-import pydeck as pdk
 import streamlit as st
 
 from dashboard.streamlit.components import (
@@ -112,6 +110,9 @@ for feature in geojson_dict["features"]:
     props["street_name"] = str(props.get("street_name") or props.get("corridor_name") or "N/A")
     props["from_street"] = str(props.get("from_street") or "N/A")
     props["to_street"] = str(props.get("to_street") or "N/A")
+
+# Lazy import pydeck for fast cold-start performance
+import pydeck as pdk
 
 # PyDeck GeoJsonLayer for street linework
 layer_lines = pdk.Layer(

@@ -229,6 +229,7 @@ $authorizedScopePatterns = @(
     "^automation/verify_project\.ps1$",
     "^\.agents/",
     "^dashboard/streamlit/",
+    "^docs/data_quality/",
     "^reports/",
     "^tests/"
 )
