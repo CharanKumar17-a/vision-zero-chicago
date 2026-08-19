@@ -165,5 +165,17 @@ An offline spatial sensitivity analysis was conducted comparing candidate crash 
   > {justification_text}
 """)
 
+st.markdown("---")
+st.subheader("5. Decision product analytics and privacy")
+
+st.markdown("""
+#### Anonymous decision product telemetry
+- **Decision Product Analytics**: Anonymous usage measurement for understanding how users navigate, explore scenarios, inspect corridors, and export planning outputs. PostHog is used as the analytics platform.
+- **Privacy and Isolation Guarantees**:
+  - **Disabled by default**: Telemetry is opt-in and inactive unless explicitly enabled in configuration or environment variables.
+  - **Zero PII**: No personal identifying information (PII), names, email addresses, raw crash records, or uploaded data are ever collected.
+  - **Zero Analytical Impact**: Telemetry operates strictly in an isolated observer mode and never affects calculations, mathematical optimizations, or displayed values.
+""")
+
 render_engineering_review_banner()
 render_economic_caveat_banner()

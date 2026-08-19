@@ -76,11 +76,28 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         gen_time = manifest_meta.get("generated_at_utc", "N/A")
         st.sidebar.info(f"**Published Analytical Snapshot**\nGenerated: `{gen_time}`")
 
+    try:
+        from dashboard.streamlit.analytics import track_scenario_selected
+        track_scenario_selected(
+            scenario_id=selected_pid,
+            budget=float(selected_b_val) if selected_b_val is not None else None,
+            equity_floor=float(selected_ef_val) if selected_ef_val is not None else None,
+            cmf_scenario=str(selected_scen) if selected_scen is not None else None,
+        )
+    except Exception:
+        pass
+
     return selected_pid
 
 
 def render_page_header(page_title: str, subtitle: str | None = None) -> None:
     """Render unified professional header across all application pages."""
+    try:
+        from dashboard.streamlit.analytics import track_page_view
+        track_page_view(page_title)
+    except Exception:
+        pass
+
     st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
     st.subheader(page_title)
     if subtitle:

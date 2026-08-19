@@ -77,3 +77,9 @@ governance:
   output_type: engineering_review_shortlist
   final_decision_authority: city_and_engineering_team
   automated_project_approval: false
+
+analytics:
+  enabled: false
+  platform: posthog
+  posthog_api_key: ""
+  posthog_host: "https://us.i.posthog.com"

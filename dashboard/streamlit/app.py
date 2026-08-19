@@ -30,5 +30,11 @@ pages = [
     st.Page(str(PAGES_DIR / "3_Governance_and_Methodology.py"), title="Governance & Methodology"),
 ]
 
+try:
+    from dashboard.streamlit.analytics import track_app_open
+    track_app_open()
+except Exception:
+    pass
+
 pg = st.navigation(pages)
 pg.run()

@@ -523,12 +523,20 @@ st.dataframe(
 )
 
 csv_data = wif_table.to_csv(index=False).encode("utf-8")
-st.download_button(
+if st.download_button(
     label=f"Download what-if portfolio CSV (${int(wif_s_row['budget_usd']/1e6)}M / {int(round(wif_s_row['equity_floor']*100))}% equity)",
     data=csv_data,
     file_name=f"vision_zero_what_if_{target_portfolio_id}.csv",
     mime="text/csv",
-)
+):
+    try:
+        from dashboard.streamlit.analytics import track_portfolio_exported
+        track_portfolio_exported(
+            scenario_id=target_portfolio_id,
+            budget=float(wif_s_row["budget_usd"]),
+        )
+    except Exception:
+        pass
 
 render_engineering_review_banner()
 render_economic_caveat_banner()

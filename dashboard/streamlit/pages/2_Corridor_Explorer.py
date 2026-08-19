@@ -200,6 +200,12 @@ selected_cid = st.selectbox(
     format_func=lambda cid: corridor_labels[cid],
 )
 
+try:
+    from dashboard.streamlit.analytics import track_corridor_inspected
+    track_corridor_inspected(selected_cid)
+except Exception:
+    pass
+
 # Extract single corridor record
 c_row = df_sel_benefits[df_sel_benefits["corridor_id"] == selected_cid].iloc[0]
 m_row = df_master[df_master["corridor_id"] == selected_cid].iloc[0]
@@ -314,12 +320,20 @@ st.dataframe(
 
 # Download CSV button for CURRENTLY selected portfolio only
 csv_bytes = df_export.to_csv(index=False).encode("utf-8")
-st.download_button(
+if st.download_button(
     label=f"Download CSV for active scenario ({portfolio_id})",
     data=csv_bytes,
     file_name=f"vision_zero_portfolio_selections_{portfolio_id}.csv",
     mime="text/csv",
-)
+):
+    try:
+        from dashboard.streamlit.analytics import track_portfolio_exported
+        track_portfolio_exported(
+            scenario_id=portfolio_id,
+            budget=float(s_row["budget_usd"]),
+        )
+    except Exception:
+        pass
 
 render_engineering_review_banner()
 render_economic_caveat_banner()

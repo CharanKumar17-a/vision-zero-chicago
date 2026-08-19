@@ -713,3 +713,93 @@ assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
             text=True,
         )
         assert res.returncode == 0, f"Lazy import check failed:\n{res.stderr}\n{res.stdout}"
+
+    def test_decision_product_analytics_disabled_by_default(self):
+        """Verify analytics is disabled by default and all event tracking functions are safe no-ops."""
+        import dashboard.streamlit.analytics as analytics
+
+        # Default config state is disabled
+        assert analytics.is_analytics_enabled() is False
+
+        # All tracking calls execute safely without exception
+        analytics.track_app_open()
+        analytics.track_page_view("Portfolio Overview")
+        analytics.track_scenario_selected("PORT_OFF_BASE_B15M_EQ20", budget=15e6, equity_floor=0.20, cmf_scenario="BASE")
+        analytics.track_corridor_inspected("HCC001")
+        analytics.track_portfolio_exported("PORT_OFF_BASE_B15M_EQ20", budget=15e6)
+
+    def test_decision_product_analytics_mock_capture_when_enabled(self, monkeypatch):
+        """Verify events emit correct decision properties and anonymous distinct ID when enabled."""
+        import dashboard.streamlit.analytics as analytics
+
+        captured_events = []
+
+        class MockPostHog:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def capture(self, distinct_id, event, properties):
+                captured_events.append({
+                    "distinct_id": distinct_id,
+                    "event": event,
+                    "properties": properties,
+                })
+
+        monkeypatch.setattr(analytics, "_POSTHOG_CLIENT", MockPostHog())
+        monkeypatch.setattr(analytics, "_ANALYTICS_INITIALIZED", True)
+
+        # 1. Track Page View
+        analytics.track_page_view("Corridor Explorer")
+        assert len(captured_events) == 1
+        assert captured_events[0]["event"] == "page_view"
+        assert captured_events[0]["properties"]["page"] == "Corridor Explorer"
+        assert captured_events[0]["distinct_id"].startswith("anon_")
+
+        # 2. Track Scenario Selected
+        analytics.track_scenario_selected("PORT_OFF_BASE_B25M_EQ30", budget=25000000.0, equity_floor=0.30, cmf_scenario="BASE")
+        assert len(captured_events) == 2
+        assert captured_events[1]["event"] == "scenario_selected"
+        assert captured_events[1]["properties"]["scenario_id"] == "PORT_OFF_BASE_B25M_EQ30"
+        assert captured_events[1]["properties"]["budget"] == 25000000.0
+        assert captured_events[1]["properties"]["equity_floor"] == 0.30
+
+        # 3. Track Corridor Inspected
+        analytics.track_corridor_inspected("HCC007")
+        assert len(captured_events) == 3
+        assert captured_events[2]["event"] == "corridor_inspected"
+        assert captured_events[2]["properties"]["corridor_id"] == "HCC007"
+
+        # 4. Track Portfolio Exported
+        analytics.track_portfolio_exported("PORT_OFF_BASE_B15M_EQ20", budget=15000000.0)
+        assert len(captured_events) == 4
+        assert captured_events[3]["event"] == "portfolio_exported"
+        assert captured_events[3]["properties"]["scenario_id"] == "PORT_OFF_BASE_B15M_EQ20"
+
+    def test_decision_product_analytics_resilience_to_exceptions(self, monkeypatch):
+        """Verify track_event is completely resilient to client crashes and never raises exceptions."""
+        import dashboard.streamlit.analytics as analytics
+
+        class CrashingPostHog:
+            def capture(self, *args, **kwargs):
+                raise RuntimeError("PostHog network failure")
+
+        monkeypatch.setattr(analytics, "_POSTHOG_CLIENT", CrashingPostHog())
+        monkeypatch.setattr(analytics, "_ANALYTICS_INITIALIZED", True)
+
+        # Should swallow exceptions silently without crashing
+        analytics.track_event("test_event", {"foo": "bar"})
+        analytics.track_page_view("Executive Recommendation")
+
+    def test_governance_page_documents_analytics_and_privacy(self):
+        """Verify Governance page (Page 3) renders Section 5 on Decision Product Analytics."""
+        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3.run()
+        assert not at3.exception
+
+        subheaders = [s.value for s in at3.subheader]
+        assert any("5. Decision product analytics" in s for s in subheaders)
+
+        markdown_text = " ".join(m.value for m in at3.markdown)
+        assert "Decision Product Analytics" in markdown_text
+        assert "Disabled by default" in markdown_text
+        assert "Zero PII" in markdown_text
