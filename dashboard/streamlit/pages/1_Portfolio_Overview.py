@@ -34,6 +34,7 @@ from dashboard.streamlit.components import (
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
+    compute_portfolio_stability,
     find_what_if_grid_portfolio,
     get_selected_portfolio_benefits,
     get_single_portfolio_summary,
@@ -320,7 +321,102 @@ st.dataframe(
 )
 
 st.markdown("---")
-st.subheader("4. What-if capital planner")
+st.subheader("4. Portfolio stability and robust project selection")
+st.caption("Cross-scenario selection frequencies from precomputed optimization runs. Identifies robust 'core' investments versus scenario-sensitive projects.")
+
+st.markdown(
+    "Analyze how frequently each corridor-treatment project is selected across precomputed optimization scenarios. "
+    "Projects consistently selected across varying budgets, equity floors, and CMF uncertainty levels represent robust capital priorities."
+)
+
+stab_col1, stab_col2 = st.columns([1, 1])
+with stab_col1:
+    scope_display = st.selectbox(
+        "Scenario scope for stability analysis",
+        options=[
+            "Official planning scenarios (27 runs)",
+            "All canonical scenarios (36 runs)",
+            "All precomputed scenarios (192 runs)",
+        ],
+        index=0,
+        help="Select scenario set: Official planning runs ($15M, $25M, $40M), Canonical runs (+ stress tests), or All precomputed mart scenarios (+ What-If grid).",
+    )
+    scope_key = "OFFICIAL" if "27" in scope_display else ("CANONICAL" if "36" in scope_display else "ALL")
+
+with stab_col2:
+    tier_filter = st.selectbox(
+        "Filter by stability tier",
+        options=[
+            "All tiers",
+            "Core (selected in most scenarios)",
+            "Conditional (selected in some scenarios)",
+            "Scenario-sensitive (selected rarely)",
+        ],
+        index=0,
+        help="Filter projects by stability classification tier.",
+    )
+
+df_stability = compute_portfolio_stability(df_selections, df_summary, scenario_scope=scope_key)
+total_scenarios_count = int(df_stability["total_scenarios"].iloc[0]) if not df_stability.empty else 0
+core_count = int((df_stability["stability_tier"] == "Core").sum())
+cond_count = int((df_stability["stability_tier"] == "Conditional").sum())
+sens_count = int((df_stability["stability_tier"] == "Scenario-sensitive").sum())
+
+sm1, sm2, sm3, sm4 = st.columns(4)
+with sm1:
+    st.metric("Core projects", f"{core_count} projects", help="Selected in >=70% of scenarios. Robust priority across varying budget ceilings and uncertainty levels.")
+with sm2:
+    st.metric("Conditional projects", f"{cond_count} projects", help="Selected in 30%–69% of scenarios. Viable under specific budget or equity floor conditions.")
+with sm3:
+    st.metric("Scenario-sensitive", f"{sens_count} projects", help="Selected in <30% of scenarios. Narrow viability (e.g. only in high-budget or low-cost scenarios).")
+with sm4:
+    st.metric("Evaluated scenarios", f"{total_scenarios_count} scenarios", help=f"Total precomputed optimization scenarios evaluated in {scope_display}.")
+
+if tier_filter.startswith("Core"):
+    df_stab_display = df_stability[df_stability["stability_tier"] == "Core"].copy()
+elif tier_filter.startswith("Conditional"):
+    df_stab_display = df_stability[df_stability["stability_tier"] == "Conditional"].copy()
+elif tier_filter.startswith("Scenario-sensitive"):
+    df_stab_display = df_stability[df_stability["stability_tier"] == "Scenario-sensitive"].copy()
+else:
+    df_stab_display = df_stability.copy()
+
+df_stab_table = df_stab_display[[
+    "corridor_id",
+    "corridor_name",
+    "treatment_name",
+    "stability_tier",
+    "selection_display",
+    "selection_rate",
+    "equity_area_flag",
+    "capital_project_cost",
+]].copy()
+
+df_stab_table["equity_area_flag"] = df_stab_table["equity_area_flag"].apply(format_equity_flag)
+df_stab_table["selection_rate"] = df_stab_table["selection_rate"].apply(lambda r: f"{r * 100:.1f}%")
+
+df_stab_table.columns = [
+    "Corridor ID",
+    "Corridor Name",
+    "Recommended Treatment",
+    "Stability Tier",
+    "Scenario Selection Frequency",
+    "Selection Rate",
+    "High-SVI Priority Area",
+    "Estimated Capital Cost",
+]
+
+st.dataframe(
+    df_stab_table.style.format({
+        "Estimated Capital Cost": "${:,.0f}",
+    }),
+    use_container_width=True,
+    hide_index=True,
+    height=320,
+)
+
+st.markdown("---")
+st.subheader("5. What-if capital planner")
 st.caption("Precomputed scenario grid (156 precomputed optimization runs across 26 budgets and 6 equity floors). Subject to engineering review and implementation approval.")
 
 st.markdown(

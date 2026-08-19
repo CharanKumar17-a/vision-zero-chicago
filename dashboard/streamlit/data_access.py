@@ -443,3 +443,105 @@ def find_what_if_grid_portfolio(
     df_scored["floor_diff"] = df_scored["equity_floor"].sub(equity_floor).abs()
     df_sorted = df_scored.sort_values(by=["budget_diff", "floor_diff"])
     return df_sorted.iloc[0], False
+
+
+def compute_portfolio_stability(
+    df_selections: pd.DataFrame,
+    df_summary: pd.DataFrame,
+    scenario_scope: str = "OFFICIAL",
+) -> pd.DataFrame:
+    """Calculate selection frequency and descriptive stability classification across scenarios.
+
+    Grain: corridor_id × treatment_id.
+
+    Args:
+        df_selections: Project selections detail dataset.
+        df_summary: Portfolio summary dataset.
+        scenario_scope: Scenario group filter ('OFFICIAL', 'CANONICAL', or 'ALL').
+            - 'OFFICIAL': 27 approved planning scenarios ($15M, $25M, $40M).
+            - 'CANONICAL': 36 canonical scenarios (27 official + 9 diagnostic stress).
+            - 'ALL': All 192 serving mart scenarios (including 156 What-If grid runs).
+
+    Returns:
+        pd.DataFrame containing:
+        - corridor_id: Corridor identifier
+        - corridor_name: Corridor street name
+        - treatment_id: Treatment countermeasure ID
+        - treatment_name: Countermeasure description
+        - selected_scenario_count: Number of scenarios in which the project is funded
+        - total_scenarios: Total count of scenarios in the evaluated scope
+        - selection_rate: Proportion of scenarios selecting the project
+        - selection_display: Formatted string 'Selected in X of Y scenarios'
+        - stability_tier: Descriptive classification ('Core', 'Conditional', 'Scenario-sensitive')
+        - equity_area_flag: High-SVI priority area boolean
+        - capital_project_cost: Mean project cost across scenarios
+    """
+    scope_upper = str(scenario_scope).strip().upper()
+    if scope_upper == "OFFICIAL":
+        target_pids = df_summary[df_summary["run_group"] == "OFFICIAL"]["portfolio_id"].unique()
+    elif scope_upper in ("CANONICAL", "CANONICAL_36"):
+        target_pids = df_summary[
+            df_summary["run_group"].isin(["OFFICIAL", "BINDING-BUDGET STRESS TEST"])
+        ]["portfolio_id"].unique()
+    elif scope_upper == "ALL":
+        target_pids = df_summary["portfolio_id"].unique()
+    else:
+        matched = df_summary[df_summary["run_group"] == scenario_scope]
+        if not matched.empty:
+            target_pids = matched["portfolio_id"].unique()
+        else:
+            target_pids = df_summary[df_summary["run_group"] == "OFFICIAL"]["portfolio_id"].unique()
+
+    total_scenarios = len(target_pids)
+    if total_scenarios == 0:
+        raise ValueError(f"No scenarios found for scope '{scenario_scope}'.")
+
+    df_sub = df_selections[df_selections["portfolio_id"].isin(target_pids)]
+    if df_sub.empty:
+        return pd.DataFrame(columns=[
+            "corridor_id",
+            "corridor_name",
+            "treatment_id",
+            "treatment_name",
+            "selected_scenario_count",
+            "total_scenarios",
+            "selection_rate",
+            "selection_display",
+            "stability_tier",
+            "equity_area_flag",
+            "capital_project_cost",
+        ])
+
+    df_agg = (
+        df_sub.groupby(["corridor_id", "treatment_id"])
+        .agg(
+            corridor_name=("corridor_name", "first"),
+            treatment_name=("treatment_name", "first"),
+            selected_scenario_count=("portfolio_id", "nunique"),
+            equity_area_flag=("equity_area_flag", "first"),
+            capital_project_cost=("capital_project_cost", "mean"),
+        )
+        .reset_index()
+    )
+
+    df_agg["total_scenarios"] = total_scenarios
+    df_agg["selection_rate"] = df_agg["selected_scenario_count"] / total_scenarios
+    df_agg["selection_display"] = df_agg.apply(
+        lambda r: f"Selected in {int(r['selected_scenario_count'])} of {int(r['total_scenarios'])} scenarios",
+        axis=1,
+    )
+
+    def _classify_tier(rate: float) -> str:
+        if rate >= 0.70:
+            return "Core"
+        elif rate >= 0.30:
+            return "Conditional"
+        return "Scenario-sensitive"
+
+    df_agg["stability_tier"] = df_agg["selection_rate"].apply(_classify_tier)
+    df_agg = df_agg.sort_values(
+        by=["selection_rate", "selected_scenario_count", "capital_project_cost"],
+        ascending=[False, False, True],
+    ).reset_index(drop=True)
+
+    return df_agg

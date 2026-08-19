@@ -42,6 +42,7 @@ from dashboard.streamlit.components import (
 )
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
+    compute_portfolio_stability,
     find_what_if_grid_portfolio,
     get_selected_corridors_geodataframe,
     get_selected_portfolio_benefits,
@@ -306,9 +307,9 @@ class TestStreamlitDashboard:
         at.run()
         assert not at.exception
 
-        # Change What-If discrete precomputed selectboxes to $24M, 35% equity
-        at.selectbox[0].select(24000000.0)
-        at.selectbox[1].select(0.35)
+        # Change What-If discrete precomputed selectboxes to $24M, 35% equity (indices 2 and 3)
+        at.selectbox[2].select(24000000.0)
+        at.selectbox[3].select(0.35)
         at.run()
         assert not at.exception
         info_texts = [i.value for i in at.info]
@@ -320,6 +321,90 @@ class TestStreamlitDashboard:
         assert not at.exception
         captions = [c.value for c in at.caption]
         assert any("PORT_OFF_BASE_B25M_EQ20" in text for text in captions)
+
+    def test_compute_portfolio_stability_official_counts(self):
+        """Verify compute_portfolio_stability accurately calculates selection frequencies and classifications for Official runs."""
+        df_summary = load_portfolio_summary()
+        df_selections = load_project_selections()
+
+        df_stab = compute_portfolio_stability(df_selections, df_summary, scenario_scope="OFFICIAL")
+
+        # 1. Row count & key uniqueness
+        assert len(df_stab) > 0
+        assert df_stab.duplicated(subset=["corridor_id", "treatment_id"]).sum() == 0
+
+        # 2. Total scenarios equals 27 for OFFICIAL
+        assert (df_stab["total_scenarios"] == 27).all()
+
+        # 3. Selection count and rate validity
+        assert (df_stab["selected_scenario_count"] >= 1).all()
+        assert (df_stab["selected_scenario_count"] <= 27).all()
+        assert (df_stab["selection_rate"] == df_stab["selected_scenario_count"] / 27.0).all()
+        assert (df_stab["selection_rate"] >= 0.0).all()
+        assert (df_stab["selection_rate"] <= 1.0).all()
+
+        # 4. Formatted display string verification
+        for _, row in df_stab.iterrows():
+            expected_display = f"Selected in {int(row['selected_scenario_count'])} of 27 scenarios"
+            assert row["selection_display"] == expected_display
+
+        # 5. Stability tier classification boundaries
+        for _, row in df_stab.iterrows():
+            rate = row["selection_rate"]
+            tier = row["stability_tier"]
+            if rate >= 0.70:
+                assert tier == "Core"
+            elif rate >= 0.30:
+                assert tier == "Conditional"
+            else:
+                assert tier == "Scenario-sensitive"
+
+        # 6. Core projects exist (selected in >=70% of official runs)
+        core_projects = df_stab[df_stab["stability_tier"] == "Core"]
+        assert len(core_projects) >= 30
+
+    def test_compute_portfolio_stability_canonical_and_all_scopes(self):
+        """Verify compute_portfolio_stability handles CANONICAL (36) and ALL (192) scopes cleanly."""
+        df_summary = load_portfolio_summary()
+        df_selections = load_project_selections()
+
+        # Canonical scope (36 runs)
+        df_can = compute_portfolio_stability(df_selections, df_summary, scenario_scope="CANONICAL")
+        assert len(df_can) > 0
+        assert (df_can["total_scenarios"] == 36).all()
+        assert (df_can["selected_scenario_count"] <= 36).all()
+        assert df_can.duplicated(subset=["corridor_id", "treatment_id"]).sum() == 0
+
+        # All scope (192 runs)
+        df_all = compute_portfolio_stability(df_selections, df_summary, scenario_scope="ALL")
+        assert len(df_all) > 0
+        assert (df_all["total_scenarios"] == 192).all()
+        assert (df_all["selected_scenario_count"] <= 192).all()
+        assert df_all.duplicated(subset=["corridor_id", "treatment_id"]).sum() == 0
+
+    def test_portfolio_stability_apptest_section_rendering(self):
+        """AppTest verifies Section 4 Portfolio Stability renders metrics, filters, and tables cleanly."""
+        at = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at.run()
+        assert not at.exception
+
+        # Check section subheaders present
+        subheaders = [s.value for s in at.subheader]
+        assert "4. Portfolio stability and robust project selection" in subheaders
+        assert "5. What-if capital planner" in subheaders
+
+        # Check 3 dataframes rendered (selections detail, stability table, what-if table)
+        assert len(at.dataframe) == 3
+
+        # Filter by Core stability tier (selectbox 1)
+        at.selectbox[1].select("Core (selected in most scenarios)")
+        at.run()
+        assert not at.exception
+
+        # Switch scope to All canonical scenarios (selectbox 0)
+        at.selectbox[0].select("All canonical scenarios (36 runs)")
+        at.run()
+        assert not at.exception
 
     def test_shared_formatting_helpers(self):
         """Verify format_equity_flag, format_cost_per_unit, format_plural, and compact formatters behave correctly."""
