@@ -535,3 +535,44 @@ class TestReportSchemaStatusAndReadiness:
         assert report["downstream_readiness"] == "READY_FOR_THRESHOLD_REVIEW"
         assert report["critical_failure_count"] == 0
         assert report["warning_count"] > 0
+
+
+class TestOfflineSpatialSensitivityReport:
+    """Validate canonical spatial_sensitivity_report.json schema, metrics, and stability conclusions."""
+
+    def test_spatial_sensitivity_report_schema_and_metrics(self):
+        report_path = ROOT / "docs" / "data_quality" / "spatial_sensitivity_report.json"
+        assert report_path.exists(), "docs/data_quality/spatial_sensitivity_report.json must exist"
+
+        with open(report_path, "r", encoding="utf-8") as f:
+            report = json.load(f)
+
+        assert report["pipeline"] == "spatial_assignment_sensitivity_analysis"
+        assert report["production_baseline_threshold_feet"] == 100.0
+        assert report["thresholds_evaluated_feet"] == [50.0, 100.0, 150.0]
+        assert report["conclusion"] == "Portfolio is STABLE across thresholds"
+        assert "100-foot production assignment rule remains justified" in report["production_rule_justification"]
+
+        results = {r["threshold_feet"]: r for r in report["threshold_results"]}
+        assert set(results.keys()) == {50.0, 100.0, 150.0}
+
+        # 100-ft Baseline validation
+        r100 = results[100.0]
+        assert r100["is_production_baseline"] is True
+        assert r100["primary_assigned_crashes"] == 112421
+        assert r100["unresolved_ties"] == 1803
+        assert r100["unmatched_crashes"] == 756545
+        assert r100["spearman_rank_correlation_vs_baseline"] == 1.0
+        assert r100["portfolio_optimization_PORT_OFF_BASE_B15M_EQ20"]["selected_corridor_count"] == 39
+
+        # 50-ft sensitivity
+        r50 = results[50.0]
+        assert r50["primary_assigned_crashes"] == 103102
+        assert r50["spearman_rank_correlation_vs_baseline"] > 0.97
+        assert r50["portfolio_optimization_PORT_OFF_BASE_B15M_EQ20"]["corridor_overlap_pct_with_baseline"] >= 97.0
+
+        # 150-ft sensitivity
+        r150 = results[150.0]
+        assert r150["primary_assigned_crashes"] == 120171
+        assert r150["spearman_rank_correlation_vs_baseline"] > 0.98
+        assert r150["portfolio_optimization_PORT_OFF_BASE_B15M_EQ20"]["corridor_overlap_count_with_baseline"] == 39

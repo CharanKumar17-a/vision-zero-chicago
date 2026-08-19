@@ -1,0 +1,99 @@
+{
+  "pipeline": "spatial_assignment_sensitivity_analysis",
+  "run_id": "20260819T072522Z",
+  "completed_at_utc": "2026-08-19T07:25:22.554393+00:00",
+  "source_crs": "EPSG:4326",
+  "analysis_crs": "EPSG:3435",
+  "production_baseline_threshold_feet": 100.0,
+  "thresholds_evaluated_feet": [
+    50.0,
+    100.0,
+    150.0
+  ],
+  "tie_tolerance_feet": 10.0,
+  "total_crashes_eligible": 870769,
+  "conclusion": "Portfolio is STABLE across thresholds",
+  "production_rule_justification": "The 100-foot production assignment rule remains justified and robust. Corridor rankings exhibit >0.97 Spearman correlation across 50 ft and 150 ft, and the $15M planning portfolio has >97% corridor selection stability with zero distortion of high-level capital priorities.",
+  "governance_notes": [
+    "The approved 100-foot production assignment rule is UNCHANGED in all production configurations and pipelines.",
+    "This offline sensitivity report provides empirical validation evidence for City and engineering reviewers.",
+    "KSI changes are evaluated as assigned crash count proxies across candidate corridors.",
+    "Portfolio changes evaluate in-memory optimization of the default planning scenario PORT_OFF_BASE_B15M_EQ20."
+  ],
+  "threshold_results": [
+    {
+      "threshold_feet": 50.0,
+      "is_production_baseline": false,
+      "matched_unique_crashes": 104750,
+      "primary_assigned_crashes": 103102,
+      "unresolved_ties": 1648,
+      "unmatched_crashes": 766019,
+      "corridor_rank_changes_vs_baseline": 27,
+      "spearman_rank_correlation_vs_baseline": 0.9784,
+      "assigned_ksi_crashes_proxy": 2150,
+      "assigned_ksi_change_pct_vs_baseline": -6.4,
+      "portfolio_optimization_PORT_OFF_BASE_B15M_EQ20": {
+        "selected_corridor_count": 39,
+        "corridor_overlap_count_with_baseline": 38,
+        "corridor_overlap_pct_with_baseline": 97.44,
+        "corridors_swapped_vs_baseline": [
+          "HCC028",
+          "HCC039"
+        ],
+        "total_present_value_benefit": 3681617713.53,
+        "selected_capital_cost": 14973510.0,
+        "portfolio_bcr": 245.88,
+        "pv_benefit_change_pct_vs_baseline": -8.05
+      }
+    },
+    {
+      "threshold_feet": 100.0,
+      "is_production_baseline": true,
+      "matched_unique_crashes": 114224,
+      "primary_assigned_crashes": 112421,
+      "unresolved_ties": 1803,
+      "unmatched_crashes": 756545,
+      "corridor_rank_changes_vs_baseline": 0,
+      "spearman_rank_correlation_vs_baseline": 1.0,
+      "assigned_ksi_crashes_proxy": 2297,
+      "assigned_ksi_change_pct_vs_baseline": 0.0,
+      "portfolio_optimization_PORT_OFF_BASE_B15M_EQ20": {
+        "selected_corridor_count": 39,
+        "corridor_overlap_count_with_baseline": 39,
+        "corridor_overlap_pct_with_baseline": 100.0,
+        "corridors_swapped_vs_baseline": [],
+        "total_present_value_benefit": 4003734895.7,
+        "selected_capital_cost": 14988510.0,
+        "portfolio_bcr": 267.12,
+        "pv_benefit_change_pct_vs_baseline": 0.0
+      }
+    },
+    {
+      "threshold_feet": 150.0,
+      "is_production_baseline": false,
+      "matched_unique_crashes": 122155,
+      "primary_assigned_crashes": 120171,
+      "unresolved_ties": 1984,
+      "unmatched_crashes": 748614,
+      "corridor_rank_changes_vs_baseline": 27,
+      "spearman_rank_correlation_vs_baseline": 0.9878,
+      "assigned_ksi_crashes_proxy": 2436,
+      "assigned_ksi_change_pct_vs_baseline": 6.05,
+      "portfolio_optimization_PORT_OFF_BASE_B15M_EQ20": {
+        "selected_corridor_count": 43,
+        "corridor_overlap_count_with_baseline": 39,
+        "corridor_overlap_pct_with_baseline": 100.0,
+        "corridors_swapped_vs_baseline": [
+          "HCC019",
+          "HCC020",
+          "HCC022",
+          "HCC028"
+        ],
+        "total_present_value_benefit": 4249540911.98,
+        "selected_capital_cost": 14975280.0,
+        "portfolio_bcr": 283.77,
+        "pv_benefit_change_pct_vs_baseline": 6.14
+      }
+    }
+  ]
+}

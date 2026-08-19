@@ -34,6 +34,7 @@ MANIFEST_PATH = DEPLOYMENT_DIR / "deployment_manifest.json"
 GEOMETRY_VAL_PATH = ROOT / "docs" / "data_quality" / "corridor_geometry_validation.json"
 DECISION_MART_VAL_PATH = ROOT / "docs" / "data_quality" / "decision_output_mart_validation.json"
 OPTIMIZATION_VAL_PATH = ROOT / "docs" / "data_quality" / "portfolio_optimization_validation.json"
+SPATIAL_SENSITIVITY_VAL_PATH = ROOT / "docs" / "data_quality" / "spatial_sensitivity_report.json"
 
 DEFAULT_PORTFOLIO_ID = "PORT_OFF_BASE_B15M_EQ20"
 
@@ -293,6 +294,12 @@ def load_validation_evidence() -> Dict[str, Any]:
             evidence["deployment_manifest"] = json.load(f)
     else:
         evidence["deployment_manifest"] = {}
+
+    if SPATIAL_SENSITIVITY_VAL_PATH.exists():
+        with open(SPATIAL_SENSITIVITY_VAL_PATH, "r", encoding="utf-8") as f:
+            evidence["spatial_sensitivity"] = json.load(f)
+    else:
+        evidence["spatial_sensitivity"] = {}
 
     return evidence
 
