@@ -232,6 +232,7 @@ $authorizedScopePatterns = @(
     "^dashboard/streamlit/",
     "^docs/audits/",
     "^docs/data_quality/",
+    "^notebooks/",
     "^reports/",
     "^tests/"
 )
