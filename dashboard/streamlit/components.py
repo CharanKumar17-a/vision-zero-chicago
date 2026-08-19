@@ -17,7 +17,7 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
     """Render sidebar scenario controls and return exactly one selected portfolio_id."""
     st.sidebar.markdown("### Vision Zero Chicago")
     st.sidebar.caption("Safety capital investment prioritization")
-    st.sidebar.title("Planning scenario controls")
+    st.sidebar.title("Precomputed scenario controls")
     st.sidebar.markdown("---")
 
     # 1. Run Group Selector
@@ -66,7 +66,7 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         selected_pid = df_final_match.iloc[0]["portfolio_id"]
 
     st.sidebar.markdown("---")
-    st.sidebar.caption(f"Active scenario: **{selected_pid}**")
+    st.sidebar.caption(f"Precomputed scenario ID: **{selected_pid}**")
 
     from dashboard.streamlit.data_access import is_cloud_deployment_mode, load_validation_evidence
 

@@ -301,21 +301,21 @@ class TestStreamlitDashboard:
         assert row_nearest["portfolio_id"] == "PORT_GRID_BASE_B15M_EQ20"
 
     def test_what_if_planner_apptest_interaction(self):
-        """AppTest interaction with What-If planner sliders dynamically updates Scenario ID."""
+        """AppTest interaction with What-If planner discrete selectors dynamically updates Scenario ID."""
         at = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
         at.run()
         assert not at.exception
 
-        # Change What-If sliders to $24M, 35% equity
-        at.slider[0].set_value(24)
-        at.select_slider[0].set_value(35)
+        # Change What-If discrete precomputed selectboxes to $24M, 35% equity
+        at.selectbox[0].select(24000000.0)
+        at.selectbox[1].select(0.35)
         at.run()
         assert not at.exception
         info_texts = [i.value for i in at.info]
         assert any("PORT_GRID_BASE_B24M_EQ35" in text for text in info_texts)
 
         # Switch sidebar budget to $25M
-        at.select_slider[1].set_value(25000000.0)
+        at.select_slider[0].set_value(25000000.0)
         at.run()
         assert not at.exception
         captions = [c.value for c in at.caption]

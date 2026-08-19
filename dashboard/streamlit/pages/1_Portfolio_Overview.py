@@ -321,35 +321,48 @@ st.dataframe(
 
 st.markdown("---")
 st.subheader("4. What-if capital planner")
-st.caption("Precomputed illustrative grid; nearest optimized planning portfolio shown. Subject to engineering review and implementation approval.")
+st.caption("Precomputed scenario grid (156 precomputed optimization runs across 26 budgets and 6 equity floors). Subject to engineering review and implementation approval.")
 
 st.markdown(
-    "Explore how capital allocation and equity requirements respond to custom budget ceilings and equity floors across the precomputed optimization grid."
+    "Select discrete precomputed scenarios from the canonical optimization grid to inspect capital allocation, selected corridor rosters, and equity outcomes without live continuous solver estimation."
 )
+
+# Extract available precomputed options directly from canonical summary dataset
+df_grid_scenarios = df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]
+if df_grid_scenarios.empty:
+    df_grid_scenarios = df_summary
+
+available_budgets = sorted(df_grid_scenarios["budget_usd"].unique().tolist())
+available_equities = sorted(df_grid_scenarios["equity_floor"].unique().tolist())
+
+default_b_val = 15000000.0 if 15000000.0 in available_budgets else available_budgets[0]
+default_b_idx = available_budgets.index(default_b_val)
+
+default_ef_val = 0.20 if 0.20 in available_equities else available_equities[0]
+default_ef_idx = available_equities.index(default_ef_val)
 
 wif_col1, wif_col2 = st.columns(2)
 with wif_col1:
-    user_budget_m = st.slider(
-        "Select custom planning budget ($M)",
-        min_value=2,
-        max_value=25,
-        value=15,
-        step=1,
-        help="Interactive slider over precomputed budget grid ($2M to $25M in $1M increments)."
+    user_budget = st.selectbox(
+        "Select precomputed budget ceiling",
+        options=available_budgets,
+        index=default_b_idx,
+        format_func=lambda b: f"${int(b / 1e6)}M" if b >= 1e6 else f"${int(b / 1e3)}k",
+        help="Select a discrete planning budget ceiling from the canonical precomputed optimization grid (26 available budget levels from $2M to $40M).",
     )
 with wif_col2:
-    user_equity_pct = st.select_slider(
-        "Select minimum equity spending floor",
-        options=[15, 20, 25, 30, 35, 40],
-        value=20,
-        format_func=lambda x: f"{x}%",
-        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors."
+    user_equity = st.selectbox(
+        "Select precomputed minimum equity spending floor",
+        options=available_equities,
+        index=default_ef_idx,
+        format_func=lambda ef: f"{int(round(ef * 100))}%",
+        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors from precomputed scenarios (15% to 40%).",
     )
 
 wif_s_row, is_exact = find_what_if_grid_portfolio(
     df_summary=df_summary,
-    budget_usd=float(user_budget_m * 1e6),
-    equity_floor=float(user_equity_pct / 100.0),
+    budget_usd=float(user_budget),
+    equity_floor=float(user_equity),
     uncertainty_scenario="BASE",
 )
 
@@ -358,7 +371,7 @@ wif_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, t
 
 wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum()
 
-exact_note = "" if is_exact else f" *(Nearest precomputed match shown for ${user_budget_m}M / {user_equity_pct}% equity)*"
+exact_note = "" if is_exact else f" *(Nearest precomputed match shown for ${int(user_budget / 1e6)}M / {int(round(user_equity * 100))}% equity)*"
 
 st.info(
     f"**Precomputed scenario active:** Budget Ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
