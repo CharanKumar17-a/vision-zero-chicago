@@ -31,8 +31,6 @@ from dashboard.streamlit.components import (
     format_ksi_compact,
     format_percent,
     format_plural,
-    render_economic_caveat_banner,
-    render_engineering_review_banner,
     render_governance_footer,
 )
 from dashboard.streamlit.data_access import (
@@ -96,10 +94,11 @@ st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
 st.subheader("Planning recommendation")
 st.caption("Planning-level decision support for prioritizing corridor safety investments under budget and equity constraints.")
 
-# Mandatory Authority Statement
+# Consolidated Executive Recommendation Callout
 st.info(
-    "**Decision Support Notice:** This tool provides planning-level decision support. "
-    "It does not authorize projects, establish construction scope, or replace engineering review."
+    "**Baseline Recommendation: $15M Budget • 20% Equity Floor • Base CMF**\n\n"
+    "Planning-level decision support for corridor safety capital prioritization. "
+    "This tool does not authorize projects, establish construction scope, or replace engineering review."
 )
 
 st.markdown("")
@@ -129,37 +128,13 @@ with col4:
         "High-SVI capital share",
         f"{high_svi_capital_share:.1f}%",
         delta=f"Floor: {format_percent(rec_summary['equity_floor'])}",
-        help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI corridors ({format_currency(high_svi_cost)}). Measures capital spending input only; not proof of equitable safety outcomes.",
+        help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI corridors ({format_currency(high_svi_cost)}). Measures capital spending input only; not proof of equitable safety outcomes. SVI is used as a spatial equity proxy.",
     )
 
-st.markdown("")
-
-# Planning Recommendation Policy Callout (Decision DEC-08)
-st.info(
-    f"**Planning Recommendation (Baseline Optimization Scenario)**\n\n"
-    f"Baseline Parameters: **$15M budget • 20% High-SVI floor • Base CMF**\n\n"
-    f"Under this canonical baseline scenario ({format_currency(selected_capital_cost)} allocated across {selected_corridors_count} corridors), "
-    f"the mathematical optimization model identifies the following planning-level safety impacts:\n\n"
-    f"- **~{int(annual_crashes_averted):,} all-severity crashes avoided / year**\n"
-    f"- **~{int(annual_ksi_averted)} KSI (fatalities & serious injuries) avoided / year**\n"
-    f"- **{high_svi_capital_share:.1f}% High-SVI capital share** (policy floor: 20.0%)\n"
-    f"- **{high_svi_ksi_share:.1f}% KSI benefit share in High-SVI areas**\n\n"
-    "Planning-level estimates only — subject to engineering review and implementation approval."
-)
-
-# Active scenario status — three small metric cards
-sc_col1, sc_col2, sc_col3 = st.columns(3)
-with sc_col1:
-    st.metric("Active scenario", DEFAULT_PORTFOLIO_ID)
-with sc_col2:
-    st.metric("Optimization status", "Mathematically optimal")
-with sc_col3:
-    st.metric("Budget slack", format_currency(budget_slack))
-
-st.caption("Optimization status: Mathematically optimal under stated assumptions")
+st.caption(f"Status: Optimal allocation (${selected_capital_cost/1e6:.2f}M of $15.0M allocated • {format_currency(budget_slack)} budget slack)")
 
 # -----------------------------------------------------------------------------
-# Section 1 — What This Investment Buys (Decision DEC-05)
+# Section 1 — What This Investment Buys
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("1. What this planning investment buys")
@@ -234,7 +209,6 @@ with col_benefit2:
         - **Eligibility criteria:** Every funded project provides an individual Benefit-Cost Ratio >= 1.0 (planning-level estimate).
         """
     )
-    st.caption("Methodology note: SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
 with st.expander("View conservative economic-only cost scenario", expanded=False):
     st.markdown(
@@ -328,7 +302,7 @@ st.caption(
 )
 
 # -----------------------------------------------------------------------------
-# Section 3 — Sensitivity to Budget & Progression (Decision DEC-01)
+# Section 3 — Sensitivity to Budget & Progression
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("3. Budget sensitivity and progression")
@@ -428,23 +402,8 @@ st.info(
     f"Expanding to $25M covers all {total_corridors_count} corridors (100% network coverage)."
 )
 
-# Navigation Action Cards (Decision DEC-01)
-st.markdown("---")
-st.markdown("#### Next Steps & Scenario Analysis")
-nav_col1, nav_col2 = st.columns(2)
-with nav_col1:
-    st.info(
-        "**Explore Alternate Portfolios**\n\n"
-        "Evaluate $25M / $40M budgets, 30% / 40% equity floors, and CMF uncertainty scenarios on the **Portfolio Overview** page."
-    )
-with nav_col2:
-    st.info(
-        "**Inspect Individual Corridors**\n\n"
-        "Explore the full 43-corridor interactive map, segment geometries, and corridor treatment histories on the **Corridor Explorer** page."
-    )
-
 # -----------------------------------------------------------------------------
-# Section 4 — Decision Boundaries & Governance (Decision DEC-04)
+# Section 4 — Decision Boundaries & Governance
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("4. Decision boundaries and engineering qualifications")
@@ -457,5 +416,5 @@ st.markdown(
     """
 )
 
-# Standardized Consolidated Governance Footer (Decision DEC-04)
+# Standardized Consolidated Governance Footer
 render_governance_footer()

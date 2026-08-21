@@ -541,18 +541,17 @@ class TestStreamlitDashboard:
         # Mandatory Authority Statement on Page 0
         info_texts = [i.value for i in at.info]
         assert any(
-            "This tool provides planning-level decision support. It does not authorize projects, establish construction scope, or replace engineering review."
+            "This tool does not authorize projects, establish construction scope, or replace engineering review."
             in text
             for text in info_texts
         )
 
-        # Planning recommendation callout (supports both info and success containers)
-        rec_texts = [i.value for i in at.info] + [s.value for s in at.success]
-        assert any("Planning Recommendation" in text for text in rec_texts)
+        # Baseline Recommendation Callout
+        assert any("Baseline Recommendation" in text for text in info_texts)
 
-        # Mathematically optimal under stated assumptions qualification
+        # Status badge
         caption_texts = [c.value for c in at.caption]
-        assert any("Mathematically optimal under stated assumptions" in text for text in caption_texts)
+        assert any("Status: Optimal allocation" in text for text in caption_texts)
 
     def test_false_precision_remediation_and_planning_estimate_labels(self):
         """Verify that executive cards use decision-relevant rounded formats and include planning-level estimate notes."""
@@ -632,13 +631,10 @@ class TestStreamlitDashboard:
         labels0 = [m.label for m in at0.metric]
         assert "High-SVI capital share" in labels0
 
-        # Tooltip warns against assuming equitable outcomes
+        # Tooltip warns against assuming equitable outcomes and explains SVI proxy
         helps0 = [m.help for m in at0.metric if m.help is not None]
         assert any("Measures capital spending input only; not proof of equitable safety outcomes." in h for h in helps0)
-
-        # Captions include methodology note
-        captions0 = [c.value for c in at0.caption]
-        assert any("SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity." in c for c in captions0)
+        assert any("SVI is used as a spatial equity proxy" in h for h in helps0)
 
         # Check Page 1 (Portfolio Overview)
         at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
@@ -649,8 +645,15 @@ class TestStreamlitDashboard:
         assert "High-SVI capital share" in labels1
         assert "KSI benefit share in high-SVI areas" in labels1
 
-        captions1 = [c.value for c in at1.caption]
-        assert any("SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity." in c for c in captions1)
+        helps1 = [m.help for m in at1.metric if m.help is not None]
+        assert any("SVI is used as a spatial equity proxy" in h for h in helps1)
+
+        # Check Page 3 (Governance and Methodology) contains methodology note
+        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3.run()
+        assert not at3.exception
+        page3_text = " ".join(m.value for m in at3.markdown)
+        assert "SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity." in page3_text
 
     def test_engineering_feasibility_status_and_portfolio_classification(self):
         """Verify that UNKNOWN physical applicability is communicated as 'Engineering review required' and planning vs implementation portfolios are distinguished."""
@@ -672,7 +675,7 @@ class TestStreamlitDashboard:
         assert "Engineering review required" in page0_markdown_text
         assert "Analytical planning portfolio" in page0_markdown_text
 
-        # Check Page 3 contains engineering hierarchy and future-ready constraint documentation
+        # Check Page 3 contains engineering hierarchy and feasibility constraint documentation
         at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
         at3.run()
         assert not at3.exception
@@ -680,7 +683,7 @@ class TestStreamlitDashboard:
         page3_markdown_text = " ".join(m.value for m in at3.markdown)
         assert "Engineering Status Hierarchy" in page3_markdown_text
         assert "Analytical Planning Portfolio vs. Implementation-Ready Portfolio" in page3_markdown_text
-        assert "Future-Ready Optimization Architecture" in page3_markdown_text
+        assert "Engineering Feasibility & Field Review Constraints" in page3_markdown_text
 
     def test_lazy_heavy_imports_cold_start_optimization(self):
         """Verify that heavy packages (geopandas, pydeck) are lazily loaded and not imported on data_access or Page 0/1 load."""
@@ -791,15 +794,15 @@ assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
         analytics.track_page_view("Executive Recommendation")
 
     def test_governance_page_documents_analytics_and_privacy(self):
-        """Verify Governance page (Page 3) renders Section 5 on Decision Product Analytics."""
+        """Verify Governance page (Page 3) renders Section 5 on Usage Analytics."""
         at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
         at3.run()
         assert not at3.exception
 
         subheaders = [s.value for s in at3.subheader]
-        assert any("5. Decision product analytics" in s for s in subheaders)
+        assert any("5. Usage analytics" in s for s in subheaders)
 
         markdown_text = " ".join(m.value for m in at3.markdown)
-        assert "Decision Product Analytics" in markdown_text
+        assert "Usage Analytics" in markdown_text
         assert "Disabled by default" in markdown_text
         assert "Zero PII" in markdown_text

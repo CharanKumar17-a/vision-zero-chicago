@@ -50,11 +50,6 @@ render_page_header(
     "Interactive planning-level decision support for provisional high-crash corridor treatment portfolios.",
 )
 
-st.markdown(
-    "**How to read this page:** Use the sidebar controls to explore portfolio investment scenarios. "
-    "This page summarizes the optimized planning portfolio, funding coverage, estimated safety impacts, and equity distribution."
-)
-
 # Load serving datasets
 df_summary = load_portfolio_summary()
 df_selections = load_project_selections()
@@ -111,7 +106,7 @@ with col4:
         "High-SVI capital share",
         format_percent(s_row["achieved_equity_share"]),
         delta=f"Floor: {format_percent(s_row['equity_floor'])}",
-        help=f"Denominator: Selected portfolio capital cost ({format_currency(s_row['selected_capital_cost'])}). Numerator: Capital allocated to high-SVI corridors. Measures capital spending input only; not proof of equitable safety outcomes.",
+        help=f"Denominator: Selected portfolio capital cost ({format_currency(s_row['selected_capital_cost'])}). Numerator: Capital allocated to high-SVI corridors. Measures capital spending input only; not proof of equitable safety outcomes. SVI is used as a spatial equity proxy.",
     )
 
 # Secondary Metrics Expander
@@ -131,8 +126,6 @@ with st.expander("View secondary metrics and economic indicators", expanded=Fals
         st.metric("Total net present benefit", format_currency_compact(s_row["total_net_present_benefit"]), help=f"Planning-level estimate: {format_currency(s_row['total_net_present_benefit'])} net present value benefit.")
         st.metric("Portfolio BCR (comprehensive)", format_bcr_compact(s_row["portfolio_bcr"]), help=f"Planning-level estimate: {s_row['portfolio_bcr']:,.1f} : 1 benefit-cost ratio from comprehensive crash costs.")
         st.metric("KSI benefit share in high-SVI areas", f"{high_svi_ksi_share:.1f}%", help=f"Denominator: Total annual KSI crashes avoided across funded corridors (~{annual_ksi:.1f}/yr). Numerator: Annual KSI avoided in high-SVI corridors (~{high_svi_ksi:.1f}/yr). SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
-
-st.caption("Methodology note: SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
 # -----------------------------------------------------------------------------
 # Section 2 — Selected Projects Detail Register

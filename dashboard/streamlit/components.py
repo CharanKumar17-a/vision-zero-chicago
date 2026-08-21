@@ -162,7 +162,7 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         f"• **Equity Floor:** {eq_label}\n"
         f"• **CMF Tier:** {selected_scen.title()}"
     )
-    st.sidebar.caption(f"Precomputed scenario ID: **{selected_pid}**")
+    st.sidebar.caption(f"Scenario ID: `{selected_pid}`")
 
     from dashboard.streamlit.data_access import is_cloud_deployment_mode, load_validation_evidence
 
@@ -170,7 +170,7 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         evidence = load_validation_evidence()
         manifest_meta = evidence.get("deployment_manifest", {})
         gen_time = manifest_meta.get("generated_at_utc", "N/A")
-        st.sidebar.info(f"**Published Analytical Snapshot**\nGenerated: `{gen_time}`")
+        st.sidebar.caption(f"Snapshot: `{gen_time}`")
 
     try:
         from dashboard.streamlit.analytics import track_scenario_selected
@@ -201,48 +201,40 @@ def render_page_header(page_title: str, subtitle: str | None = None) -> None:
 
 
 def render_governance_header_banner(run_group: str, is_official: bool) -> None:
-    """Render mandatory governance banner based on run group."""
+    """Render user-facing scenario note based on run group."""
     if is_official:
         st.info(
-            "**Official planning scenario (Subject to engineering review and implementation approval)**: "
-            "Under sourced planning-level treatment costs (D024), the full 43-corridor network costs approx. "
-            "\\$17.5M–\\$18.8M under Road Diet caps (D026/D027). The \\$15M planning budget ceiling is binding "
-            "(allocating \\$14.99M of \\$15M in the Baseline Scenario); \\$25M and \\$40M remain nonbinding "
-            "(all eligible corridors fit). Budget and equity scenarios provide planning-level decision support "
-            "and do not constitute official City appropriations or construction authorizations. "
-            "Physical applicability remains UNKNOWN pending engineering field review."
+            "$15M budget is binding ($14.99M across 39 corridors); $25M/$40M allow full 43-corridor coverage. "
+            "All selections require engineering field review."
         )
     else:
         st.warning(
-            "**Analyst-defined binding-budget diagnostics**: This stress scenario represents an analyst-defined "
-            "diagnostic scenario under constrained budgets (\\$2M, \\$4M, \\$6M) to evaluate binding constraint mechanics. "
-            "This provides planning-level decision support and does not constitute official City policy or project authorization."
+            "Diagnostic stress scenario ($2M–$6M budget constraints). "
+            "Planning-level decision support only; does not constitute City policy or project authorization."
         )
 
 
 def render_engineering_review_banner() -> None:
-    """Render mandatory engineering field review warning banner."""
+    """Render engineering field review warning banner."""
     st.warning(
-        "**Subject to engineering review and implementation approval**: "
-        "Lane counts, median widths, and crossing inventories are not yet available in the analytical dataset. "
-        "Physical applicability status is UNKNOWN across candidate corridors. "
-        "Detailed engineering field review and survey are required prior to project programming or construction scoping."
+        "Subject to engineering field review and implementation approval before construction scoping."
     )
 
 
 def render_economic_caveat_banner() -> None:
-    """Render mandatory economic cost-benefit disclaimer banner."""
+    """Render economic cost-benefit disclaimer banner."""
     st.warning(
-        "**Planning-level estimate**: Benefits reflect comprehensive crash costs from federal guidance — not expected City financial returns. "
-        "All figures provide planning-level decision support and are subject to engineering review and implementation approval."
+        "Planning-level estimate: Benefits reflect societal crash cost savings from federal guidance, not City financial returns."
     )
 
 
 def render_governance_footer() -> None:
-    """Render standardized concise governance and economic footer across all pages (Decision DEC-04)."""
+    """Render standardized concise governance and economic footer across all pages."""
     st.markdown("---")
-    st.caption("Planning-level decision support • Engineering review required before implementation")
-    st.caption("Economic benefits represent estimated societal crash costs, not City cash revenues.")
+    st.caption(
+        "Planning-level decision support. Requires engineering field review before programming. "
+        "Economic values reflect societal cost savings, not City revenues."
+    )
 
 
 def format_currency(val: float) -> str:

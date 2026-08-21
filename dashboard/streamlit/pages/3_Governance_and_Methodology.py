@@ -17,8 +17,6 @@ import pandas as pd
 import streamlit as st
 
 from dashboard.streamlit.components import (
-    render_economic_caveat_banner,
-    render_engineering_review_banner,
     render_governance_footer,
     render_page_header,
     render_sidebar_controls,
@@ -47,19 +45,13 @@ geom_ev = evidence.get("geometry", {})
 opt_ev = evidence.get("optimization", {})
 mart_ev = evidence.get("decision_mart", {})
 
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.metric("Geometry validation run ID", geom_ev.get("run_id", "N/A"))
-
-with col2:
-    st.metric("Optimization run ID", opt_ev.get("run_id", "N/A"))
-
-with col3:
-    st.metric("Decision mart run ID", mart_ev.get("run_id", "N/A"))
-
-with col4:
-    st.metric("Decision mart status", mart_ev.get("status", "N/A"))
+lineage_records = [
+    {"Pipeline Component": "Corridor Geometry Validation", "Execution Run ID": str(geom_ev.get("run_id", "N/A")), "Status": "PASS"},
+    {"Pipeline Component": "Portfolio Optimization", "Execution Run ID": str(opt_ev.get("run_id", "N/A")), "Status": "OPTIMAL"},
+    {"Pipeline Component": "Decision Mart Serving", "Execution Run ID": str(mart_ev.get("run_id", "N/A")), "Status": str(mart_ev.get("status", "VALIDATED"))},
+]
+with st.expander("View pipeline execution runs and lineage IDs", expanded=True):
+    st.dataframe(pd.DataFrame(lineage_records), use_container_width=True, hide_index=True)
 
 st.markdown("---")
 st.subheader("2. Governance warning register")
@@ -113,7 +105,7 @@ st.markdown(r"""
   - *Equity of Estimated Safety Benefit (`KSI benefit share in high-SVI areas`)*: Tracks the percentage of estimated life-safety crash reductions (Fatal K + Serious Injury A) realized within high-SVI corridors (e.g., 55.9% of portfolio KSI avoided in the $15M Baseline Scenario).
 
 #### Scenario definitions
-- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating \$15M, \$25M, and \$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official \$15M planning budgets bind strictly under realistic unit costs (\$14.99M cost, selecting 39 corridors in the Baseline Scenario under D026/D027 Road Diet diversification and screening), while \$25M and \$40M budget ceilings allow network-wide coverage.
+- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating \$15M, \$25M, and \$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official \$15M planning budgets bind strictly under realistic unit costs (\$14.99M cost, selecting 39 corridors in the Baseline Scenario under Road Diet diversification and screening), while \$25M and \$40M budget ceilings allow network-wide coverage.
 - **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \$2M, \$4M, and \$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 #### Crash severity definitions and analytical denominators
@@ -134,13 +126,13 @@ st.markdown(r"""
 - **Analytical Planning Portfolio vs. Implementation-Ready Portfolio**:
   - *Analytical Planning Portfolio*: The mathematically optimal combination of corridor treatments selected under stated budget, equity floor, and CMF assumptions. All selected projects in the current analytical dataset carry provisional status `UNKNOWN` (*Engineering review required*).
   - *Implementation-Ready Portfolio*: Projects that have completed formal engineering field review, utility coordination, geometric design, and City departmental approval.
-- **Future-Ready Optimization Architecture**:
+- **Engineering Feasibility & Field Review Constraints**:
   - The decision support system's optimization engine is architected to ingest verified field engineering data as hard constraints (see formulation below).
   - Once CDOT or engineering field surveys produce verified feasibility attributes, the MILP optimization model will automatically enforce engineering eligibility without redesigning the core optimization formulation.
 """)
 
 st.info(
-    "**Engineering eligibility constraint (Future-Ready Optimization Architecture)**\n\n"
+    "**Engineering Feasibility & Field Review Constraints**\n\n"
     "The optimization engine is designed to ingest verified field engineering data as hard constraints, "
     "so that projects marked NOT_APPLICABLE are excluded from selection, and — for implementation-ready runs — "
     "only projects with a verified ELIGIBLE engineering status may be selected.\n\n"
@@ -174,16 +166,16 @@ An offline spatial sensitivity analysis was conducted comparing candidate crash 
 """)
 
 st.markdown("---")
-st.subheader("5. Decision product analytics and privacy")
+st.subheader("5. Usage analytics and privacy")
 
 st.markdown("""
-#### Anonymous decision product telemetry
-- **Decision Product Analytics**: Anonymous usage measurement for understanding how users navigate, explore scenarios, inspect corridors, and export planning outputs. PostHog is used as the analytics platform.
+#### Anonymous usage measurement
+- **Usage Analytics**: Anonymous usage measurement for understanding how users navigate, explore scenarios, inspect corridors, and export planning outputs. PostHog is used as the analytics platform.
 - **Privacy and Isolation Guarantees**:
   - **Disabled by default**: Telemetry is opt-in and inactive unless explicitly enabled in configuration or environment variables.
   - **Zero PII**: No personal identifying information (PII), names, email addresses, raw crash records, or uploaded data are ever collected.
   - **Zero Analytical Impact**: Telemetry operates strictly in an isolated observer mode and never affects calculations, mathematical optimizations, or displayed values.
 """)
 
-# Standardized Consolidated Governance Footer (Decision DEC-04)
+# Standardized Consolidated Governance Footer
 render_governance_footer()
