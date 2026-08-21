@@ -29,6 +29,7 @@ from dashboard.streamlit.components import (
     format_percent,
     render_economic_caveat_banner,
     render_engineering_review_banner,
+    render_governance_footer,
     render_governance_header_banner,
     render_page_header,
     render_sidebar_controls,
@@ -131,155 +132,13 @@ with st.expander("View secondary metrics and economic indicators", expanded=Fals
         st.metric("Portfolio BCR (comprehensive)", format_bcr_compact(s_row["portfolio_bcr"]), help=f"Planning-level estimate: {s_row['portfolio_bcr']:,.1f} : 1 benefit-cost ratio from comprehensive crash costs.")
         st.metric("KSI benefit share in high-SVI areas", f"{high_svi_ksi_share:.1f}%", help=f"Denominator: Total annual KSI crashes avoided across funded corridors (~{annual_ksi:.1f}/yr). Numerator: Annual KSI avoided in high-SVI corridors (~{high_svi_ksi:.1f}/yr). SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
+st.caption("Methodology note: SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
+
+# -----------------------------------------------------------------------------
+# Section 2 — Selected Projects Detail Register
+# -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("2. Scenario visual analytics")
-
-# Visual Charts Section
-c1, c2 = st.columns(2)
-
-with c1:
-    st.markdown("#### Capital cost versus planning budget ceiling")
-    fig_cost = go.Figure()
-    fig_cost.add_trace(go.Bar(
-        x=["Selected capital cost"],
-        y=[s_row["selected_capital_cost"]],
-        name="Selected capital cost",
-        marker_color="#1f77b4",
-        text=[format_currency(s_row["selected_capital_cost"])],
-        textposition="auto",
-    ))
-    fig_cost.add_trace(go.Bar(
-        x=["Budget ceiling"],
-        y=[s_row["budget_usd"]],
-        name="Planning budget ceiling",
-        marker_color="#d62728",
-        text=[format_currency(s_row["budget_usd"])],
-        textposition="auto",
-    ))
-    fig_cost.update_layout(
-        barmode="group",
-        height=320,
-        margin=dict(l=20, r=20, t=30, b=20),
-        yaxis=dict(tickprefix="$", tickformat="~s", title="Capital cost (USD)"),
-    )
-    st.plotly_chart(fig_cost, use_container_width=True)
-
-with c2:
-    st.markdown("#### High-SVI capital share versus required floor")
-    fig_eq = go.Figure()
-    fig_eq.add_trace(go.Bar(
-        x=["High-SVI capital share", "Required equity floor"],
-        y=[s_row["achieved_equity_share"] * 100, s_row["equity_floor"] * 100],
-        marker_color=["#2ca02c", "#ff7f0e"],
-        text=[f"{s_row['achieved_equity_share']*100:.1f}%", f"{s_row['equity_floor']*100:.1f}%"],
-        textposition="auto",
-    ))
-    fig_eq.update_layout(
-        height=320,
-        margin=dict(l=20, r=20, t=30, b=20),
-        yaxis=dict(ticksuffix="%", title="Spending share (%)"),
-    )
-    st.plotly_chart(fig_eq, use_container_width=True)
-    st.caption("Methodology note: SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
-
-c3, c4 = st.columns(2)
-
-with c3:
-    st.markdown("#### Selected project cost distribution")
-    fig_dist = px.histogram(
-        df_sel_benefits,
-        x="capital_project_cost",
-        nbins=15,
-        labels={"capital_project_cost": "Capital project cost ($)"},
-        color_discrete_sequence=["#1f77b4"],
-    )
-    mean_cost = float(df_sel_benefits["capital_project_cost"].mean())
-    median_cost = float(df_sel_benefits["capital_project_cost"].median())
-    fig_dist.add_vline(
-        x=mean_cost,
-        line_dash="dash",
-        line_color="#d62728",
-        annotation_text=f"Mean: {format_currency(mean_cost)}",
-        annotation_position="top right",
-    )
-    fig_dist.add_vline(
-        x=median_cost,
-        line_dash="dot",
-        line_color="#2ca02c",
-        annotation_text=f"Median: {format_currency(median_cost)}",
-        annotation_position="top left",
-    )
-    fig_dist.update_layout(
-        height=320,
-        margin=dict(l=20, r=20, t=30, b=20),
-        xaxis=dict(tickprefix="$", tickformat="~s", title="Capital project cost (USD)"),
-        yaxis=dict(title="Corridor count"),
-    )
-    st.plotly_chart(fig_dist, use_container_width=True)
-
-from plotly.subplots import make_subplots
-
-with c4:
-    st.markdown("#### Estimated annual avoided crashes by severity")
-    st.caption("Primary Vision Zero life-safety outcomes (Fatalities & Serious Injuries) vs. secondary outcomes.")
-
-    k_val = float(df_sel_benefits["crashes_averted_k"].sum())
-    a_val = float(df_sel_benefits["crashes_averted_a"].sum())
-    ksi_val = float(df_sel_benefits["crashes_averted_ksi"].sum())
-    b_val = float(df_sel_benefits["crashes_averted_b"].sum())
-    c_val = float(df_sel_benefits["crashes_averted_c"].sum())
-    o_val = float(df_sel_benefits["crashes_averted_o"].sum())
-
-    fig_sev = make_subplots(
-        rows=1,
-        cols=2,
-        subplot_titles=[
-            "Primary: Life-Safety (KSI)",
-            "Secondary: Non-Severe & PDO",
-        ],
-        horizontal_spacing=0.18,
-    )
-
-    # Subplot 1: Life-Safety (Fatal K, Serious A, Combined KSI)
-    fig_sev.add_trace(
-        go.Bar(
-            x=["Fatal (K)", "Serious (A)", "Combined KSI"],
-            y=[k_val, a_val, ksi_val],
-            text=[f"{k_val:.1f}", f"{a_val:.1f}", f"{ksi_val:.1f}"],
-            textposition="auto",
-            marker_color=["#d62728", "#ff7f0e", "#9467bd"],
-            name="Life-Safety (KSI)",
-            showlegend=False,
-        ),
-        row=1,
-        col=1,
-    )
-
-    # Subplot 2: Secondary Outcomes (Minor B, Possible C, PDO O)
-    fig_sev.add_trace(
-        go.Bar(
-            x=["Minor (B)", "Possible (C)", "PDO (O)"],
-            y=[b_val, c_val, o_val],
-            text=[f"{b_val:.0f}", f"{c_val:.0f}", f"{o_val:.0f}"],
-            textposition="auto",
-            marker_color=["#1f77b4", "#17becf", "#7f7f7f"],
-            name="Secondary (Non-Severe & PDO)",
-            showlegend=False,
-        ),
-        row=1,
-        col=2,
-    )
-
-    fig_sev.update_layout(
-        height=320,
-        margin=dict(l=10, r=10, t=35, b=10),
-    )
-    fig_sev.update_yaxes(title_text="Avoided / yr", row=1, col=1)
-    fig_sev.update_yaxes(title_text="Avoided / yr", row=1, col=2)
-    st.plotly_chart(fig_sev, use_container_width=True)
-
-st.markdown("---")
-st.subheader("3. Selected projects detail register")
+st.subheader("2. Selected projects detail register")
 st.caption("Analytical planning portfolio; individual project engineering status is provisionally UNKNOWN (Engineering review required). Subject to engineering review and implementation approval.")
 
 df_table = df_sel_benefits[[
@@ -317,11 +176,14 @@ st.dataframe(
     }),
     use_container_width=True,
     hide_index=True,
-    height=350,
+    height=320,
 )
 
+# -----------------------------------------------------------------------------
+# Section 3 — Portfolio Robustness Across Scenarios (Decision DEC-07)
+# -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("4. Portfolio stability and robust project selection")
+st.subheader("3. Portfolio robustness across scenarios")
 st.caption("Cross-scenario selection frequencies from precomputed optimization runs. Identifies robust 'core' investments versus scenario-sensitive projects.")
 
 st.markdown(
@@ -412,9 +274,79 @@ st.dataframe(
     }),
     use_container_width=True,
     hide_index=True,
-    height=320,
+    height=280,
 )
 
+# -----------------------------------------------------------------------------
+# Section 4 — Benefit-Cost Efficiency View (Decision DEC-02)
+# -----------------------------------------------------------------------------
+st.markdown("---")
+st.subheader("4. Funded corridors — Benefit-Cost efficiency")
+st.caption(
+    "Corridors ranked by individual Benefit-Cost Ratio (BCR). "
+    "Portfolio selection maximizes total lifecycle present-value safety benefit under budget and equity constraints."
+)
+
+df_eff = df_sel_benefits.copy()
+df_eff["bcr_float"] = df_eff["benefit_cost_ratio"].astype(float)
+df_eff = df_eff.sort_values("bcr_float", ascending=True)  # Ascending for horizontal bar chart display
+
+colors = ["#276749" if eq else "#1B4F8A" for eq in df_eff["equity_area_flag"]]
+
+fig_bcr = go.Figure()
+fig_bcr.add_trace(go.Bar(
+    y=df_eff["corridor_name"],
+    x=df_eff["bcr_float"],
+    orientation="h",
+    marker_color=colors,
+    text=[f"BCR {bcr:.1f} (${int(c/1e3)}k)" for bcr, c in zip(df_eff["bcr_float"], df_eff["capital_project_cost"])],
+    textposition="auto",
+))
+
+fig_bcr.update_layout(
+    title=dict(
+        text="Funded Corridors — Benefit-Cost Efficiency",
+        font=dict(size=14),
+    ),
+    height=max(400, len(df_eff) * 20),
+    margin=dict(l=20, r=20, t=40, b=20),
+    xaxis=dict(title="Individual Project Benefit-Cost Ratio (BCR)"),
+    yaxis=dict(title=""),
+)
+
+st.plotly_chart(fig_bcr, use_container_width=True)
+
+# Legend indicator
+c_leg1, c_leg2 = st.columns(2)
+with c_leg1:
+    st.markdown("🟢 **Green bars**: High-SVI Equity Priority Corridors")
+with c_leg2:
+    st.markdown("🔵 **Blue bars**: Standard Priority Corridors")
+
+with st.expander("Comprehensive severity & economic accounts (Detailed KABCO breakdowns)", expanded=False):
+    k_val = float(df_sel_benefits["crashes_averted_k"].sum())
+    a_val = float(df_sel_benefits["crashes_averted_a"].sum())
+    ksi_val = float(df_sel_benefits["crashes_averted_ksi"].sum())
+    b_val = float(df_sel_benefits["crashes_averted_b"].sum())
+    c_val = float(df_sel_benefits["crashes_averted_c"].sum())
+    o_val = float(df_sel_benefits["crashes_averted_o"].sum())
+    tot_val = float(df_sel_benefits["crashes_averted_total"].sum())
+
+    st.markdown("#### Comprehensive annual crash severity breakdown")
+    sev_df = pd.DataFrame([
+        {"Outcome Tier": "Primary (Life-Safety)", "Severity Category": "Fatal crashes (K)", "Estimated Crashes Avoided / Yr": f"{k_val:.2f}", "Share of Total": f"{(k_val/tot_val)*100:.2f}%"},
+        {"Outcome Tier": "Primary (Life-Safety)", "Severity Category": "Serious injury crashes (A)", "Estimated Crashes Avoided / Yr": f"{a_val:.2f}", "Share of Total": f"{(a_val/tot_val)*100:.2f}%"},
+        {"Outcome Tier": "Primary (Life-Safety)", "Severity Category": "Combined Vision Zero KSI (K + A)", "Estimated Crashes Avoided / Yr": f"{ksi_val:.2f}", "Share of Total": f"{(ksi_val/tot_val)*100:.2f}%"},
+        {"Outcome Tier": "Secondary (Non-Severe)", "Severity Category": "Minor injury crashes (B)", "Estimated Crashes Avoided / Yr": f"{b_val:.2f}", "Share of Total": f"{(b_val/tot_val)*100:.2f}%"},
+        {"Outcome Tier": "Secondary (Non-Severe)", "Severity Category": "Possible injury crashes (C)", "Estimated Crashes Avoided / Yr": f"{c_val:.2f}", "Share of Total": f"{(c_val/tot_val)*100:.2f}%"},
+        {"Outcome Tier": "Secondary (Property Damage)", "Severity Category": "Property damage only crashes (PDO / O)", "Estimated Crashes Avoided / Yr": f"{o_val:.2f}", "Share of Total": f"{(o_val/tot_val)*100:.2f}%"},
+        {"Outcome Tier": "Total", "Severity Category": "All-severity crashes (Total)", "Estimated Crashes Avoided / Yr": f"{tot_val:,.2f}", "Share of Total": "100.00%"},
+    ])
+    st.dataframe(sev_df, use_container_width=True, hide_index=True)
+
+# -----------------------------------------------------------------------------
+# Section 5 — What-If Capital Planner
+# -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("5. What-if capital planner")
 st.caption("Precomputed scenario grid (156 precomputed optimization runs across 26 budgets and 6 equity floors). Subject to engineering review and implementation approval.")
@@ -423,7 +355,6 @@ st.markdown(
     "Select discrete precomputed scenarios from the canonical optimization grid to inspect capital allocation, selected corridor rosters, and equity outcomes without live continuous solver estimation."
 )
 
-# Extract available precomputed options directly from canonical summary dataset
 df_grid_scenarios = df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]
 if df_grid_scenarios.empty:
     df_grid_scenarios = df_summary
@@ -470,7 +401,7 @@ wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum()
 exact_note = "" if is_exact else f" *(Nearest precomputed match shown for ${int(user_budget / 1e6)}M / {int(round(user_equity * 100))}% equity)*"
 
 st.info(
-    f"**Precomputed scenario active:** Budget Ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
+    f"**Precomputed scenario active:** Budget Ceiling: **\\${int(wif_s_row['budget_usd']/1e6)}M** | "
     f"Equity Floor: **{int(round(wif_s_row['equity_floor']*100))}%** | "
     f"Scenario ID: `{target_portfolio_id}`{exact_note}"
 )
@@ -538,5 +469,5 @@ if st.download_button(
     except Exception:
         pass
 
-render_engineering_review_banner()
-render_economic_caveat_banner()
+# Standardized Consolidated Governance Footer (Decision DEC-04)
+render_governance_footer()

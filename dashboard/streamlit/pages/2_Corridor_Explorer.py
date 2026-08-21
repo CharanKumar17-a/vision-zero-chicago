@@ -29,6 +29,7 @@ from dashboard.streamlit.components import (
     format_percent,
     render_economic_caveat_banner,
     render_engineering_review_banner,
+    render_governance_footer,
     render_governance_header_banner,
     render_page_header,
     render_sidebar_controls,
@@ -69,21 +70,153 @@ df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
 
 render_governance_header_banner(s_row["run_group"], (s_row["run_group"] == "OFFICIAL"))
 
+# -----------------------------------------------------------------------------
+# Section 1 — Corridor Detail Inspector (Inspector-First Hierarchy)
+# -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("1. Selected portfolio investment map")
+st.subheader("1. Corridor detail inspector")
+st.caption("Inspect individual corridor geometry, baseline crash burden, treatment candidates, and optimization decision rationale.")
 
-# Visual Map Legend
-col_leg1, col_leg2 = st.columns([1, 1])
-with col_leg1:
-    st.markdown(":orange[■] **High-SVI equity priority areas** (CDC Social Vulnerability Index proxy)")
-with col_leg2:
-    st.markdown(":blue[■] **Standard priority corridors**")
+selected_cids = set(df_sel_benefits["corridor_id"])
 
-# Prepare PyDeck map data for selected corridors
-gdf_sel = get_selected_corridors_geodataframe(df_selections, gdf_corridors, portfolio_id)
+# Build 43-corridor selection options with [Selected] / [Deferred] badges
+corridor_options = sorted(df_master["corridor_id"].tolist())
+corridor_labels = {}
+for cid in corridor_options:
+    cm = df_master[df_master["corridor_id"] == cid].iloc[0]
+    if cid in selected_cids:
+        c_sel = df_sel_benefits[df_sel_benefits["corridor_id"] == cid].iloc[0]
+        corridor_labels[cid] = f"🟢 [Selected] {cid} — {cm['corridor_name']} ({c_sel['treatment_name']})"
+    else:
+        corridor_labels[cid] = f"⚪ [Deferred] {cid} — {cm['corridor_name']} (Deferred under ceiling)"
 
-# Merge forecast risk & master attributes onto gdf_sel
-gdf_map = gdf_sel.merge(
+selected_cid = st.selectbox(
+    "Select high-crash corridor to inspect (43 candidate corridors):",
+    options=corridor_options,
+    format_func=lambda cid: corridor_labels[cid],
+    index=0,
+)
+
+try:
+    from dashboard.streamlit.analytics import track_corridor_inspected
+    track_corridor_inspected(selected_cid)
+except Exception:
+    pass
+
+m_row = df_master[df_master["corridor_id"] == selected_cid].iloc[0]
+is_selected = selected_cid in selected_cids
+
+# Extract treatment candidates for this corridor
+base_benefits_cid = df_benefits[
+    (df_benefits["corridor_id"] == selected_cid)
+    & (
+        (df_benefits["uncertainty_scenario"] == "BASE")
+        if "uncertainty_scenario" in df_benefits.columns
+        else (df_benefits["scenario_level"] == "BASE")
+    )
+]
+
+if is_selected:
+    c_row = df_sel_benefits[df_sel_benefits["corridor_id"] == selected_cid].iloc[0]
+    c_cost = float(c_row["capital_project_cost"])
+    c_ksi_averted = float(c_row["crashes_averted_ksi"])
+    c_tot_averted = float(c_row["crashes_averted_total"])
+    c_comp_bcr = float(c_row["benefit_cost_ratio"])
+    c_econ_bcr = float(c_row["bcr_economic_only"]) if "bcr_economic_only" in c_row and pd.notnull(c_row["bcr_economic_only"]) else 0.0
+    c_trt = str(c_row["treatment_name"])
+    c_status = "SELECTED"
+else:
+    best_cand = base_benefits_cid.sort_values("benefit_cost_ratio", ascending=False).iloc[0]
+    c_cost = float(best_cand["capital_project_cost"])
+    c_ksi_averted = float(best_cand["crashes_averted_k"] + best_cand["crashes_averted_a"])
+    c_tot_averted = float(best_cand["crashes_averted_total"])
+    c_comp_bcr = float(best_cand["benefit_cost_ratio"])
+    c_econ_bcr = 0.0
+    c_trt = f"{best_cand['treatment_name']} (Candidate)"
+    c_status = "DEFERRED"
+
+cost_per_ksi_str = format_cost_per_unit(c_cost, c_ksi_averted, "KSI")
+cost_per_crash_str = format_cost_per_unit(c_cost, c_tot_averted, "crash")
+
+ic1, ic2, ic3, ic4 = st.columns(4)
+with ic1:
+    st.markdown(f"**Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
+    st.markdown(f"**Length:** {m_row['spatial_total_length_miles']:.2f} miles")
+    st.markdown(f"**SVI Weighted Index:** {m_row['corridor_length_weighted_svi']:.3f}")
+with ic2:
+    st.markdown(f"**Baseline Total Crashes / Year:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr")
+    st.markdown(f"**Baseline KSI / Year:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr")
+    st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
+with ic3:
+    st.markdown(f"**Recommended Treatment:** {c_trt}")
+    st.markdown(f"**Estimated Capital Cost:** {format_currency_compact(c_cost)} ({format_currency(c_cost)})")
+    st.markdown(f"**Engineering Status:** **Engineering review required** (Provisional: `UNKNOWN`)")
+with ic4:
+    st.markdown(f"**Estimated Avoided Crashes:** {format_count_compact(c_tot_averted)} all-severity / yr (KSI: {format_ksi_compact(c_ksi_averted)} / yr)")
+    st.markdown(f"**BCR (Comprehensive, Planning-Level):** `{format_bcr_compact(c_comp_bcr)}` ({c_comp_bcr:.1f} : 1)")
+    st.markdown(f"**Portfolio Status:** **{c_status}**")
+
+# Explicit Selection Rationale Note
+if is_selected:
+    st.info(
+        f"**Selection Rationale:** Corridor `{selected_cid}` was selected for funding under active scenario `{portfolio_id}`. "
+        f"It provides a high benefit-cost ratio ({c_comp_bcr:.1f}:1) and delivers ~{c_ksi_averted:.1f} avoided KSI / year."
+    )
+else:
+    st.warning(
+        f"**Deferred Rationale:** Corridor `{selected_cid}` was deferred under active scenario `{portfolio_id}` because its capital cost "
+        f"({format_currency(c_cost)}) exceeds remaining budget slack or higher-efficiency alternatives took precedence. "
+        f"Best candidate treatment provides a positive ROI ({c_comp_bcr:.1f}:1) and would be considered under expanded funding."
+    )
+
+with st.expander("View all evaluated treatment candidates for this corridor", expanded=False):
+    cand_disp = base_benefits_cid[[
+        "treatment_name", "capital_project_cost", "benefit_cost_ratio",
+        "crashes_averted_total", "crashes_averted_k", "crashes_averted_a",
+        "physical_applicability_status"
+    ]].copy()
+    cand_disp.columns = [
+        "Treatment Candidate", "Capital Cost", "BCR",
+        "Total Avoided / Yr", "Fatal Avoided / Yr", "Serious Injury Avoided / Yr",
+        "Engineering Status"
+    ]
+    st.dataframe(
+        cand_disp.style.format({
+            "Capital Cost": "${:,.0f}",
+            "BCR": "{:,.1f}",
+            "Total Avoided / Yr": "{:,.2f}",
+            "Fatal Avoided / Yr": "{:,.2f}",
+            "Serious Injury Avoided / Yr": "{:,.2f}",
+        }),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+# -----------------------------------------------------------------------------
+# Section 2 — Spatial Investment Map (Full 43 Corridors - Decision DEC-03)
+# -----------------------------------------------------------------------------
+st.markdown("---")
+st.subheader("2. Citywide corridor investment map (43 corridors)")
+st.caption("Visualizes all 43 candidate high-crash corridors across Chicago with active portfolio funding status and CDC/ATSDR SVI equity priority areas.")
+
+# Visual Map Legend (Separated Portfolio Status from Interaction State - Issue A)
+leg_col1, leg_col2 = st.columns([3, 2])
+with leg_col1:
+    st.markdown("**Portfolio Funding Status (Under Active Scenario):**")
+    l1, l2, l3 = st.columns(3)
+    with l1:
+        st.markdown("🟢 **Selected (High-SVI)**\n\n*Thick green corridor, priority*")
+    with l2:
+        st.markdown("🔵 **Selected (Standard)**\n\n*Medium blue corridor, funded*")
+    with l3:
+        st.markdown("🟠 **Deferred (Candidate)**\n\n*Thinner amber corridor, unselected*")
+
+with leg_col2:
+    st.markdown("**Interactive Selection State:**")
+    st.markdown(f"🟡 **Inspected Corridor:** `{selected_cid}` — **{m_row['corridor_name']}** (*Highlighted gold line & halo marker*)")
+
+# Prepare full 43-corridor GeoDataFrame
+gdf_map = gdf_corridors.merge(
     df_master[[
         "corridor_id",
         "street_name",
@@ -98,59 +231,101 @@ gdf_map = gdf_sel.merge(
     how="left",
 )
 
-# Prepare GeoJSON FeatureCollection dict for PyDeck GeoJsonLayer street linework
+# Merge selected treatment info
+gdf_map = gdf_map.merge(
+    df_sel_benefits[["corridor_id", "treatment_name", "capital_project_cost", "equity_area_flag"]],
+    on="corridor_id",
+    how="left",
+)
+
+# Prepare GeoJSON FeatureCollection dict for PyDeck GeoJsonLayer
 geojson_dict = json.loads(gdf_map.to_json())
 for feature in geojson_dict["features"]:
     props = feature["properties"]
-    props["color"] = [255, 140, 0] if props.get("equity_area_flag") else [31, 119, 180]
-    props["capital_cost"] = float(props.get("capital_project_cost", 0.0))
-    props["forecast_total"] = float(props.get("annual_forecast_total_crashes_2026", 0.0))
-    props["forecast_ksi"] = float(props.get("annual_forecast_ksi_crashes_2026", 0.0))
-    props["svi_score"] = float(props.get("corridor_length_weighted_svi", 0.0))
+    cid = props.get("corridor_id")
+    is_sel = cid in selected_cids
+    is_active = (cid == selected_cid)
+
+    if is_active:
+        props["color"] = [234, 179, 8]  # Vibrant Gold
+        props["width"] = 52
+    elif is_sel:
+        # High-SVI Green vs Standard Blue
+        props["color"] = [22, 101, 52] if props.get("equity_area_flag") else [30, 64, 175]
+        props["width"] = 36 if props.get("equity_area_flag") else 30
+    else:
+        props["color"] = [194, 65, 12]  # Dark Amber (Deferred)
+        props["width"] = 20
+
+    props["capital_cost"] = float(props.get("capital_project_cost") or 0.0)
+    props["forecast_total"] = float(props.get("annual_forecast_total_crashes_2026") or 0.0)
+    props["forecast_ksi"] = float(props.get("annual_forecast_ksi_crashes_2026") or 0.0)
+    props["svi_score"] = float(props.get("corridor_length_weighted_svi") or 0.0)
     props["street_name"] = str(props.get("street_name") or props.get("corridor_name") or "N/A")
     props["from_street"] = str(props.get("from_street") or "N/A")
     props["to_street"] = str(props.get("to_street") or "N/A")
+    props["treatment_display"] = str(props.get("treatment_name") or "Deferred candidate")
+    props["status_display"] = "SELECTED" if is_sel else "DEFERRED"
+    props["badge"] = "🟢 SELECTED (HIGH-SVI)" if (is_sel and props.get("equity_area_flag")) else ("🔵 SELECTED (STANDARD)" if is_sel else "🟠 DEFERRED")
 
-# Lazy import pydeck for fast cold-start performance
+# Lazy import pydeck
 import pydeck as pdk
 
-# PyDeck GeoJsonLayer for street linework
 layer_lines = pdk.Layer(
     "GeoJsonLayer",
     data=geojson_dict,
     get_line_color="properties.color",
-    get_line_width=35,
-    width_min_pixels=4,
+    get_line_width="properties.width",
+    width_min_pixels=2,
     pickable=True,
 )
 
-# PyDeck ScatterplotLayer for centroid markers
+# Centroid ScatterplotLayer for all 43 corridors
 map_data = []
 for idx, row in gdf_map.iterrows():
-    color = [255, 140, 0] if row["equity_area_flag"] else [31, 119, 180]
+    cid = row["corridor_id"]
+    is_sel = cid in selected_cids
+    is_active = (cid == selected_cid)
+
+    if is_active:
+        color = [234, 179, 8]  # Gold
+        radius = 460
+        badge = "🟡 INSPECTED"
+    elif is_sel:
+        color = [22, 101, 52] if row.get("equity_area_flag") else [30, 64, 175]
+        radius = 320 if row.get("equity_area_flag") else 280
+        badge = "🟢 SELECTED (HIGH-SVI)" if row.get("equity_area_flag") else "🔵 SELECTED (STANDARD)"
+    else:
+        color = [194, 65, 12]  # Amber
+        radius = 200
+        badge = "🟠 DEFERRED"
+
     map_data.append({
-        "corridor_id": row["corridor_id"],
+        "corridor_id": cid,
         "corridor_name": row["corridor_name"],
         "street_name": row.get("street_name", row["corridor_name"]),
         "from_street": row.get("from_street", "N/A"),
         "to_street": row.get("to_street", "N/A"),
         "lat": float(row["centroid_latitude"]),
         "lon": float(row["centroid_longitude"]),
-        "treatment_name": row["treatment_name"],
-        "capital_cost": float(row["capital_project_cost"]),
+        "treatment_name": row.get("treatment_name") or "Deferred candidate",
+        "capital_cost": float(row.get("capital_project_cost") or 0.0),
         "svi_score": float(row.get("corridor_length_weighted_svi", 0.0)),
         "forecast_total": float(row.get("annual_forecast_total_crashes_2026", 0.0)),
         "forecast_ksi": float(row.get("annual_forecast_ksi_crashes_2026", 0.0)),
+        "status": "SELECTED" if is_sel else "DEFERRED",
+        "badge": badge,
         "color": color,
+        "radius": radius,
     })
 
 df_pydeck = pd.DataFrame(map_data)
 
-# PyDeck View State centered on Chicago
+# Frame citywide Chicago corridor network cleanly (Issue A)
 view_state = pdk.ViewState(
-    latitude=df_pydeck["lat"].mean() if not df_pydeck.empty else 41.8781,
-    longitude=df_pydeck["lon"].mean() if not df_pydeck.empty else -87.6298,
-    zoom=10.5,
+    latitude=41.855,
+    longitude=-87.680,
+    zoom=10.2,
     pitch=0,
 )
 
@@ -159,7 +334,7 @@ layer_points = pdk.Layer(
     data=df_pydeck,
     get_position=["lon", "lat"],
     get_color="color",
-    get_radius=300,
+    get_radius="radius",
     pickable=True,
 )
 
@@ -167,82 +342,25 @@ deck = pdk.Deck(
     layers=[layer_lines, layer_points],
     initial_view_state=view_state,
     tooltip={
-        "html": "<b>Corridor:</b> {corridor_name} ({corridor_id})<br/>"
-                "<b>Limits:</b> {from_street} to {to_street}<br/>"
-                "<b>Recommended Planning Treatment:</b> {treatment_name}<br/>"
-                "<b>Estimated Capital Cost (Planning-Level):</b> ${capital_cost:,.0f}<br/>"
-                "<b>2026 Baseline Forecast:</b> {forecast_total:.1f} all-severity crashes/yr (Baseline KSI: {forecast_ksi:.1f}/yr)<br/>"
-                "<b>SVI Weighted Score (Planning Proxy):</b> {svi_score:.3f}",
-        "style": {"backgroundColor": "steelblue", "color": "white"},
+        "html": "<div style='font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 4px 6px; min-width: 200px;'>"
+                "<div style='font-size: 13px; font-weight: 700; color: #F8FAFC; margin-bottom: 4px;'>{badge}</div>"
+                "<div style='font-size: 13px; font-weight: 600; color: #93C5FD;'>{corridor_name} ({corridor_id})</div>"
+                "<hr style='margin: 4px 0; border: none; border-top: 1px solid #475569;'/>"
+                "<div style='font-size: 11px; color: #E2E8F0;'><b>Limits:</b> {from_street} to {to_street}</div>"
+                "<div style='font-size: 11px; color: #E2E8F0;'><b>Treatment:</b> {treatment_name}</div>"
+                "<div style='font-size: 11px; color: #E2E8F0;'><b>Estimated Cost:</b> ${capital_cost:,.0f}</div>"
+                "<div style='font-size: 11px; color: #E2E8F0;'><b>2026 Baseline Total:</b> {forecast_total:.1f}/yr (KSI: {forecast_ksi:.1f}/yr)</div>"
+                "<div style='font-size: 11px; color: #E2E8F0;'><b>SVI Equity Score:</b> {svi_score:.3f}</div>"
+                "</div>",
+        "style": {"backgroundColor": "#0F172A", "color": "#F8FAFC", "borderRadius": "6px", "boxShadow": "0 4px 12px rgba(0,0,0,0.4)"},
     },
 )
 
 st.pydeck_chart(deck, use_container_width=True)
 
-st.caption(
-    "Planning-level decision support. SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity. "
-    "Equity classification uses CDC/ATSDR Social Vulnerability Index (SVI) as a project-defined planning proxy, "
-    "not the City of Chicago's official equity definition. Subject to engineering review and implementation approval."
-)
-
-st.markdown("---")
-st.subheader("2. Corridor detail inspector")
-
-# Corridor Selector Dropdown
-corridor_options = df_sel_benefits["corridor_id"].tolist()
-corridor_labels = {
-    row["corridor_id"]: f"{row['corridor_id']} — {row['corridor_name']} ({row['treatment_name']})"
-    for idx, row in df_sel_benefits.iterrows()
-}
-selected_cid = st.selectbox(
-    "Select corridor to inspect:",
-    options=corridor_options,
-    format_func=lambda cid: corridor_labels[cid],
-)
-
-try:
-    from dashboard.streamlit.analytics import track_corridor_inspected
-    track_corridor_inspected(selected_cid)
-except Exception:
-    pass
-
-# Extract single corridor record
-c_row = df_sel_benefits[df_sel_benefits["corridor_id"] == selected_cid].iloc[0]
-m_row = df_master[df_master["corridor_id"] == selected_cid].iloc[0]
-
-# Compute corridor efficiency metrics
-c_cost = float(c_row["capital_project_cost"])
-c_ksi_averted = float(c_row["crashes_averted_ksi"])
-c_tot_averted = float(c_row["crashes_averted_total"])
-cost_per_ksi_str = format_cost_per_unit(c_cost, c_ksi_averted, "KSI")
-cost_per_crash_str = format_cost_per_unit(c_cost, c_tot_averted, "crash")
-
-c_comp_bcr = float(c_row["benefit_cost_ratio"])
-c_econ_bcr = float(c_row["bcr_economic_only"]) if "bcr_economic_only" in c_row and pd.notnull(c_row["bcr_economic_only"]) else 0.0
-
-ic1, ic2, ic3, ic4 = st.columns(4)
-with ic1:
-    st.markdown(f"**Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
-    st.markdown(f"**Length:** {m_row['spatial_total_length_miles']:.2f} miles")
-    st.markdown(f"**SVI Weighted Index:** {m_row['corridor_length_weighted_svi']:.3f}")
-with ic2:
-    st.markdown(f"**Baseline Total Crashes / Year:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr (All-severity planning estimate)")
-    st.markdown(f"**Baseline KSI / Year:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr (Fatal K + Serious injury A planning estimate)")
-    st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
-with ic3:
-    st.markdown(f"**Recommended Treatment:** {c_row['treatment_name']}")
-    st.markdown(f"**Estimated Capital Cost:** {format_currency_compact(c_row['capital_project_cost'])} ({format_currency(c_row['capital_project_cost'])})")
-    st.markdown(f"**Engineering Status:** `:orange[Engineering review required]` (Provisional: `{c_row['physical_applicability_status']}`)")
-with ic4:
-    st.markdown(f"**Estimated Avoided Crashes:** {format_count_compact(c_tot_averted)} all-severity / yr (KSI: {format_ksi_compact(c_ksi_averted)} / yr)")
-    st.markdown(f"**BCR (Comprehensive, Planning-Level):** `{format_bcr_compact(c_comp_bcr)}` ({c_comp_bcr:.1f} : 1)")
-    st.markdown(f"**BCR (Economic-Only, Planning-Level):** `{format_bcr_compact(c_econ_bcr)}` ({c_econ_bcr:.1f} : 1)")
-
-st.caption(
-    f"Planning-level estimate: Cost per KSI Avoided (Fatal K + Serious injury A) = {cost_per_ksi_str} | Cost per All-Severity Crash Avoided = {cost_per_crash_str}. "
-    f"Denominator: Single corridor ({c_row['corridor_id']}). Lower cost per KSI avoided indicates higher relative efficiency at preventing the most severe crashes. Subject to engineering review."
-)
-
+# -----------------------------------------------------------------------------
+# Section 3 — Selected Projects Export Table
+# -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("3. Selected projects export table")
 
@@ -315,7 +433,7 @@ st.dataframe(
     }),
     use_container_width=True,
     hide_index=True,
-    height=300,
+    height=280,
 )
 
 # Download CSV button for CURRENTLY selected portfolio only
@@ -335,5 +453,5 @@ if st.download_button(
     except Exception:
         pass
 
-render_engineering_review_banner()
-render_economic_caveat_banner()
+# Standardized Consolidated Governance Footer (Decision DEC-04)
+render_governance_footer()

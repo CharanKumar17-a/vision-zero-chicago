@@ -19,6 +19,7 @@ import streamlit as st
 from dashboard.streamlit.components import (
     render_economic_caveat_banner,
     render_engineering_review_banner,
+    render_governance_footer,
     render_page_header,
     render_sidebar_controls,
 )
@@ -134,16 +135,23 @@ st.markdown(r"""
   - *Analytical Planning Portfolio*: The mathematically optimal combination of corridor treatments selected under stated budget, equity floor, and CMF assumptions. All selected projects in the current analytical dataset carry provisional status `UNKNOWN` (*Engineering review required*).
   - *Implementation-Ready Portfolio*: Projects that have completed formal engineering field review, utility coordination, geometric design, and City departmental approval.
 - **Future-Ready Optimization Architecture**:
-  - The decision support system's optimization engine is architected to ingest verified field engineering data as hard constraints:
-    $$\begin{aligned}
-    x_{i,t} &= 0 \quad \forall (i,t) \text{ where } \text{status}(i,t) = \text{NOT\_APPLICABLE} \\
-    x_{i,t} &\le \mathbb{I}(\text{status}(i,t) = \text{ELIGIBLE}) \quad \text{[For Implementation-Ready Runs]}
-    \end{aligned}$$
+  - The decision support system's optimization engine is architected to ingest verified field engineering data as hard constraints (see formulation below).
   - Once CDOT or engineering field surveys produce verified feasibility attributes, the MILP optimization model will automatically enforce engineering eligibility without redesigning the core optimization formulation.
 """)
 
+st.info(
+    "**Engineering eligibility constraint (Future-Ready Optimization Architecture)**\n\n"
+    "The optimization engine is designed to ingest verified field engineering data as hard constraints, "
+    "so that projects marked NOT_APPLICABLE are excluded from selection, and — for implementation-ready runs — "
+    "only projects with a verified ELIGIBLE engineering status may be selected.\n\n"
+    "Once CDOT engineering surveys are complete, the model enforces these constraints automatically "
+    "without redesigning the core optimization formulation. "
+    "All current projects carry provisional status UNKNOWN (engineering review required)."
+)
+
 st.markdown("---")
-st.subheader("4. Spatial assignment sensitivity analysis (50 ft / 100 ft baseline / 150 ft)")
+st.subheader("4. Spatial assignment sensitivity")
+st.caption("Comparing 50 ft vs 100 ft baseline vs 150 ft crash-to-corridor assignment thresholds")
 
 spatial_ev = evidence.get("spatial_sensitivity", {})
 conclusion_text = spatial_ev.get("conclusion", "Portfolio is STABLE across thresholds")
@@ -158,7 +166,7 @@ An offline spatial sensitivity analysis was conducted comparing candidate crash 
 
 - **Production Rule Status**: **UNCHANGED**. The approved 100-foot distance threshold and 10-foot tie tolerance remain the authoritative standard for all production pipelines and official planning scenarios.
 - **Corridor Prioritization Stability**: Corridor crash rankings maintain high Spearman rank correlations of **0.9784 (at 50 ft)** and **0.9878 (at 150 ft)** against the 100-ft baseline.
-- **Portfolio Selection Stability**: Under the \\$15M Baseline Scenario (`PORT_OFF_BASE_B15M_EQ20`), **38 of 39 selected corridors (97.4%)** remain identical between 50 ft and the 100-ft baseline.
+- **Portfolio Selection Stability**: Under the $15M Baseline Scenario (`PORT_OFF_BASE_B15M_EQ20`), **38 of 39 selected corridors (97.4%)** remain identical between 50 ft and the 100-ft baseline.
 - **Sensitivity Conclusion**:
   > **{conclusion_text}**
   >
@@ -177,5 +185,5 @@ st.markdown("""
   - **Zero Analytical Impact**: Telemetry operates strictly in an isolated observer mode and never affects calculations, mathematical optimizations, or displayed values.
 """)
 
-render_engineering_review_banner()
-render_economic_caveat_banner()
+# Standardized Consolidated Governance Footer (Decision DEC-04)
+render_governance_footer()

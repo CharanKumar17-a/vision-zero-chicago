@@ -13,29 +13,85 @@ import streamlit as st
 from dashboard.streamlit.data_access import DEFAULT_PORTFOLIO_ID
 
 
+def inject_global_css() -> None:
+    """Inject global typography and visual consistency CSS.
+
+    Called once from app.py after st.set_page_config(). Establishes a
+    consistent typography hierarchy across all four application pages.
+    No user-supplied content is embedded — only static CSS rules.
+    """
+    st.markdown(
+        """
+        <style>
+        /* ── App & page titles ──────────────────────────────────────────── */
+        h1 { font-size: 28px !important; font-weight: 700 !important;
+             letter-spacing: -0.3px !important; margin-bottom: 0.25rem !important; }
+        h2 { font-size: 22px !important; font-weight: 600 !important;
+             margin-top: 0.25rem !important; margin-bottom: 0.15rem !important; }
+
+        /* ── Section headings (#### in st.markdown) ─────────────────────── */
+        h4 { font-size: 16px !important; font-weight: 600 !important;
+             margin-top: 0.75rem !important; margin-bottom: 0.25rem !important; }
+
+        /* ── Body text ──────────────────────────────────────────────────── */
+        p, li { font-size: 14px !important; line-height: 1.65 !important; }
+        .stMarkdown p { margin-bottom: 0.3rem !important; }
+
+        /* ── Caption / secondary text ───────────────────────────────────── */
+        .stCaption, small { font-size: 13px !important; color: #666 !important; }
+
+        /* ── Alert / info / success / warning boxes ─────────────────────── */
+        [data-testid="stAlert"] p,
+        [data-testid="stAlert"] li { font-size: 14px !important; line-height: 1.65 !important; }
+
+        /* ── KPI metrics ────────────────────────────────────────────────── */
+        [data-testid="stMetricValue"] {
+            font-size: 26px !important; font-weight: 700 !important; }
+        [data-testid="stMetricLabel"] {
+            font-size: 13px !important; font-weight: 500 !important;
+            text-transform: none !important; }
+        [data-testid="stMetricDelta"] { font-size: 12px !important; }
+
+        /* ── Sidebar ────────────────────────────────────────────────────── */
+        [data-testid="stSidebar"] label { font-size: 13px !important; }
+        [data-testid="stSidebar"] p    { font-size: 13px !important; }
+        [data-testid="stSidebarNavLink"] { font-size: 14px !important; }
+
+        /* ── Inline code / badges ───────────────────────────────────────── */
+        code { font-size: 12px !important; padding: 1px 4px !important;
+               border-radius: 3px !important; }
+
+        /* ── Dataframe headers ──────────────────────────────────────────── */
+        .dvn-scroller thead th { font-size: 13px !important; font-weight: 600 !important; }
+        .dvn-scroller tbody td { font-size: 13px !important; }
+
+        /* ── Expander labels ────────────────────────────────────────────── */
+        [data-testid="stExpander"] summary p { font-size: 14px !important; font-weight: 600 !important; }
+
+        /* ── Divider spacing ────────────────────────────────────────────── */
+        hr { margin: 0.75rem 0 !important; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
-    """Render sidebar scenario controls and return exactly one selected portfolio_id."""
+    """Render decision-first sidebar scenario controls and return exactly one selected portfolio_id."""
     st.sidebar.markdown("### Vision Zero Chicago")
     st.sidebar.caption("Safety capital investment prioritization")
-    st.sidebar.title("Precomputed scenario controls")
+    st.sidebar.title("Scenario Controls")
     st.sidebar.markdown("---")
 
-    # 1. Run Group Selector
-    run_groups = sorted(df_summary["run_group"].unique().tolist())
-    default_rg_idx = run_groups.index("OFFICIAL") if "OFFICIAL" in run_groups else 0
-    selected_rg = st.sidebar.selectbox("Scenario run group", options=run_groups, index=default_rg_idx)
+    # Read diagnostic stress setting from session state
+    include_stress = st.session_state.get("sidebar_stress_toggle", False)
 
-    df_filtered_rg = df_summary[df_summary["run_group"] == selected_rg]
+    # 1. Planning Budget Ceiling (Policy Constraint #1)
+    if include_stress:
+        budgets = [2000000.0, 4000000.0, 6000000.0, 15000000.0, 25000000.0, 40000000.0]
+    else:
+        budgets = [15000000.0, 25000000.0, 40000000.0]
 
-    # 2. CMF Uncertainty Scenario
-    scenarios = sorted(df_filtered_rg["uncertainty_scenario"].unique().tolist())
-    default_scen_idx = scenarios.index("BASE") if "BASE" in scenarios else 0
-    selected_scen = st.sidebar.radio("CMF uncertainty level", options=scenarios, index=default_scen_idx)
-
-    df_filtered_scen = df_filtered_rg[df_filtered_rg["uncertainty_scenario"] == selected_scen]
-
-    # 3. Budget Level
-    budgets = sorted(df_filtered_scen["budget_usd"].unique().tolist())
     default_b_val = 15000000.0 if 15000000.0 in budgets else budgets[0]
     selected_b_val = st.sidebar.select_slider(
         "Planning budget ceiling",
@@ -44,28 +100,68 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         format_func=lambda b: f"${int(b / 1e6)}M" if b >= 1e6 else f"${int(b / 1e3)}k",
     )
 
-    df_filtered_b = df_filtered_scen[df_filtered_scen["budget_usd"] == selected_b_val]
-
-    # 4. Equity Spending Floor
-    equity_floors = sorted(df_filtered_b["equity_floor"].unique().tolist())
-    default_ef_val = 0.20 if 0.20 in equity_floors else equity_floors[0]
-    default_ef_idx = equity_floors.index(default_ef_val)
+    # 2. Equity Spending Floor (Policy Constraint #2)
+    equity_floors = [0.20, 0.30, 0.40]
     selected_ef_val = st.sidebar.selectbox(
         "Minimum equity spending floor",
         options=equity_floors,
-        index=default_ef_idx,
+        index=0,
         format_func=lambda ef: f"{int(round(ef * 100))}%",
     )
 
-    df_final_match = df_filtered_b[df_filtered_b["equity_floor"] == selected_ef_val]
+    # 3. CMF Uncertainty Scenario (Sensitivity Parameter)
+    scenarios = ["BASE", "CONSERVATIVE", "OPTIMISTIC"]
+    selected_scen = st.sidebar.radio(
+        "CMF uncertainty level",
+        options=scenarios,
+        index=0,
+    )
 
-    if df_final_match.empty:
-        st.sidebar.warning("Selected combination unavailable. Reverting to default canonical portfolio.")
+    # Collapsible Advanced / Diagnostic Section (Issue B)
+    with st.sidebar.expander("Diagnostic & Stress Scenarios", expanded=include_stress):
+        st.checkbox(
+            "Include diagnostic stress budgets ($2M–$6M)",
+            value=include_stress,
+            key="sidebar_stress_toggle",
+            help="Enable analyst diagnostic scenarios with severely constrained budgets ($2M, $4M, $6M) under BASE CMF uncertainty.",
+        )
+
+    # Determine run group from budget
+    if selected_b_val in [2000000.0, 4000000.0, 6000000.0]:
+        target_rg = "BINDING-BUDGET STRESS TEST"
+    else:
+        target_rg = "OFFICIAL"
+
+    # Match exact portfolio row
+    df_match = df_summary[
+        (df_summary["run_group"] == target_rg)
+        & (df_summary["budget_usd"] == selected_b_val)
+        & (df_summary["equity_floor"] == selected_ef_val)
+        & (df_summary["uncertainty_scenario"] == selected_scen)
+    ]
+
+    if df_match.empty:
+        # Fallback to nearest official match if stress combination is unavailable
+        df_match = df_summary[
+            (df_summary["budget_usd"] == selected_b_val)
+            & (df_summary["uncertainty_scenario"] == selected_scen)
+        ]
+
+    if df_match.empty:
         selected_pid = DEFAULT_PORTFOLIO_ID
     else:
-        selected_pid = df_final_match.iloc[0]["portfolio_id"]
+        selected_pid = df_match.iloc[0]["portfolio_id"]
 
+    # Human-readable scenario descriptor badge
+    b_label = f"${int(selected_b_val/1e6)}M" if selected_b_val >= 1e6 else f"${int(selected_b_val/1e3)}k"
+    eq_label = f"{int(round(selected_ef_val*100))}%"
     st.sidebar.markdown("---")
+    st.sidebar.info(
+        f"**Active Scenario**\n\n"
+        f"• **Budget:** {b_label}\n"
+        f"• **Equity Floor:** {eq_label}\n"
+        f"• **CMF Tier:** {selected_scen.title()}"
+    )
     st.sidebar.caption(f"Precomputed scenario ID: **{selected_pid}**")
 
     from dashboard.streamlit.data_access import is_cloud_deployment_mode, load_validation_evidence
@@ -140,6 +236,13 @@ def render_economic_caveat_banner() -> None:
         "**Planning-level estimate**: Benefits reflect comprehensive crash costs from federal guidance — not expected City financial returns. "
         "All figures provide planning-level decision support and are subject to engineering review and implementation approval."
     )
+
+
+def render_governance_footer() -> None:
+    """Render standardized concise governance and economic footer across all pages (Decision DEC-04)."""
+    st.markdown("---")
+    st.caption("Planning-level decision support • Engineering review required before implementation")
+    st.caption("Economic benefits represent estimated societal crash costs, not City cash revenues.")
 
 
 def format_currency(val: float) -> str:
