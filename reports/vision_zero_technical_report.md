@@ -64,3 +64,4 @@ Forecasts are of recorded crash burden; no exposure (traffic volume) data; not e
 Road Diet remains the dominant selected treatment on applicable corridors (all-crash target scope); pedestrian treatments now competitive and selected where applicable.
 10. Sources of Every Number
 All figures trace to committed files: docs/data_quality/*_validation.json (run IDs above), data/processed/*.parquet (benefits, summary, selections), dashboard/streamlit/deployment_data/ snapshots, notebooks 01–09 (incl. hindsight backtest), and python -m pytest -q (301 passed, 2026-08-17). Decision log D001–D025; evidence tables under docs/evidence/ (CMF matrix, unit costs 2024).
+
