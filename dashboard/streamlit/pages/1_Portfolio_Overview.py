@@ -219,13 +219,14 @@ sens_count = int((df_stability["stability_tier"] == "Scenario-sensitive").sum())
 
 sm1, sm2, sm3, sm4 = st.columns(4)
 with sm1:
-    st.metric("Core projects", f"{core_count} projects", help="Selected in >=70% of scenarios. Robust priority across varying budget ceilings and uncertainty levels.")
+    st.metric("Core candidates", f"{core_count} projects", help="Corridor-treatment candidates selected in >=70% of scenarios. Robust priority across varying budget ceilings and uncertainty levels.")
 with sm2:
-    st.metric("Conditional projects", f"{cond_count} projects", help="Selected in 30%–69% of scenarios. Viable under specific budget or equity floor conditions.")
+    st.metric("Conditional candidates", f"{cond_count} projects", help="Corridor-treatment candidates selected in 30%–69% of scenarios. Viable under specific budget or equity floor conditions.")
 with sm3:
-    st.metric("Scenario-sensitive", f"{sens_count} projects", help="Selected in <30% of scenarios. Narrow viability (e.g. only in high-budget or low-cost scenarios).")
+    st.metric("Scenario-sensitive", f"{sens_count} projects", help="Corridor-treatment candidates selected in <30% of scenarios. Narrow viability (e.g. only in high-budget or low-cost scenarios).")
 with sm4:
-    st.metric("Evaluated scenarios", f"{total_scenarios_count} scenarios", help=f"Total precomputed optimization scenarios evaluated in {scope_display}.")
+    scen_label = "Official scenarios evaluated" if scope_key == "OFFICIAL" else ("Canonical scenarios evaluated" if scope_key == "CANONICAL" else "Precomputed scenarios evaluated")
+    st.metric(scen_label, f"{total_scenarios_count}", help=f"Total precomputed optimization scenarios evaluated in {scope_display}.")
 
 if tier_filter.startswith("Core"):
     df_stab_display = df_stability[df_stability["stability_tier"] == "Core"].copy()
@@ -277,7 +278,7 @@ st.markdown("---")
 st.subheader("4. Funded corridors — Benefit-Cost efficiency")
 st.caption(
     "Corridors ranked by individual Benefit-Cost Ratio (BCR). "
-    "Portfolio selection maximizes total lifecycle present-value safety benefit under budget and equity constraints."
+    "The optimization selects the mathematically optimal portfolio under the stated objective, budget, equity, treatment, and screening constraints."
 )
 
 df_eff = df_sel_benefits.copy()
@@ -342,10 +343,10 @@ with st.expander("Comprehensive severity & economic accounts (Detailed KABCO bre
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("5. What-if capital planner")
-st.caption("Precomputed scenario grid (156 precomputed optimization runs across 26 budgets and 6 equity floors). Subject to engineering review and implementation approval.")
+st.caption("Precomputed scenario grid (156 precomputed What-If grid scenarios across 26 budgets and 6 equity floors). Subject to engineering review and implementation approval.")
 
 st.markdown(
-    "Select discrete precomputed scenarios from the canonical optimization grid to inspect capital allocation, selected corridor rosters, and equity outcomes without live continuous solver estimation."
+    "Select discrete precomputed scenarios from the 156 precomputed What-If grid scenarios to inspect capital allocation, selected corridor rosters, and equity outcomes without live continuous solver estimation."
 )
 
 df_grid_scenarios = df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]

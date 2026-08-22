@@ -140,7 +140,7 @@ st.markdown("---")
 st.subheader("1. What this planning investment buys")
 
 st.markdown(
-    "Over a 20-year project lifecycle with standard federal discount rates (3.0% real), "
+    "Over a 20-year project lifecycle using a 3.0% real discount-rate assumption, "
     "this capital program delivers substantial life-safety reductions across Chicago's highest-risk roadways. "
     "All figures represent planning-level estimates."
 )
@@ -189,9 +189,9 @@ with col_benefit1:
             "Planning Context": f"{format_currency(total_pv_benefit)} present value at 3.0% real discount",
         },
         {
-            "Outcome Measure": "Portfolio Benefit-Cost Ratio (BCR)",
+            "Outcome Measure": "Portfolio benefit-cost ratio (planning-level scenario estimate)",
             "Estimated Annual Impact": f"{format_bcr_compact(portfolio_bcr)}",
-            "Planning Context": f"{portfolio_bcr:.1f} : 1 return per dollar invested",
+            "Planning Context": f"{portfolio_bcr:.1f} : 1 • Planning-level scenario estimate; not an expected realized program return.",
         },
     ]
     st.dataframe(pd.DataFrame(summary_data), use_container_width=True, hide_index=True)
@@ -201,7 +201,7 @@ with col_benefit2:
     st.markdown(
         f"""
         - **Present value safety benefit (planning-level estimate):** `{format_currency_compact(total_pv_benefit)}` ({format_currency(total_pv_benefit)})
-        - **Portfolio benefit-cost ratio (BCR, planning-level estimate):** `{format_bcr_compact(portfolio_bcr)}` ({portfolio_bcr:.1f} : 1)
+        - **Portfolio benefit-cost ratio (planning-level scenario estimate):** `{format_bcr_compact(portfolio_bcr)}` ({portfolio_bcr:.1f} : 1; planning-level scenario estimate, not an expected realized program return)
         - **High-SVI capital share (spending equity):** `{high_svi_capital_share:.1f}%` (Policy floor: `20.0%`)
         - **KSI benefit share in high-SVI areas (safety benefit equity):** `{high_svi_ksi_share:.1f}%` (~{high_svi_ksi:.1f} of ~{annual_ksi_averted:.1f} annual KSI avoided)
         - **Engineering status:** **Engineering review required** (Provisional applicability `UNKNOWN`)
@@ -212,17 +212,30 @@ with col_benefit2:
 
 with st.expander("View conservative economic-only cost scenario", expanded=False):
     st.markdown(
-        "Using **economic-only crash costs** (FHWA 2025) yields a more conservative benefit estimate by accounting only for "
-        "direct tangible economic costs (medical treatment, emergency services, wage loss, property damage) without quality-of-life additions. "
-        "Comprehensive costs (incl. quality-of-life) are shown elsewhere. Neither is an expected City return; both are planning-level estimates."
+        "20-year planning-level estimate using direct tangible economic crash costs; excludes non-market societal valuation. "
+        "Using **economic-only crash costs** (FHWA 2025) accounts strictly for direct tangible economic costs "
+        "(medical treatment, emergency services, wage loss, property damage) without quality-of-life additions. "
+        "Neither is an expected City return; both are planning-level scenario estimates."
     )
     econ_col1, econ_col2, econ_col3 = st.columns(3)
     with econ_col1:
-        st.metric("Economic-only PV benefit", format_currency_compact(total_pv_econ), help=f"Planning-level estimate: {format_currency(total_pv_econ)} using direct tangible economic costs.")
+        st.metric(
+            "Economic-only 20-year PV benefit",
+            format_currency_compact(total_pv_econ),
+            help=f"Planning-level estimate: {format_currency(total_pv_econ)} direct tangible economic savings over 20 years at 3.0% real discount.",
+        )
     with econ_col2:
-        st.metric("Economic-only portfolio BCR", format_bcr_compact(bcr_econ_portfolio), help=f"Planning-level estimate: {bcr_econ_portfolio:.1f} : 1 Benefit-Cost Ratio under conservative economic-only costs.")
+        st.metric(
+            "Economic-only 20-year BCR",
+            f"~{bcr_econ_portfolio:.1f}:1",
+            help=f"Planning-level estimate: {bcr_econ_portfolio:.1f} : 1 Benefit-Cost Ratio using direct tangible economic costs only.",
+        )
     with econ_col3:
-        st.metric("Annual economic savings", f"{format_currency_compact(total_annual_econ)} / yr", help=f"Planning-level estimate: {format_currency(total_annual_econ)} / yr direct economic crash costs prevented.")
+        st.metric(
+            "Annual economic savings",
+            f"{format_currency_compact(total_annual_econ)} / yr",
+            help=f"Planning-level estimate: {format_currency(total_annual_econ)} / yr direct economic crash costs prevented.",
+        )
 
 # -----------------------------------------------------------------------------
 # Section 2 — Deferred Corridors (Planning Alternatives)

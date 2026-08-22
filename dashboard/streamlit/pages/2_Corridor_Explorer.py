@@ -138,6 +138,8 @@ else:
 cost_per_ksi_str = format_cost_per_unit(c_cost, c_ksi_averted, "KSI")
 cost_per_crash_str = format_cost_per_unit(c_cost, c_tot_averted, "crash")
 
+st.markdown(f"#### {selected_cid} — {m_row['corridor_name']}")
+
 ic1, ic2, ic3, ic4 = st.columns(4)
 with ic1:
     st.markdown(f"**Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
@@ -146,7 +148,7 @@ with ic1:
 with ic2:
     st.markdown(f"**Baseline Total Crashes / Year:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr")
     st.markdown(f"**Baseline KSI / Year:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr")
-    st.markdown(f"**Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
+    st.markdown(f"**Demand Risk Rank (2026 Forecast):** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
 with ic3:
     st.markdown(f"**Recommended Treatment:** {c_trt}")
     st.markdown(f"**Estimated Capital Cost:** {format_currency_compact(c_cost)} ({format_currency(c_cost)})")
@@ -159,8 +161,8 @@ with ic4:
 # Explicit Selection Rationale Note
 if is_selected:
     st.info(
-        f"**Selection Rationale:** Corridor `{selected_cid}` was selected for funding under active scenario `{portfolio_id}`. "
-        f"It provides a high benefit-cost ratio ({c_comp_bcr:.1f}:1) and delivers ~{c_ksi_averted:.1f} avoided KSI / year."
+        f"**Selection Rationale:** Selected by the active portfolio optimization under the stated budget, equity, treatment, and screening constraints; "
+        f"the candidate provides an estimated {c_ksi_averted:.1f} avoided KSI/year at a planning-level BCR of {c_comp_bcr:.1f}:1."
     )
 else:
     st.warning(
@@ -344,7 +346,7 @@ deck = pdk.Deck(
     tooltip={
         "html": "<div style='font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 4px 6px; min-width: 200px;'>"
                 "<div style='font-size: 13px; font-weight: 700; color: #F8FAFC; margin-bottom: 4px;'>{badge}</div>"
-                "<div style='font-size: 13px; font-weight: 600; color: #93C5FD;'>{corridor_name} ({corridor_id})</div>"
+                "<div style='font-size: 13px; font-weight: 600; color: #93C5FD;'>{corridor_id} — {corridor_name}</div>"
                 "<hr style='margin: 4px 0; border: none; border-top: 1px solid #475569;'/>"
                 "<div style='font-size: 11px; color: #E2E8F0;'><b>Limits:</b> {from_street} to {to_street}</div>"
                 "<div style='font-size: 11px; color: #E2E8F0;'><b>Treatment:</b> {treatment_name}</div>"

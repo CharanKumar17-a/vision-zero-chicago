@@ -172,7 +172,7 @@ spatial_ev = evidence.get("spatial_sensitivity", {})
 conclusion_text = spatial_ev.get("conclusion", "Portfolio is STABLE across thresholds")
 justification_text = spatial_ev.get(
     "production_rule_justification",
-    "The 100-foot production assignment rule remains justified and robust. Corridor rankings exhibit >0.97 Spearman correlation across 50 ft and 150 ft, and the $15M planning portfolio has >97% corridor selection stability with zero distortion of high-level capital priorities.",
+    "The 100-foot production assignment rule remains justified and robust. Corridor rankings exhibit >0.97 Spearman correlation across 50 ft and 150 ft, and the $15M planning portfolio has >97% corridor selection stability with no material distortion of high-level capital priorities.",
 )
 
 st.markdown(f"""
