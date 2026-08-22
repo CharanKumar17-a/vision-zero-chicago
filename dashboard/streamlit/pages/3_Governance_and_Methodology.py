@@ -137,7 +137,7 @@ st.markdown(r"""
 - **Minor & Possible Injury Crashes**: Non-incapacitating injury crashes (`B`) and Possible / complaint-of-injury crashes (`C`).
 - **Property Damage Only (PDO / O)**: Non-injury property damage crashes.
 - **Analytical Denominators**:
-  - *Network Baseline*: Evaluated across all 43 candidate high-crash corridors (~78.8 Baseline KSI / yr).
+  - *Network Baseline*: Evaluated across all 43 candidate high-crash corridors (~196.0 Baseline KSI / yr).
   - *Portfolio Averted Metrics*: Aggregated strictly over the subset of shortlisted corridors funded within each active scenario (e.g., 39 funded corridors in the $15M Baseline Scenario).
 
 #### Engineering feasibility and portfolio classification
@@ -202,3 +202,5 @@ st.markdown("""
 
 # Standardized Consolidated Governance Footer
 render_governance_footer()
+
+
