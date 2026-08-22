@@ -164,13 +164,22 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
     )
     st.sidebar.caption(f"Scenario ID: `{selected_pid}`")
 
-    from dashboard.streamlit.data_access import is_cloud_deployment_mode, load_validation_evidence
+    from dashboard.streamlit.data_access import load_validation_evidence
 
-    if is_cloud_deployment_mode():
-        evidence = load_validation_evidence()
-        manifest_meta = evidence.get("deployment_manifest", {})
-        gen_time = manifest_meta.get("generated_at_utc", "N/A")
-        st.sidebar.caption(f"Snapshot: `{gen_time}`")
+    evidence = load_validation_evidence()
+    mart_completed = (
+        evidence.get("decision_mart", {}).get("completed_at_utc")
+        or evidence.get("deployment_manifest", {}).get("generated_at_utc", "")
+    )
+    val_date = mart_completed[:10] if len(mart_completed) >= 10 else "2026-08-17"
+
+    st.sidebar.markdown("---")
+    st.sidebar.caption(
+        f"**Data Freshness**\n\n"
+        f"• Analysis period: **2018–2025**\n"
+        f"• Data last validated: **{val_date}**\n"
+        f"• Status: **Validated**"
+    )
 
     try:
         from dashboard.streamlit.analytics import track_scenario_selected

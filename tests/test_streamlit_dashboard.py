@@ -806,3 +806,25 @@ assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
         assert "Usage Analytics" in markdown_text
         assert "Disabled by default" in markdown_text
         assert "Zero PII" in markdown_text
+
+    def test_data_freshness_indicator_rendered(self):
+        """Verify data freshness indicator renders analysis period (2018–2025), valid date, and validated status."""
+        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3.run()
+        assert not at3.exception
+
+        labels = [m.label for m in at3.metric]
+        assert "Analysis Period" in labels
+        assert "Data Last Validated" in labels
+        assert "Pipeline Status" in labels
+
+        metrics_dict = {m.label: m.value for m in at3.metric}
+        assert metrics_dict["Analysis Period"] == "2018–2025"
+        assert metrics_dict["Pipeline Status"] == "Validated"
+        assert metrics_dict["Data Last Validated"] == "2026-08-17"
+
+        # Check sidebar caption rendered
+        sidebar_captions = [c.value for c in at3.sidebar.caption]
+        assert any("Analysis period: **2018–2025**" in c for c in sidebar_captions)
+        assert any("Data last validated:" in c for c in sidebar_captions)
+        assert any("Status: **Validated**" in c for c in sidebar_captions)
