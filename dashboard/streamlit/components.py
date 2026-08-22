@@ -282,10 +282,12 @@ def format_count_compact(val: float) -> str:
 
 
 def format_ksi_compact(val: float) -> str:
-    """Format KSI counts rounded to whole numbers with tilde (e.g., ~48, ~49)."""
+    """Format KSI counts with decision precision (e.g., ~1.6 for single corridor, ~48 for portfolio)."""
     if pd.isnull(val) or val is None:
         return "N/A"
-    return f"~{int(round(val))}"
+    if val >= 10:
+        return f"~{int(round(val))}"
+    return f"~{val:.1f}"
 
 
 def format_percent(val: float) -> str:

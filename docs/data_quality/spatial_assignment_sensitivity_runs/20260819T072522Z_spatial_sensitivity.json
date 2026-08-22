@@ -13,7 +13,7 @@
   "tie_tolerance_feet": 10.0,
   "total_crashes_eligible": 870769,
   "conclusion": "Portfolio is STABLE across thresholds",
-  "production_rule_justification": "The 100-foot production assignment rule remains justified and robust. Corridor rankings exhibit >0.97 Spearman correlation across 50 ft and 150 ft, and the $15M planning portfolio has >97% corridor selection stability with zero distortion of high-level capital priorities.",
+  "production_rule_justification": "The 100-foot production assignment rule remains justified and robust. Corridor rankings exhibit >0.97 Spearman correlation across 50 ft and 150 ft, and the $15M planning portfolio has >97% corridor selection stability with no material distortion of high-level capital priorities.",
   "governance_notes": [
     "The approved 100-foot production assignment rule is UNCHANGED in all production configurations and pipelines.",
     "This offline sensitivity report provides empirical validation evidence for City and engineering reviewers.",

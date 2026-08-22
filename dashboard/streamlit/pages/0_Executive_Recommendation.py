@@ -131,7 +131,7 @@ with col4:
         help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI corridors ({format_currency(high_svi_cost)}). Measures capital spending input only; not proof of equitable safety outcomes. SVI is used as a spatial equity proxy.",
     )
 
-st.caption(f"Status: Optimal allocation (${selected_capital_cost/1e6:.2f}M of $15.0M allocated • {format_currency(budget_slack)} budget slack)")
+st.caption(f"Optimization status: Mathematically optimal under stated planning constraints (${selected_capital_cost/1e6:.2f}M of $15.0M allocated • {format_currency(budget_slack)} budget slack)")
 
 # -----------------------------------------------------------------------------
 # Section 1 — What This Investment Buys
@@ -298,12 +298,16 @@ sel_25m = df_selections[df_selections["portfolio_id"] == "PORT_OFF_BASE_B25M_EQ2
 funded_at_25m_count = sum(1 for cid in unselected_ids if cid in set(sel_25m["corridor_id"])) if unselected_ids else 0
 all_funded_at_25m = (funded_at_25m_count == len(unselected_ids)) if unselected_ids else True
 
-roi_note = "All deferred corridors have positive ROI (BCR > 1.0)" if deferred_all_positive_roi else "Viable candidate projects exist"
-expansion_note = f"all {len(unselected_ids)} would be funded under the $25M budget scenario" if all_funded_at_25m else f"{funded_at_25m_count} of {len(unselected_ids)} would be funded under $25M"
+roi_note = "All deferred corridors have positive planning-level BCR (>1.0)" if deferred_all_positive_roi else "Viable candidate projects exist"
+expansion_note = (
+    f"all {len(unselected_ids)} are selected in the $25M Baseline scenario"
+    if all_funded_at_25m
+    else f"{funded_at_25m_count} of {len(unselected_ids)} are selected in the $25M Baseline scenario"
+)
 
 st.markdown(
-    f"Under the **\\$15M budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred because "
-    f"treatment costs exceed the remaining budget slack ({format_currency(budget_slack)}). "
+    f"Under the **$15M budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred because "
+    f"treatment costs exceed the remaining **{format_currency(budget_slack)}** of budget slack. "
     f"{roi_note}, and {expansion_note}. "
     "All figures represent planning-level estimates subject to engineering review."
 )

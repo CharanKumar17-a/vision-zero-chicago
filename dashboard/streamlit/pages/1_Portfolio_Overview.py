@@ -212,18 +212,21 @@ with stab_col2:
     )
 
 df_stability = compute_portfolio_stability(df_selections, df_summary, scenario_scope=scope_key)
+total_candidates_count = len(df_stability)
 total_scenarios_count = int(df_stability["total_scenarios"].iloc[0]) if not df_stability.empty else 0
 core_count = int((df_stability["stability_tier"] == "Core").sum())
 cond_count = int((df_stability["stability_tier"] == "Conditional").sum())
 sens_count = int((df_stability["stability_tier"] == "Scenario-sensitive").sum())
 
+st.caption(f"Stability is evaluated across {total_candidates_count} corridor-treatment candidates selected across the {total_scenarios_count} {scope_display.lower()}.")
+
 sm1, sm2, sm3, sm4 = st.columns(4)
 with sm1:
-    st.metric("Core candidates", f"{core_count} projects", help="Corridor-treatment candidates selected in >=70% of scenarios. Robust priority across varying budget ceilings and uncertainty levels.")
+    st.metric("Core candidates", f"{core_count}", help=f"Selected in >=70% of evaluated scenarios ({core_count} of {total_candidates_count} candidates). Robust priority across varying budget ceilings and uncertainty levels.")
 with sm2:
-    st.metric("Conditional candidates", f"{cond_count} projects", help="Corridor-treatment candidates selected in 30%–69% of scenarios. Viable under specific budget or equity floor conditions.")
+    st.metric("Conditional candidates", f"{cond_count}", help=f"Selected in 30%–69% of evaluated scenarios ({cond_count} of {total_candidates_count} candidates). Viable under specific budget or equity floor conditions.")
 with sm3:
-    st.metric("Scenario-sensitive", f"{sens_count} projects", help="Corridor-treatment candidates selected in <30% of scenarios. Narrow viability (e.g. only in high-budget or low-cost scenarios).")
+    st.metric("Scenario-sensitive candidates", f"{sens_count}", help=f"Selected in <30% of evaluated scenarios ({sens_count} of {total_candidates_count} candidates). Narrow viability (e.g. selected only in high-budget or low-cost scenarios).")
 with sm4:
     scen_label = "Official scenarios evaluated" if scope_key == "OFFICIAL" else ("Canonical scenarios evaluated" if scope_key == "CANONICAL" else "Precomputed scenarios evaluated")
     st.metric(scen_label, f"{total_scenarios_count}", help=f"Total precomputed optimization scenarios evaluated in {scope_display}.")

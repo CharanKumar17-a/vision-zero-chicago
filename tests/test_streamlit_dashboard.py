@@ -551,7 +551,7 @@ class TestStreamlitDashboard:
 
         # Status badge
         caption_texts = [c.value for c in at.caption]
-        assert any("Status: Optimal allocation" in text for text in caption_texts)
+        assert any("Optimization status: Mathematically optimal under stated planning constraints" in text for text in caption_texts)
 
     def test_false_precision_remediation_and_planning_estimate_labels(self):
         """Verify that executive cards use decision-relevant rounded formats and include planning-level estimate notes."""
