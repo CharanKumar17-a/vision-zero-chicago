@@ -36,7 +36,7 @@ from dashboard.streamlit.components import (
 )
 from dashboard.streamlit.data_access import (
     compute_portfolio_stability,
-    find_what_if_grid_portfolio,
+    evaluate_portfolio_scenario,
     get_selected_portfolio_benefits,
     get_single_portfolio_summary,
     load_corridor_master,
@@ -56,12 +56,17 @@ df_selections = load_project_selections()
 df_master = load_corridor_master()
 df_benefits = load_treatment_benefits()
 
-# Render sidebar controls & get single selected portfolio_id
-portfolio_id = render_sidebar_controls(df_summary)
+# Render sidebar controls & get active scenario parameters
+scenario_params = render_sidebar_controls(df_summary, return_dict=True)
 
-# Extract single portfolio data
-s_row = get_single_portfolio_summary(df_summary, portfolio_id)
-df_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, portfolio_id)
+# Dynamically solve active scenario
+s_row, df_sel_benefits = evaluate_portfolio_scenario(
+    budget=scenario_params["budget"],
+    equity_floor=scenario_params["equity_floor"],
+    cost_case=scenario_params["cost_case"],
+    cmf_case=scenario_params["cmf_case"],
+    df_benefits=df_benefits,
+)
 
 is_official = (s_row["run_group"] == "OFFICIAL")
 render_governance_header_banner(s_row["run_group"], is_official)
@@ -346,61 +351,66 @@ with st.expander("Comprehensive severity & economic accounts (Detailed KABCO bre
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("5. What-if capital planner")
-st.caption("Precomputed scenario grid (156 precomputed What-If grid scenarios across 26 budgets and 6 equity floors). Subject to engineering review and implementation approval.")
+st.caption("Interactive optimization engine: evaluate alternative capital budgets and equity spending floors under active cost and CMF assumptions.")
 
 st.markdown(
-    "Select discrete precomputed scenarios from the 156 precomputed What-If grid scenarios to inspect capital allocation, selected corridor rosters, and equity outcomes without live continuous solver estimation."
+    "Explore how capital allocation, corridor funding rosters, and equity outcomes adjust under different budget ceilings and equity floors."
 )
 
-df_grid_scenarios = df_summary[df_summary["run_group"] == "WHAT-IF PLANNER GRID"]
-if df_grid_scenarios.empty:
-    df_grid_scenarios = df_summary
+wif_budgets = [
+    2000000.0, 3000000.0, 4000000.0, 5000000.0, 6000000.0,
+    7000000.0, 8000000.0, 9000000.0, 10000000.0, 11000000.0,
+    12000000.0, 13000000.0, 14000000.0, 15000000.0, 16000000.0,
+    17000000.0, 18000000.0, 19000000.0, 20000000.0, 21000000.0,
+    22000000.0, 23000000.0, 24000000.0, 25000000.0, 30000000.0,
+    40000000.0,
+]
+wif_equities = [0.15, 0.20, 0.25, 0.30, 0.35, 0.40]
 
-available_budgets = sorted(df_grid_scenarios["budget_usd"].unique().tolist())
-available_equities = sorted(df_grid_scenarios["equity_floor"].unique().tolist())
 
-default_b_val = 15000000.0 if 15000000.0 in available_budgets else available_budgets[0]
-default_b_idx = available_budgets.index(default_b_val)
+default_wb_val = scenario_params["budget"] if scenario_params["budget"] in wif_budgets else 15000000.0
+default_wb_idx = wif_budgets.index(default_wb_val)
 
-default_ef_val = 0.20 if 0.20 in available_equities else available_equities[0]
-default_ef_idx = available_equities.index(default_ef_val)
+default_we_val = scenario_params["equity_floor"] if scenario_params["equity_floor"] in wif_equities else 0.20
+default_we_idx = wif_equities.index(default_we_val)
 
 wif_col1, wif_col2 = st.columns(2)
 with wif_col1:
     user_budget = st.selectbox(
-        "Select precomputed budget ceiling",
-        options=available_budgets,
-        index=default_b_idx,
+        "Select planning budget ceiling",
+        options=wif_budgets,
+        index=default_wb_idx,
+        key="wif_budget_select",
         format_func=lambda b: f"${int(b / 1e6)}M" if b >= 1e6 else f"${int(b / 1e3)}k",
-        help="Select a discrete planning budget ceiling from the canonical precomputed optimization grid (26 available budget levels from $2M to $40M).",
+        help="Select a planning budget ceiling for what-if evaluation ($2M to $40M).",
     )
 with wif_col2:
     user_equity = st.selectbox(
-        "Select precomputed minimum equity spending floor",
-        options=available_equities,
-        index=default_ef_idx,
+        "Select minimum equity spending floor",
+        options=wif_equities,
+        index=default_we_idx,
+        key="wif_equity_select",
         format_func=lambda ef: f"{int(round(ef * 100))}%",
-        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors from precomputed scenarios (15% to 40%).",
+        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors (15% to 50%).",
     )
 
-wif_s_row, is_exact = find_what_if_grid_portfolio(
-    df_summary=df_summary,
-    budget_usd=float(user_budget),
+wif_s_row, wif_sel_benefits = evaluate_portfolio_scenario(
+    budget=float(user_budget),
     equity_floor=float(user_equity),
-    uncertainty_scenario="BASE",
+    cost_case=scenario_params["cost_case"],
+    cmf_case=scenario_params["cmf_case"],
+    df_benefits=df_benefits,
 )
 
 target_portfolio_id = str(wif_s_row["portfolio_id"])
-wif_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, target_portfolio_id)
-
-wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum()
-
-exact_note = "" if is_exact else f" *(Nearest precomputed match shown for ${int(user_budget / 1e6)}M / {int(round(user_equity * 100))}% equity)*"
+wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum() if not wif_sel_benefits.empty else 0.0
 
 st.info(
-    f"**Precomputed scenario active:** Budget Ceiling: **\\${int(wif_s_row['budget_usd']/1e6)}M** | "
+    f"**What-If Scenario Evaluated:** Budget Ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
     f"Equity Floor: **{int(round(wif_s_row['equity_floor']*100))}%** | "
-    f"Scenario ID: `{target_portfolio_id}`{exact_note}"
+    f"Cost: **{scenario_params['cost_case'].title()}** | "
+    f"CMF: **{scenario_params['cmf_case'].title()}** | "
+    f"Scenario ID: `{target_portfolio_id}`"
 )
 
 wc1, wc2, wc3, wc4 = st.columns(4)

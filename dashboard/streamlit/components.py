@@ -76,81 +76,95 @@ def inject_global_css() -> None:
     )
 
 
-def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
-    """Render decision-first sidebar scenario controls and return exactly one selected portfolio_id."""
+def render_sidebar_controls(
+    df_summary: Optional[pd.DataFrame] = None,
+    return_dict: bool = False,
+) -> Any:
+    """Render decision-first sidebar scenario controls for Budget, Equity Floor, Cost Case, and CMF Case.
+
+    Args:
+        df_summary: Optional portfolio summary dataset for backward compatibility.
+        return_dict: If True, returns dict with keys ('budget', 'equity_floor', 'cost_case', 'cmf_case', 'portfolio_id').
+            If False (default), returns portfolio_id string.
+
+    Returns:
+        portfolio_id (str) or dict containing scenario parameters.
+    """
     st.sidebar.markdown("### Vision Zero Chicago")
     st.sidebar.caption("Safety capital investment prioritization")
     st.sidebar.title("Scenario Controls")
     st.sidebar.markdown("---")
 
-    # Read diagnostic stress setting from session state
-    include_stress = st.session_state.get("sidebar_stress_toggle", False)
+    # Reset to defaults button
+    if st.sidebar.button("Reset to Baseline Scenario", help="Reset all controls to the $15M baseline policy scenario."):
+        st.session_state["sidebar_budget_slider"] = 15000000.0
+        st.session_state["sidebar_equity_select"] = 0.20
+        st.session_state["sidebar_cost_select"] = "BASE"
+        st.session_state["sidebar_cmf_select"] = "BASE"
+        st.rerun()
 
     # 1. Planning Budget Ceiling (Policy Constraint #1)
-    if include_stress:
-        budgets = [2000000.0, 4000000.0, 6000000.0, 15000000.0, 25000000.0, 40000000.0]
-    else:
-        budgets = [15000000.0, 25000000.0, 40000000.0]
+    budgets = [2000000.0, 4000000.0, 6000000.0, 10000000.0, 15000000.0, 20000000.0, 25000000.0, 30000000.0, 40000000.0]
+    default_b_val = 15000000.0
 
-    default_b_val = 15000000.0 if 15000000.0 in budgets else budgets[0]
     selected_b_val = st.sidebar.select_slider(
         "Planning budget ceiling",
         options=budgets,
-        value=default_b_val,
+        value=st.session_state.get("sidebar_budget_slider", default_b_val),
+        key="sidebar_budget_slider",
         format_func=lambda b: f"${int(b / 1e6)}M" if b >= 1e6 else f"${int(b / 1e3)}k",
     )
 
     # 2. Equity Spending Floor (Policy Constraint #2)
-    equity_floors = [0.20, 0.30, 0.40]
+    equity_floors = [0.20, 0.30, 0.40, 0.50]
+    saved_ef = st.session_state.get("sidebar_equity_select", 0.20)
+    ef_idx = equity_floors.index(saved_ef) if saved_ef in equity_floors else 0
+
     selected_ef_val = st.sidebar.selectbox(
         "Minimum equity spending floor",
         options=equity_floors,
-        index=0,
+        index=ef_idx,
+        key="sidebar_equity_select",
         format_func=lambda ef: f"{int(round(ef * 100))}%",
     )
 
-    # 3. CMF Uncertainty Scenario (Sensitivity Parameter)
-    scenarios = ["BASE", "CONSERVATIVE", "OPTIMISTIC"]
-    selected_scen = st.sidebar.radio(
-        "CMF uncertainty level",
-        options=scenarios,
-        index=0,
+    # 3. Cost & Scope Case (Sensitivity Parameter #1)
+    cost_cases = ["BASE", "LOW", "HIGH"]
+    saved_cost = st.session_state.get("sidebar_cost_select", "BASE")
+    cost_idx = cost_cases.index(saved_cost) if saved_cost in cost_cases else 0
+
+    selected_cost_val = st.sidebar.selectbox(
+        "Cost & scope case",
+        options=cost_cases,
+        index=cost_idx,
+        key="sidebar_cost_select",
+        help="BASE: Sourced unit costs ($15k refuge, $400k/mi road diet, $22.5k RRFB). LOW: Lower project expenditure / minimal scope ($160.8k mean cost). HIGH: Higher project expenditure / comprehensive scope ($234.1k mean cost).",
     )
 
-    # Collapsible Advanced / Diagnostic Section (Issue B)
-    with st.sidebar.expander("Diagnostic & Stress Scenarios", expanded=include_stress):
-        st.checkbox(
-            "Include diagnostic stress budgets ($2M–$6M)",
-            value=include_stress,
-            key="sidebar_stress_toggle",
-            help="Enable analyst diagnostic scenarios with severely constrained budgets ($2M, $4M, $6M) under BASE CMF uncertainty.",
-        )
+    # 4. CMF Benefit Case (Sensitivity Parameter #2)
+    cmf_cases = ["BASE", "CONSERVATIVE", "OPTIMISTIC"]
+    saved_cmf = st.session_state.get("sidebar_cmf_select", "BASE")
+    cmf_idx = cmf_cases.index(saved_cmf) if saved_cmf in cmf_cases else 0
 
-    # Determine run group from budget
-    if selected_b_val in [2000000.0, 4000000.0, 6000000.0]:
-        target_rg = "BINDING-BUDGET STRESS TEST"
+    selected_scen = st.sidebar.selectbox(
+        "CMF uncertainty level",
+        options=cmf_cases,
+        index=cmf_idx,
+        key="sidebar_cmf_select",
+        help="BASE: Published FHWA CMF point estimate. CONSERVATIVE: Lower-bound safety benefit (+1.96 SE). OPTIMISTIC: Upper-bound safety benefit (-1.96 SE).",
+    )
+
+    # Resolve portfolio_id string
+    b_m = int(selected_b_val / 1e6) if selected_b_val >= 1e6 else int(selected_b_val / 1e3)
+    eq_pct = int(round(selected_ef_val * 100))
+
+    cost_norm = "CONSERVATIVE" if selected_cost_val == "LOW" else ("OPTIMISTIC" if selected_cost_val == "HIGH" else "BASE")
+    if selected_scen == cost_norm and selected_b_val in [15e6, 25e6, 40e6] and selected_ef_val in [0.20, 0.30, 0.40]:
+        selected_pid = f"PORT_OFF_{selected_scen}_B{b_m}M_EQ{eq_pct}"
+    elif selected_scen == cost_norm and selected_b_val in [2e6, 4e6, 6e6] and selected_ef_val in [0.20, 0.30, 0.40]:
+        selected_pid = f"PORT_STR_{selected_scen}_B{b_m}M_EQ{eq_pct}"
     else:
-        target_rg = "OFFICIAL"
-
-    # Match exact portfolio row
-    df_match = df_summary[
-        (df_summary["run_group"] == target_rg)
-        & (df_summary["budget_usd"] == selected_b_val)
-        & (df_summary["equity_floor"] == selected_ef_val)
-        & (df_summary["uncertainty_scenario"] == selected_scen)
-    ]
-
-    if df_match.empty:
-        # Fallback to nearest official match if stress combination is unavailable
-        df_match = df_summary[
-            (df_summary["budget_usd"] == selected_b_val)
-            & (df_summary["uncertainty_scenario"] == selected_scen)
-        ]
-
-    if df_match.empty:
-        selected_pid = DEFAULT_PORTFOLIO_ID
-    else:
-        selected_pid = df_match.iloc[0]["portfolio_id"]
+        selected_pid = f"PORT_DYN_{selected_scen[:3]}_{selected_cost_val[:3]}_B{b_m}M_EQ{eq_pct}"
 
     # Human-readable scenario descriptor badge
     b_label = f"${int(selected_b_val/1e6)}M" if selected_b_val >= 1e6 else f"${int(selected_b_val/1e3)}k"
@@ -160,6 +174,7 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         f"**Active Scenario**\n\n"
         f"• **Budget:** {b_label}\n"
         f"• **Equity Floor:** {eq_label}\n"
+        f"• **Cost Case:** {selected_cost_val.title()}\n"
         f"• **CMF Tier:** {selected_scen.title()}"
     )
     st.sidebar.caption(f"Scenario ID: `{selected_pid}`")
@@ -191,6 +206,15 @@ def render_sidebar_controls(df_summary: pd.DataFrame) -> str:
         )
     except Exception:
         pass
+
+    if return_dict:
+        return {
+            "budget": float(selected_b_val),
+            "equity_floor": float(selected_ef_val),
+            "cost_case": selected_cost_val,
+            "cmf_case": selected_scen,
+            "portfolio_id": selected_pid,
+        }
 
     return selected_pid
 

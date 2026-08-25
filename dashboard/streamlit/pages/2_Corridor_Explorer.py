@@ -36,6 +36,7 @@ from dashboard.streamlit.components import (
 )
 from dashboard.streamlit.data_access import (
     compute_economic_only_benefits,
+    evaluate_portfolio_scenario,
     get_selected_corridors_geodataframe,
     get_selected_portfolio_benefits,
     get_single_portfolio_summary,
@@ -60,14 +61,21 @@ gdf_corridors = load_corridor_geodataframe()
 
 total_corridors_count = len(df_master)
 
-# Render sidebar controls & get single selected portfolio_id
-portfolio_id = render_sidebar_controls(df_summary)
+# Render sidebar controls & get active scenario parameters
+scenario_params = render_sidebar_controls(df_summary, return_dict=True)
 
-# Extract single portfolio data & selected spatial GeoDataFrame
-s_row = get_single_portfolio_summary(df_summary, portfolio_id)
-df_sel_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, portfolio_id)
-df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
+# Dynamically solve active scenario
+s_row, df_sel_benefits = evaluate_portfolio_scenario(
+    budget=scenario_params["budget"],
+    equity_floor=scenario_params["equity_floor"],
+    cost_case=scenario_params["cost_case"],
+    cmf_case=scenario_params["cmf_case"],
+    df_benefits=df_benefits,
+)
+if not df_sel_benefits.empty:
+    df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
 
+portfolio_id = str(s_row["portfolio_id"])
 render_governance_header_banner(s_row["run_group"], (s_row["run_group"] == "OFFICIAL"))
 
 # -----------------------------------------------------------------------------

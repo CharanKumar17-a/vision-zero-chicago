@@ -279,6 +279,8 @@ class TestStreamlitDeployment:
         expected_reqs = [
             "streamlit==1.60.0",
             "pandas==3.0.5",
+            "numpy==2.2.3",
+            "scipy==1.15.3",
             "geopandas==1.1.4",
             "shapely==2.1.2",
             "plotly==6.9.0",

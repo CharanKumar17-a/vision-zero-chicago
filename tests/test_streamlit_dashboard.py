@@ -307,20 +307,21 @@ class TestStreamlitDashboard:
         at.run()
         assert not at.exception
 
-        # Change What-If discrete precomputed selectboxes to $24M, 35% equity (indices 2 and 3)
-        at.selectbox[2].select(24000000.0)
-        at.selectbox[3].select(0.35)
+        # Change What-If discrete selectors to $24M, 35% equity by widget key
+        at.selectbox(key="wif_budget_select").select(24000000.0)
+        at.selectbox(key="wif_equity_select").select(0.35)
         at.run()
         assert not at.exception
         info_texts = [i.value for i in at.info]
-        assert any("PORT_GRID_BASE_B24M_EQ35" in text for text in info_texts)
+        assert any("B24M_EQ35" in text for text in info_texts)
 
-        # Switch sidebar budget to $25M
+        # Switch sidebar budget slider to $25M
         at.select_slider[0].set_value(25000000.0)
         at.run()
         assert not at.exception
         captions = [c.value for c in at.caption]
         assert any("PORT_OFF_BASE_B25M_EQ20" in text for text in captions)
+
 
     def test_compute_portfolio_stability_official_counts(self):
         """Verify compute_portfolio_stability accurately calculates selection frequencies and classifications for Official runs."""
@@ -828,3 +829,119 @@ assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
         assert any("Analysis period: **2018–2025**" in c for c in sidebar_captions)
         assert any("Data last validated:" in c for c in sidebar_captions)
         assert any("Status: **Validated**" in c for c in sidebar_captions)
+
+    def test_dynamic_evaluate_portfolio_scenario_reconciliation(self):
+        """Dynamic evaluation across budget, equity, cost, and CMF cases satisfies exact $0.0 delta mathematical reconciliation."""
+        from dashboard.streamlit.data_access import evaluate_portfolio_scenario
+
+        df_benefits = load_treatment_benefits()
+
+        test_cases = [
+            {"budget": 15e6, "equity": 0.20, "cost": "BASE", "cmf": "BASE"},
+            {"budget": 25e6, "equity": 0.30, "cost": "BASE", "cmf": "BASE"},
+            {"budget": 40e6, "equity": 0.40, "cost": "BASE", "cmf": "BASE"},
+            {"budget": 2e6, "equity": 0.20, "cost": "BASE", "cmf": "BASE"},
+            {"budget": 4e6, "equity": 0.20, "cost": "BASE", "cmf": "BASE"},
+            {"budget": 6e6, "equity": 0.20, "cost": "BASE", "cmf": "BASE"},
+            {"budget": 15e6, "equity": 0.20, "cost": "LOW", "cmf": "OPTIMISTIC"},
+            {"budget": 15e6, "equity": 0.20, "cost": "HIGH", "cmf": "CONSERVATIVE"},
+            {"budget": 25e6, "equity": 0.30, "cost": "LOW", "cmf": "BASE"},
+            {"budget": 25e6, "equity": 0.30, "cost": "HIGH", "cmf": "BASE"},
+            {"budget": 15e6, "equity": 0.20, "cost": "BASE", "cmf": "CONSERVATIVE"},
+            {"budget": 15e6, "equity": 0.20, "cost": "BASE", "cmf": "OPTIMISTIC"},
+        ]
+
+        for tc in test_cases:
+            s_row, df_sel = evaluate_portfolio_scenario(
+                budget=tc["budget"],
+                equity_floor=tc["equity"],
+                cost_case=tc["cost"],
+                cmf_case=tc["cmf"],
+                df_benefits=df_benefits,
+            )
+
+            assert s_row["solver_status"] == "OPTIMAL"
+            assert len(df_sel) == s_row["selected_project_count"]
+            assert df_sel["corridor_id"].nunique() == s_row["selected_corridor_count"]
+
+            # 1. Cost Reconciliation
+            assert pytest.approx(df_sel["capital_project_cost"].sum(), abs=1e-4) == s_row["selected_capital_cost"]
+            assert s_row["selected_capital_cost"] <= tc["budget"] + 1e-4
+            assert pytest.approx(tc["budget"] - s_row["selected_capital_cost"], abs=1e-4) == s_row["budget_slack"]
+
+            # 2. PV Benefit Reconciliation
+            assert pytest.approx(df_sel["present_value_benefit"].sum(), abs=1e-4) == s_row["total_present_value_benefit"]
+            assert pytest.approx(df_sel["net_present_benefit"].sum(), abs=1e-4) == s_row["total_net_present_benefit"]
+
+            # 3. Equity Share Reconciliation
+            eq_spend = df_sel[df_sel["equity_area_flag"] == True]["capital_project_cost"].sum()
+            calc_eq_share = eq_spend / s_row["selected_capital_cost"] if s_row["selected_capital_cost"] > 0 else 0.0
+            assert pytest.approx(calc_eq_share, abs=1e-6) == s_row["achieved_equity_share"]
+            assert s_row["achieved_equity_share"] >= tc["equity"] - 1e-6
+
+            # 4. BCR Reconciliation
+            calc_bcr = s_row["total_present_value_benefit"] / s_row["selected_capital_cost"] if s_row["selected_capital_cost"] > 0 else 0.0
+            assert pytest.approx(calc_bcr, abs=1e-6) == s_row["portfolio_bcr"]
+
+            # 5. Policy Constraints: 1 treatment per corridor & No NOT_APPLICABLE
+            assert df_sel["corridor_id"].duplicated().sum() == 0
+            if "physical_applicability_status" in df_sel.columns:
+                assert (df_sel["physical_applicability_status"] != "NOT_APPLICABLE").all()
+
+    def test_three_run_determinism_dynamic_solver(self):
+        """Executing evaluate_portfolio_scenario 3 times yields 100% identical outputs, keys, and SHA-256 hashes."""
+        from dashboard.streamlit.data_access import evaluate_portfolio_scenario
+
+        runs = []
+        for _ in range(3):
+            s_row, df_sel = evaluate_portfolio_scenario(
+                budget=15000000.0,
+                equity_floor=0.20,
+                cost_case="BASE",
+                cmf_case="BASE",
+            )
+            runs.append((s_row, df_sel))
+
+        s1, d1 = runs[0]
+        s2, d2 = runs[1]
+        s3, d3 = runs[2]
+
+        assert s1["portfolio_hash"] == s2["portfolio_hash"] == s3["portfolio_hash"]
+        assert s1["selected_capital_cost"] == s2["selected_capital_cost"] == s3["selected_capital_cost"]
+        assert s1["total_present_value_benefit"] == s2["total_present_value_benefit"] == s3["total_present_value_benefit"]
+        assert s1["portfolio_bcr"] == s2["portfolio_bcr"] == s3["portfolio_bcr"]
+        assert (d1["corridor_id"].values == d2["corridor_id"].values).all()
+        assert (d1["treatment_id"].values == d2["treatment_id"].values).all()
+
+    def test_all_sidebar_controls_affect_results(self):
+        """Each sidebar control (Budget, Equity floor, Cost Case, CMF Case) measurably affects the analytical result."""
+        from dashboard.streamlit.data_access import evaluate_portfolio_scenario
+
+        # Baseline: $15M, 20% equity, BASE cost, BASE CMF
+        s_base, d_base = evaluate_portfolio_scenario(15e6, 0.20, "BASE", "BASE")
+
+        # 1. Budget effect ($15M vs $25M)
+        s_b25, d_b25 = evaluate_portfolio_scenario(25e6, 0.20, "BASE", "BASE")
+        assert s_b25["selected_capital_cost"] != s_base["selected_capital_cost"]
+        assert s_b25["selected_project_count"] > s_base["selected_project_count"]
+
+        # 2. Equity floor effect ($15M budget: 20% vs 50% equity floor forces higher equity allocation)
+        s_eq20, d_eq20 = evaluate_portfolio_scenario(15e6, 0.20, "BASE", "BASE")
+        s_eq50, d_eq50 = evaluate_portfolio_scenario(15e6, 0.50, "BASE", "BASE")
+        assert s_eq50["achieved_equity_share"] >= 0.50
+        assert s_eq50["portfolio_hash"] != s_eq20["portfolio_hash"]
+        assert s_eq50["equity_spending"] > s_eq20["equity_spending"]
+
+
+        # 3. Cost Case effect (BASE vs HIGH vs LOW costs alters project unit costs and portfolio composition)
+        s_cost_high, d_cost_high = evaluate_portfolio_scenario(15e6, 0.20, "HIGH", "BASE")
+        s_cost_low, d_cost_low = evaluate_portfolio_scenario(15e6, 0.20, "LOW", "BASE")
+        assert s_cost_high["portfolio_hash"] != s_base["portfolio_hash"]
+        assert s_cost_low["portfolio_hash"] != s_base["portfolio_hash"]
+        assert s_cost_high["portfolio_hash"] != s_cost_low["portfolio_hash"]
+
+        # 4. CMF Case effect (BASE vs OPTIMISTIC increases PV benefits)
+        s_cmf_opt, d_cmf_opt = evaluate_portfolio_scenario(15e6, 0.20, "BASE", "OPTIMISTIC")
+        s_cmf_cons, d_cmf_cons = evaluate_portfolio_scenario(15e6, 0.20, "BASE", "CONSERVATIVE")
+        assert s_cmf_opt["total_present_value_benefit"] > s_base["total_present_value_benefit"]
+        assert s_cmf_cons["total_present_value_benefit"] < s_base["total_present_value_benefit"]

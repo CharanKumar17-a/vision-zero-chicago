@@ -14,13 +14,20 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
 import pandas as pd
 import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.optimization.optimize_portfolios import compute_portfolio_hash, solve_single_milp
+
 
 SUMMARY_PATH = ROOT / "data" / "processed" / "power_bi_portfolio_summary.parquet"
 SELECTIONS_PATH = ROOT / "data" / "processed" / "power_bi_project_selections.parquet"
@@ -374,6 +381,213 @@ def get_selected_corridors_geodataframe(
     if len(gdf_merged) != len(df_sel):
         raise ValueError(f"Row count mismatch when creating spatial GeoDataFrame for '{portfolio_id}'.")
     return gdf_merged
+
+
+def get_dynamic_corridors_geodataframe(
+    df_selected: pd.DataFrame,
+    gdf_corridors: Any,
+) -> Any:
+    """Filter spatial linework to selected corridors for dynamic scenario results without row expansion."""
+    if df_selected.empty:
+        return gdf_corridors.iloc[0:0].copy()
+    selected_corridors = df_selected["corridor_id"].unique()
+    gdf_selected = gdf_corridors[gdf_corridors["corridor_id"].isin(selected_corridors)].copy()
+    gdf_merged = gdf_selected.merge(
+        df_selected[["corridor_id", "treatment_name", "capital_project_cost", "equity_area_flag", "selected_rank_by_benefit"]],
+        on="corridor_id",
+        how="inner",
+    )
+    return gdf_merged
+
+
+def evaluate_portfolio_scenario(
+    budget: float,
+    equity_floor: float,
+    cost_case: str = "BASE",
+    cmf_case: str = "BASE",
+    df_benefits: Optional[pd.DataFrame] = None,
+) -> Tuple[pd.Series, pd.DataFrame]:
+    """Execute dynamic MILP portfolio optimization over frozen candidate benefits and costs.
+
+    Performs fresh solve on every invocation (cache-free) ensuring 0 stale state risk:
+    1. Normalizes cost_case ('LOW', 'BASE', 'HIGH') and cmf_case ('CONSERVATIVE', 'BASE', 'OPTIMISTIC').
+    2. Builds candidate panel from frozen authoritative data.
+    3. Screens physical applicability (NOT_APPLICABLE excluded) and BCR eligibility (BCR >= 1.0 per D023).
+    4. Executes scipy.optimize.milp with 1-treatment-per-corridor, budget, equity floor, and 70% Road Diet cap (D026).
+    5. Returns fully reconciled summary Series and selected projects DataFrame.
+    """
+    if df_benefits is None:
+        df_benefits = load_treatment_benefits()
+
+    c_upper = str(cost_case).strip().upper()
+    if c_upper in ("LOW", "CONSERVATIVE", "MINIMAL"):
+        cost_level = "CONSERVATIVE"
+    elif c_upper in ("HIGH", "OPTIMISTIC", "COMPREHENSIVE"):
+        cost_level = "OPTIMISTIC"
+    else:
+        cost_level = "BASE"
+
+    m_upper = str(cmf_case).strip().upper()
+    if m_upper in ("LOW", "CONSERVATIVE"):
+        cmf_level = "CONSERVATIVE"
+    elif m_upper in ("HIGH", "OPTIMISTIC"):
+        cmf_level = "OPTIMISTIC"
+    else:
+        cmf_level = "BASE"
+
+    if cmf_level == cost_level:
+        df_scen = df_benefits[df_benefits["uncertainty_scenario"] == cmf_level].copy().reset_index(drop=True)
+    else:
+        df_cmf = df_benefits[df_benefits["uncertainty_scenario"] == cmf_level].copy()
+        df_cost = df_benefits[df_benefits["uncertainty_scenario"] == cost_level].copy()
+        df_scen = pd.merge(
+            df_cmf.drop(columns=["capital_project_cost", "net_present_benefit", "benefit_cost_ratio"], errors="ignore"),
+            df_cost[["corridor_id", "treatment_id", "capital_project_cost"]],
+            on=["corridor_id", "treatment_id"],
+            how="inner",
+        )
+        df_scen["net_present_benefit"] = df_scen["present_value_benefit"] - df_scen["capital_project_cost"]
+        df_scen["benefit_cost_ratio"] = df_scen["present_value_benefit"] / df_scen["capital_project_cost"].replace(0, float("nan"))
+
+    # Applicability screening
+    if "physical_applicability_status" in df_scen.columns:
+        df_scen = df_scen[df_scen["physical_applicability_status"] != "NOT_APPLICABLE"].reset_index(drop=True)
+
+    # Candidate BCR >= 1.0 eligibility filter (Decision D023)
+    df_scen = df_scen[df_scen["benefit_cost_ratio"] >= 1.0].reset_index(drop=True)
+
+    c = -df_scen["present_value_benefit"].values
+    costs = df_scen["capital_project_cost"].values
+    equity_flags = df_scen["equity_area_flag"].values.astype(float)
+    treatment_ids = df_scen["treatment_id"].values
+    corridors = df_scen["corridor_id"].values
+    unique_corridors = sorted(list(set(corridors)))
+
+    x, status_code, msg = solve_single_milp(
+        c=c,
+        costs=costs,
+        equity_flags=equity_flags,
+        treatment_ids=treatment_ids,
+        corridors=corridors,
+        unique_corridors=unique_corridors,
+        budget=budget,
+        equity_floor=equity_floor,
+    )
+
+    solver_status = "OPTIMAL" if status_code == 0 else f"STATUS_{status_code}"
+
+    b_m = int(budget / 1e6) if budget >= 1e6 else int(budget / 1e3)
+    eq_pct = int(round(equity_floor * 100))
+
+    if status_code != 0:
+        summary = pd.Series({
+            "portfolio_id": f"PORT_INFEASIBLE_B{b_m}M_EQ{eq_pct}",
+            "run_group": "DYNAMIC",
+            "uncertainty_scenario": cmf_level,
+            "cost_case": cost_level,
+            "cmf_case": cmf_level,
+            "budget": budget,
+            "budget_usd": budget,
+            "equity_floor": equity_floor,
+            "solver_status": solver_status,
+            "solver_message": msg,
+            "selected_project_count": 0,
+            "selected_corridor_count": 0,
+            "selected_capital_cost": 0.0,
+            "budget_slack": budget,
+            "budget_utilization_pct": 0.0,
+            "equity_spending": 0.0,
+            "achieved_equity_share": 0.0,
+            "total_present_value_benefit": 0.0,
+            "total_net_present_benefit": 0.0,
+            "portfolio_bcr": 0.0,
+            "budget_constraint_status": "INFEASIBLE",
+            "equity_constraint_status": "INFEASIBLE",
+        })
+        return summary, pd.DataFrame()
+
+    selected_indices = np.where(x > 0.5)[0]
+    df_selected = df_scen.iloc[selected_indices].copy()
+    df_selected = df_selected.sort_values(by="present_value_benefit", ascending=False).reset_index(drop=True)
+    df_selected["selected_rank_by_benefit"] = np.arange(1, len(df_selected) + 1, dtype=int)
+    if "crashes_averted_ksi" not in df_selected.columns:
+        df_selected["crashes_averted_ksi"] = df_selected["crashes_averted_k"] + df_selected["crashes_averted_a"]
+
+    selected_project_count = len(df_selected)
+    selected_corridor_count = df_selected["corridor_id"].nunique()
+    selected_capital_cost = float(df_selected["capital_project_cost"].sum())
+    budget_slack = float(budget - selected_capital_cost)
+    budget_utilization_pct = float((selected_capital_cost / budget) * 100.0) if budget > 0 else 0.0
+
+    eq_mask = df_selected["equity_area_flag"] == True
+    equity_spending = float(df_selected[eq_mask]["capital_project_cost"].sum())
+    achieved_equity_share = float(equity_spending / selected_capital_cost) if selected_capital_cost > 0 else 0.0
+
+    total_present_value_benefit = float(df_selected["present_value_benefit"].sum())
+    total_net_present_benefit = float(df_selected["net_present_benefit"].sum())
+    portfolio_bcr = float(total_present_value_benefit / selected_capital_cost) if selected_capital_cost > 0 else 0.0
+
+    sel_keys = [(r["corridor_id"], r["treatment_id"]) for _, r in df_selected.iterrows()]
+    portfolio_hash = compute_portfolio_hash(sel_keys)
+
+    # Determine constraint status
+    unselected_corridors = set(unique_corridors) - set(df_selected["corridor_id"].unique())
+    if len(unselected_corridors) == 0:
+        budget_constraint_status = "NONBINDING_CORRIDOR_CEILING"
+    else:
+        unselected_df = df_scen[df_scen["corridor_id"].isin(unselected_corridors)]
+        min_unselected_cost = float(unselected_df["capital_project_cost"].min()) if len(unselected_df) > 0 else 0.0
+        if budget_slack < min_unselected_cost - 1e-6:
+            budget_constraint_status = "EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR"
+        else:
+            budget_constraint_status = "SLACK"
+
+    if abs(achieved_equity_share - equity_floor) <= 1e-4:
+        equity_constraint_status = "BINDING"
+    else:
+        equity_constraint_status = "SLACK"
+
+    # Canonical portfolio ID mapping if matching official
+    if cmf_level == cost_level and budget in [15e6, 25e6, 40e6] and equity_floor in [0.20, 0.30, 0.40]:
+        portfolio_id = f"PORT_OFF_{cmf_level}_B{b_m}M_EQ{eq_pct}"
+        run_group = "OFFICIAL"
+    elif cmf_level == cost_level and budget in [2e6, 4e6, 6e6] and equity_floor in [0.20, 0.30, 0.40]:
+        portfolio_id = f"PORT_STR_{cmf_level}_B{b_m}M_EQ{eq_pct}"
+        run_group = "BINDING-BUDGET STRESS TEST"
+    else:
+        portfolio_id = f"PORT_DYN_{cmf_level[:3]}_{cost_level[:3]}_B{b_m}M_EQ{eq_pct}"
+        run_group = "DYNAMIC"
+
+    df_selected["portfolio_id"] = portfolio_id
+    df_selected["uncertainty_scenario"] = cmf_level
+
+    summary = pd.Series({
+        "portfolio_id": portfolio_id,
+        "run_group": run_group,
+        "uncertainty_scenario": cmf_level,
+        "cost_case": cost_level,
+        "cmf_case": cmf_level,
+        "budget": budget,
+        "budget_usd": budget,
+        "equity_floor": equity_floor,
+        "solver_status": solver_status,
+        "solver_message": msg,
+        "selected_project_count": selected_project_count,
+        "selected_corridor_count": selected_corridor_count,
+        "selected_capital_cost": selected_capital_cost,
+        "budget_slack": budget_slack,
+        "budget_utilization_pct": budget_utilization_pct,
+        "equity_spending": equity_spending,
+        "achieved_equity_share": achieved_equity_share,
+        "total_present_value_benefit": total_present_value_benefit,
+        "total_net_present_benefit": total_net_present_benefit,
+        "portfolio_bcr": portfolio_bcr,
+        "budget_constraint_status": budget_constraint_status,
+        "equity_constraint_status": equity_constraint_status,
+        "portfolio_hash": portfolio_hash,
+    })
+
+    return summary, df_selected
 
 
 # FHWA 2025 Economic-Only Crash Cost Benchmarks (FHWA safety factsheet 2025: direct tangible costs only)

@@ -32,10 +32,12 @@ from dashboard.streamlit.components import (
     format_percent,
     format_plural,
     render_governance_footer,
+    render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
     DEFAULT_PORTFOLIO_ID,
     compute_economic_only_benefits,
+    evaluate_portfolio_scenario,
     get_selected_portfolio_benefits,
     get_single_portfolio_selections,
     get_single_portfolio_summary,
@@ -46,22 +48,34 @@ from dashboard.streamlit.data_access import (
 )
 
 # -----------------------------------------------------------------------------
-# Data Loading
+# Data Loading & Dynamic Scenario Evaluation
 # -----------------------------------------------------------------------------
 df_summary = load_portfolio_summary()
 df_selections = load_project_selections()
 df_master = load_corridor_master()
 df_benefits = load_treatment_benefits()
 
-# Canonical recommended portfolio: OFFICIAL BASE $15M with 20% equity floor
-rec_summary = get_single_portfolio_summary(df_summary, DEFAULT_PORTFOLIO_ID)
-rec_selections = get_single_portfolio_selections(df_selections, DEFAULT_PORTFOLIO_ID)
-rec_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, DEFAULT_PORTFOLIO_ID)
+# Render sidebar controls & get active scenario parameters
+scenario_params = render_sidebar_controls(df_summary, return_dict=True)
+
+# Dynamically solve active scenario
+rec_summary, rec_selections = evaluate_portfolio_scenario(
+    budget=scenario_params["budget"],
+    equity_floor=scenario_params["equity_floor"],
+    cost_case=scenario_params["cost_case"],
+    cmf_case=scenario_params["cmf_case"],
+    df_benefits=df_benefits,
+)
+rec_benefits = rec_selections
 
 # Compute economic-only benefits for recommended portfolio
-rec_benefits_econ = compute_economic_only_benefits(rec_benefits)
-total_annual_econ = float(rec_benefits_econ["annual_economic_benefit"].sum())
-total_pv_econ = float(rec_benefits_econ["pv_economic_benefit"].sum())
+if not rec_benefits.empty:
+    rec_benefits_econ = compute_economic_only_benefits(rec_benefits)
+    total_annual_econ = float(rec_benefits_econ["annual_economic_benefit"].sum())
+    total_pv_econ = float(rec_benefits_econ["pv_economic_benefit"].sum())
+else:
+    total_annual_econ = 0.0
+    total_pv_econ = 0.0
 bcr_econ_portfolio = total_pv_econ / float(rec_summary["selected_capital_cost"]) if float(rec_summary["selected_capital_cost"]) > 0 else 0.0
 
 # Derived metrics for recommended portfolio (all dynamically computed)
@@ -73,17 +87,21 @@ portfolio_bcr = float(rec_summary["portfolio_bcr"])
 achieved_equity_pct = float(rec_summary["achieved_equity_share"]) * 100
 budget_slack = float(rec_summary["budget_slack"])
 
-annual_crashes_averted = float(rec_benefits["crashes_averted_total"].sum())
-annual_k_averted = float(rec_benefits["crashes_averted_k"].sum())
-annual_a_averted = float(rec_benefits["crashes_averted_a"].sum())
-annual_b_averted = float(rec_benefits["crashes_averted_b"].sum())
-annual_c_averted = float(rec_benefits["crashes_averted_c"].sum())
-annual_o_averted = float(rec_benefits["crashes_averted_o"].sum())
-annual_ksi_averted = float(rec_benefits["crashes_averted_ksi"].sum())
+annual_crashes_averted = float(rec_benefits["crashes_averted_total"].sum()) if not rec_benefits.empty else 0.0
+annual_k_averted = float(rec_benefits["crashes_averted_k"].sum()) if not rec_benefits.empty else 0.0
+annual_a_averted = float(rec_benefits["crashes_averted_a"].sum()) if not rec_benefits.empty else 0.0
+annual_b_averted = float(rec_benefits["crashes_averted_b"].sum()) if not rec_benefits.empty else 0.0
+annual_c_averted = float(rec_benefits["crashes_averted_c"].sum()) if not rec_benefits.empty else 0.0
+annual_o_averted = float(rec_benefits["crashes_averted_o"].sum()) if not rec_benefits.empty else 0.0
+annual_ksi_averted = float(rec_benefits["crashes_averted_ksi"].sum()) if not rec_benefits.empty else 0.0
 
-svi_mask = rec_benefits["equity_area_flag"] == True
-high_svi_ksi = float(rec_benefits[svi_mask]["crashes_averted_ksi"].sum())
-high_svi_cost = float(rec_benefits[svi_mask]["capital_project_cost"].sum())
+if not rec_benefits.empty:
+    svi_mask = rec_benefits["equity_area_flag"] == True
+    high_svi_ksi = float(rec_benefits[svi_mask]["crashes_averted_ksi"].sum())
+    high_svi_cost = float(rec_benefits[svi_mask]["capital_project_cost"].sum())
+else:
+    high_svi_ksi = 0.0
+    high_svi_cost = 0.0
 high_svi_ksi_share = (high_svi_ksi / annual_ksi_averted * 100) if annual_ksi_averted > 0 else 0.0
 high_svi_capital_share = (high_svi_cost / selected_capital_cost * 100) if selected_capital_cost > 0 else 0.0
 
@@ -94,12 +112,27 @@ st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
 st.subheader("Planning recommendation")
 st.caption("Planning-level decision support for prioritizing corridor safety investments under budget and equity constraints.")
 
+b_title = f"${int(scenario_params['budget']/1e6)}M" if scenario_params['budget'] >= 1e6 else f"${int(scenario_params['budget']/1e3)}k"
+ef_title = f"{int(round(scenario_params['equity_floor']*100))}%"
+cost_title = scenario_params['cost_case'].title()
+cmf_title = scenario_params['cmf_case'].title()
+
+is_default_baseline = (
+    scenario_params["budget"] == 15000000.0
+    and scenario_params["equity_floor"] == 0.20
+    and scenario_params["cost_case"] == "BASE"
+    and scenario_params["cmf_case"] == "BASE"
+)
+header_tag = "Baseline Recommendation" if is_default_baseline else "Active Planning Scenario"
+
 # Consolidated Executive Recommendation Callout
 st.info(
-    "**Baseline Recommendation: $15M Budget • 20% Equity Floor • Base CMF**\n\n"
+    f"**{header_tag}: {b_title} Budget • {ef_title} Equity Floor • {cost_title} Cost • {cmf_title} CMF**\n\n"
     "Planning-level decision support for corridor safety capital prioritization. "
     "This tool does not authorize projects, establish construction scope, or replace engineering review."
 )
+
+
 
 st.markdown("")
 
@@ -115,7 +148,7 @@ with col2:
     st.metric(
         "Corridors funded",
         f"{selected_corridors_count} of {total_corridors_count}",
-        help=f"Denominator: {total_corridors_count} candidate corridors in the high-crash network. Numerator: {selected_corridors_count} corridors funded under $15M budget. Subject to engineering review.",
+        help=f"Denominator: {total_corridors_count} candidate corridors in the high-crash network. Numerator: {selected_corridors_count} corridors funded under {b_title} budget. Subject to engineering review.",
     )
 with col3:
     st.metric(
@@ -131,7 +164,7 @@ with col4:
         help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI corridors ({format_currency(high_svi_cost)}). Measures capital spending input only; not proof of equitable safety outcomes. SVI is used as a spatial equity proxy.",
     )
 
-st.caption(f"Optimization status: Mathematically optimal under stated planning constraints (${selected_capital_cost/1e6:.2f}M of $15.0M allocated • {format_currency(budget_slack)} budget slack)")
+st.caption(f"Optimization status: Mathematically optimal under stated planning constraints (${selected_capital_cost/1e6:.2f}M of {b_title} allocated • {format_currency(budget_slack)} budget slack)")
 
 # -----------------------------------------------------------------------------
 # Section 1 — What This Investment Buys
@@ -181,7 +214,7 @@ with col_benefit1:
         {
             "Outcome Measure": "All-Severity Crashes Avoided",
             "Estimated Annual Impact": f"~{int(round(annual_crashes_averted)):,} / yr",
-            "Planning Context": "Across all 39 funded corridors (incl. minor injury & PDO)",
+            "Planning Context": f"Across all {selected_corridors_count} funded corridors (incl. minor injury & PDO)",
         },
         {
             "Outcome Measure": "20-Year Lifecycle Safety Benefit",
@@ -202,7 +235,7 @@ with col_benefit2:
         f"""
         - **Present value safety benefit (planning-level estimate):** `{format_currency_compact(total_pv_benefit)}` ({format_currency(total_pv_benefit)})
         - **Portfolio benefit-cost ratio (planning-level scenario estimate):** `{format_bcr_compact(portfolio_bcr)}` ({portfolio_bcr:.1f} : 1; planning-level scenario estimate, not an expected realized program return)
-        - **High-SVI capital share (spending equity):** `{high_svi_capital_share:.1f}%` (Policy floor: `20.0%`)
+        - **High-SVI capital share (spending equity):** `{high_svi_capital_share:.1f}%` (Policy floor: `{format_percent(rec_summary['equity_floor'])}`)
         - **KSI benefit share in high-SVI areas (safety benefit equity):** `{high_svi_ksi_share:.1f}%` (~{high_svi_ksi:.1f} of ~{annual_ksi_averted:.1f} annual KSI avoided)
         - **Engineering status:** **Engineering review required** (Provisional applicability `UNKNOWN`)
         - **Portfolio classification:** **Analytical planning portfolio** (Subject to engineering review; not yet an implementation-ready portfolio)
@@ -243,14 +276,15 @@ with st.expander("View conservative economic-only cost scenario", expanded=False
 st.markdown("---")
 st.subheader("2. Deferred corridors (planning alternatives)")
 
-selected_ids = set(rec_selections["corridor_id"])
+selected_ids = set(rec_selections["corridor_id"]) if not rec_selections.empty else set()
 all_ids = set(df_master["corridor_id"])
 unselected_ids = sorted(list(all_ids - selected_ids))
 
+active_cmf = scenario_params["cmf_case"]
 base_benefits = df_benefits[
-    (df_benefits["uncertainty_scenario"] == "BASE")
+    (df_benefits["uncertainty_scenario"] == active_cmf)
     if "uncertainty_scenario" in df_benefits.columns
-    else (df_benefits["scenario_level"] == "BASE")
+    else (df_benefits["scenario_level"] == active_cmf)
 ]
 unselected_candidates = base_benefits[base_benefits["corridor_id"].isin(unselected_ids)]
 
@@ -261,6 +295,8 @@ for cid in unselected_ids:
         c_cands_app = c_cands[c_cands["physical_applicability_status"] != "NOT_APPLICABLE"]
         if len(c_cands_app) > 0:
             c_cands = c_cands_app
+    if c_cands.empty:
+        continue
     best_cand = c_cands.sort_values("benefit_cost_ratio", ascending=False).iloc[0]
     c_master = df_master[df_master["corridor_id"] == cid].iloc[0]
 
@@ -286,33 +322,23 @@ for cid in unselected_ids:
         "Equity Priority Area": equity_str,
     })
 
-df_deferred = pd.DataFrame(deferred_list).sort_values("raw_bcr", ascending=False)
-display_cols = [c for c in df_deferred.columns if c != "raw_bcr"]
+df_deferred = pd.DataFrame(deferred_list).sort_values("raw_bcr", ascending=False) if deferred_list else pd.DataFrame()
+display_cols = [c for c in df_deferred.columns if c != "raw_bcr"] if not df_deferred.empty else []
 
-# Dynamic verification of deferred corridor characteristics
 deferred_count_str = format_plural(len(df_deferred), "corridor")
 deferred_all_positive_roi = all(float(r["raw_bcr"]) >= 1.0 for _, r in df_deferred.iterrows()) if not df_deferred.empty else True
 
-# Check if unselected corridors are funded at $25M budget
-sel_25m = df_selections[df_selections["portfolio_id"] == "PORT_OFF_BASE_B25M_EQ20"]
-funded_at_25m_count = sum(1 for cid in unselected_ids if cid in set(sel_25m["corridor_id"])) if unselected_ids else 0
-all_funded_at_25m = (funded_at_25m_count == len(unselected_ids)) if unselected_ids else True
-
-roi_note = "All deferred corridors have positive planning-level BCR (>1.0)" if deferred_all_positive_roi else "Viable candidate projects exist"
-expansion_note = (
-    f"all {len(unselected_ids)} are selected in the $25M Baseline scenario"
-    if all_funded_at_25m
-    else f"{funded_at_25m_count} of {len(unselected_ids)} are selected in the $25M Baseline scenario"
-)
-
 st.markdown(
-    f"Under the **$15M budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred because "
+    f"Under the **{b_title} budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred because "
     f"treatment costs exceed the remaining **{format_currency(budget_slack)}** of budget slack. "
-    f"{roi_note}, and {expansion_note}. "
+    f"{'All deferred corridors have positive planning-level BCR (>1.0)' if deferred_all_positive_roi else 'Viable candidate projects exist'}. "
     "All figures represent planning-level estimates subject to engineering review."
 )
 
-st.dataframe(df_deferred[display_cols], use_container_width=True, hide_index=True)
+if not df_deferred.empty:
+    st.dataframe(df_deferred[display_cols], use_container_width=True, hide_index=True)
+else:
+    st.success("All 43 candidate corridors are funded under this scenario!")
 st.caption(
     "Lower cost per KSI avoided = more efficient at preventing the most severe crashes. "
     "These are planning-level estimates subject to engineering review and implementation approval."
@@ -329,38 +355,33 @@ st.markdown(
     "The progression table below outlines the **'what more money buys'** scaling across budget tiers."
 )
 
-# Build sensitivity datasets across official and stress budgets in BASE scenario
-sens_official = df_summary[
-    (df_summary["run_group"] == "OFFICIAL")
-    & (df_summary["uncertainty_scenario"] == "BASE")
-    & (df_summary["equity_floor"] == 0.20)
-].sort_values("budget_usd")
-
-sens_stress = df_summary[
-    (df_summary["run_group"] == "BINDING-BUDGET STRESS TEST")
-    & (df_summary["uncertainty_scenario"] == "BASE")
-    & (df_summary["equity_floor"] == 0.20)
-].sort_values("budget_usd")
-
+progression_budgets = [2000000.0, 4000000.0, 6000000.0, 15000000.0, 25000000.0, 40000000.0]
 progression_records = []
 
-for _, row in pd.concat([sens_stress, sens_official]).sort_values("budget_usd").iterrows():
-    pid = str(row["portfolio_id"])
-    b_val = float(row["budget_usd"])
-    b_str = f"${int(b_val / 1e6)}M"
-    c_cost = float(row["selected_capital_cost"])
-    pv_b = float(row["total_present_value_benefit"])
-    p_bcr = float(row["portfolio_bcr"])
-    n_sel = int(row["selected_project_count"])
-    eq_share = float(row["achieved_equity_share"]) * 100
+for b_val in progression_budgets:
+    s_tier, d_tier = evaluate_portfolio_scenario(
+        budget=b_val,
+        equity_floor=scenario_params["equity_floor"],
+        cost_case=scenario_params["cost_case"],
+        cmf_case=scenario_params["cmf_case"],
+        df_benefits=df_benefits,
+    )
+    b_str = f"${int(b_val / 1e6)}M" if b_val >= 1e6 else f"${int(b_val / 1e3)}k"
+    c_cost = float(s_tier["selected_capital_cost"])
+    pv_b = float(s_tier["total_present_value_benefit"])
+    p_bcr = float(s_tier["portfolio_bcr"])
+    n_sel = int(s_tier["selected_project_count"])
+    eq_share = float(s_tier["achieved_equity_share"]) * 100
 
-    p_benefits = get_selected_portfolio_benefits(df_selections, df_benefits, pid)
-    p_econ = compute_economic_only_benefits(p_benefits)
-    pv_econ = float(p_econ["pv_economic_benefit"].sum())
-    tot_crashes_av = float(p_benefits["crashes_averted_total"].sum())
-    ksi_av = float(p_benefits["crashes_averted_ksi"].sum())
+    if not d_tier.empty:
+        p_econ = compute_economic_only_benefits(d_tier)
+        pv_econ = float(p_econ["pv_economic_benefit"].sum())
+        tot_crashes_av = float(d_tier["crashes_averted_total"].sum())
+        ksi_av = float(d_tier["crashes_averted_ksi"].sum())
+    else:
+        pv_econ, tot_crashes_av, ksi_av = 0.0, 0.0, 0.0
 
-    tier_type = "Diagnostic stress" if "STR" in pid else ("Official (binding)" if b_val == 15e6 else "Official (nonbinding)")
+    tier_type = "Diagnostic stress" if b_val < 15e6 else ("Official (binding)" if b_val == 15e6 else "Official (expanded)")
 
     progression_records.append({
         "Budget Tier": b_str,
@@ -393,6 +414,7 @@ with col_sens_tbl:
 
 with col_sens_chart:
     st.markdown("#### Corridors selected by budget tier")
+    import plotly.graph_objects as go
     fig_chart = go.Figure()
     fig_chart.add_trace(go.Bar(
         x=df_prog["Budget Tier"],
@@ -414,9 +436,8 @@ with col_sens_chart:
     st.plotly_chart(fig_chart, use_container_width=True)
 
 st.info(
-    f"**Budget finding (planning-level estimate):** At the $15M budget ceiling, "
-    f"**{selected_corridors_count} of {total_corridors_count} corridors** are shortlisted. "
-    f"Expanding to $25M covers all {total_corridors_count} corridors (100% network coverage)."
+    f"**Budget finding (planning-level estimate):** Under {cost_title} costs and {cmf_title} CMFs, "
+    f"at the **{b_title} budget ceiling**, **{selected_corridors_count} of {total_corridors_count} corridors** are shortlisted."
 )
 
 # -----------------------------------------------------------------------------
