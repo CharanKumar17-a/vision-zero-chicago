@@ -198,7 +198,7 @@ with st.expander("View all evaluated treatment candidates for this corridor", ex
             "Fatal Avoided / Yr": "{:,.2f}",
             "Serious Injury Avoided / Yr": "{:,.2f}",
         }),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -366,7 +366,7 @@ deck = pdk.Deck(
     },
 )
 
-st.pydeck_chart(deck, use_container_width=True)
+st.pydeck_chart(deck, width="stretch")
 
 # -----------------------------------------------------------------------------
 # Section 3 — Selected Projects Export Table
@@ -441,7 +441,7 @@ st.dataframe(
         "Cost / KSI Avoided": "${:,.0f}",
         "Cost / All-Severity Crash Avoided": "${:,.0f}",
     }),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
     height=280,
 )

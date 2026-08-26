@@ -74,7 +74,7 @@ lineage_records = [
     {"Pipeline Component": "Decision Mart Serving", "Execution Run ID": str(mart_ev.get("run_id", "N/A")), "Status": str(mart_ev.get("status", "VALIDATED"))},
 ]
 with st.expander("View pipeline execution runs and lineage IDs", expanded=True):
-    st.dataframe(pd.DataFrame(lineage_records), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(lineage_records), width="stretch", hide_index=True)
 
 st.markdown("---")
 st.subheader("2. Governance warning register")
@@ -87,7 +87,7 @@ with st.expander("Portfolio optimization governance warnings (Phase 4C evidence)
         cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_opt_w.columns]
         df_opt_display = df_opt_w[cols_to_show].copy()
         df_opt_display.columns = [c.replace("_", " ").title() for c in df_opt_display.columns]
-        st.dataframe(df_opt_display, use_container_width=True, hide_index=True, height=220)
+        st.dataframe(df_opt_display, width="stretch", hide_index=True, height=220)
     else:
         st.info("No portfolio optimization warnings loaded.")
 
@@ -99,7 +99,7 @@ with st.expander("Decision mart serving governance warnings (Phase 5A evidence)"
         cols_to_show = [c for c in ["code", "explanation", "limitation_or_resolution", "governance_reference"] if c in df_mart_w.columns]
         df_mart_display = df_mart_w[cols_to_show].copy()
         df_mart_display.columns = [c.replace("_", " ").title() for c in df_mart_display.columns]
-        st.dataframe(df_mart_display, use_container_width=True, hide_index=True, height=150)
+        st.dataframe(df_mart_display, width="stretch", hide_index=True, height=150)
     else:
         st.info("No decision mart warnings loaded.")
 
@@ -115,7 +115,7 @@ st.markdown(r"""
 - **Mathematical Optimization**: Status values of `OPTIMAL` indicate that the Mixed-Integer Linear Program (MILP) solved to mathematical optimality under the stated constraints and planning-level cost/benefit assumptions. It does not guarantee field constructibility.
 
 #### Analytical grains and lineage
-- **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 canonical optimization runs: 27 Official, 9 Stress; 192 total serving mart scenarios including What-If grid).
+- **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 canonical optimization runs: 27 Official, 9 Stress; 192 total serving mart scenarios including What-if grid).
 - **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,362 detail rows across 36 canonical runs; 6,999 detail rows across all serving mart scenarios).
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
@@ -128,8 +128,8 @@ st.markdown(r"""
   - *Equity of Estimated Safety Benefit (`KSI benefit share in high-SVI areas`)*: Tracks the percentage of estimated life-safety crash reductions (Fatal K + Serious Injury A) realized within high-SVI corridors (e.g., 55.9% of portfolio KSI avoided in the $15M Baseline Scenario).
 
 #### Scenario definitions
-- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating \$15M, \$25M, and \$40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official \$15M planning budgets bind strictly under realistic unit costs (\$14.99M cost, selecting 39 corridors in the Baseline Scenario under Road Diet diversification and screening), while \$25M and \$40M budget ceilings allow network-wide coverage.
-- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating \$2M, \$4M, and \$6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
+- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official $15M planning budgets bind strictly under realistic unit costs ($14.99M cost, selecting 39 corridors in the Baseline Scenario under Road Diet diversification and screening), while $25M and $40M budget ceilings allow network-wide coverage.
+- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating $2M, $4M, and $6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 #### Crash severity definitions and analytical denominators
 - **All-Severity Crashes**: Comprehensive sum of all police-reported crash severities under the KABCO scale (`K` + `A` + `B` + `C` + `O`).

@@ -32,6 +32,7 @@ from dashboard.streamlit.components import (
     format_percent,
     format_plural,
     render_governance_footer,
+    render_page_header,
     render_sidebar_controls,
 )
 from dashboard.streamlit.data_access import (
@@ -108,9 +109,10 @@ high_svi_capital_share = (high_svi_cost / selected_capital_cost * 100) if select
 # -----------------------------------------------------------------------------
 # Landing Header & 4 Key Decision Metrics Hero
 # -----------------------------------------------------------------------------
-st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
-st.subheader("Planning recommendation")
-st.caption("Planning-level decision support for prioritizing corridor safety investments under budget and equity constraints.")
+render_page_header(
+    "Executive recommendation",
+    "Planning-level decision support for prioritizing corridor safety investments under budget and equity constraints.",
+)
 
 b_title = f"${int(scenario_params['budget']/1e6)}M" if scenario_params['budget'] >= 1e6 else f"${int(scenario_params['budget']/1e3)}k"
 ef_title = f"{int(round(scenario_params['equity_floor']*100))}%"
@@ -134,7 +136,6 @@ st.info(
 
 
 
-st.markdown("")
 
 # 4 Key Decision Metrics Hero
 col1, col2, col3, col4 = st.columns(4)
@@ -199,12 +200,11 @@ with ls_col3:
         help=f"Denominator: {selected_corridors_count} shortlisted corridors. Scope: All severities (K, A, B, C, PDO). Exact: {annual_crashes_averted:,.2f} / yr.",
     )
 
-st.markdown("")
 
 col_benefit1, col_benefit2 = st.columns([3, 2])
 
 with col_benefit1:
-    st.markdown("#### Primary Life-Safety & Economic Outcomes")
+    st.markdown("#### Primary life-safety and economic outcomes")
     summary_data = [
         {
             "Outcome Measure": "Vision Zero Life-Safety (Fatalities & Serious Injuries)",
@@ -227,7 +227,7 @@ with col_benefit1:
             "Planning Context": f"{portfolio_bcr:.1f} : 1 • Planning-level scenario estimate; not an expected realized program return.",
         },
     ]
-    st.dataframe(pd.DataFrame(summary_data), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(summary_data), width="stretch", hide_index=True)
 
 with col_benefit2:
     st.markdown("#### Economic and equity return summary")
@@ -329,14 +329,15 @@ deferred_count_str = format_plural(len(df_deferred), "corridor")
 deferred_all_positive_roi = all(float(r["raw_bcr"]) >= 1.0 for _, r in df_deferred.iterrows()) if not df_deferred.empty else True
 
 st.markdown(
-    f"Under the **{b_title} budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred because "
-    f"treatment costs exceed the remaining **{format_currency(budget_slack)}** of budget slack. "
-    f"{'All deferred corridors have positive planning-level BCR (>1.0)' if deferred_all_positive_roi else 'Viable candidate projects exist'}. "
+    f"Under the **{b_title} budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred: "
+    f"the optimized portfolio exhausts the available budget, and the remaining **{format_currency(budget_slack)}** "
+    f"is insufficient to fund those alternatives. "
+    f"{'All deferred corridors have positive planning-level BCRs (>1.0)' if deferred_all_positive_roi else 'Viable candidate projects exist'}. "
     "All figures represent planning-level estimates subject to engineering review."
 )
 
 if not df_deferred.empty:
-    st.dataframe(df_deferred[display_cols], use_container_width=True, hide_index=True)
+    st.dataframe(df_deferred[display_cols], width="stretch", hide_index=True)
 else:
     st.success("All 43 candidate corridors are funded under this scenario!")
 st.caption(
@@ -408,7 +409,7 @@ with col_sens_tbl:
             "Budget Tier", "Scenario Type", "Corridor Coverage", "Estimated Capital Cost",
             "Comprehensive PV Benefit", "Estimated Annual KSI Avoided", "Achieved Equity Share"
         ]],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -433,7 +434,7 @@ with col_sens_chart:
         ),
         yaxis=dict(title="Corridors selected", range=[0, 45]),
     )
-    st.plotly_chart(fig_chart, use_container_width=True)
+    st.plotly_chart(fig_chart, width="stretch")
 
 st.info(
     f"**Budget finding (planning-level estimate):** Under {cost_title} costs and {cmf_title} CMFs, "

@@ -14,7 +14,6 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -95,7 +94,7 @@ with col1:
 with col2:
     st.metric(
         "Corridors funded",
-        f"{int(s_row['selected_project_count'])} / {total_corridors_count}",
+        f"{int(s_row['selected_project_count'])} of {total_corridors_count}",
         help=f"Denominator: {total_corridors_count} candidate corridors in the network. Numerator: {int(s_row['selected_project_count'])} corridors selected for funding. Subject to engineering review.",
     )
 
@@ -172,7 +171,7 @@ st.dataframe(
         "Estimated Fatal (K) Avoided / Yr": "{:,.2f}",
         "Estimated Serious Injury (A) Avoided / Yr": "{:,.2f}",
     }),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
     height=320,
 )
@@ -199,7 +198,7 @@ with stab_col1:
             "All precomputed scenarios (192 runs)",
         ],
         index=0,
-        help="Select scenario set: Official planning runs ($15M, $25M, $40M), Canonical runs (+ stress tests), or All precomputed mart scenarios (+ What-If grid).",
+        help="Select scenario set: Official planning runs ($15M, $25M, $40M), Canonical runs (+ stress tests), or All precomputed mart scenarios (+ What-if grid).",
     )
     scope_key = "OFFICIAL" if "27" in scope_display else ("CANONICAL" if "36" in scope_display else "ALL")
 
@@ -274,7 +273,7 @@ st.dataframe(
     df_stab_table.style.format({
         "Estimated Capital Cost": "${:,.0f}",
     }),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
     height=280,
 )
@@ -283,7 +282,7 @@ st.dataframe(
 # Section 4 — Benefit-Cost Efficiency View (Decision DEC-02)
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("4. Funded corridors — Benefit-Cost efficiency")
+st.subheader("4. Funded corridors — benefit-cost efficiency")
 st.caption(
     "Corridors ranked by individual Benefit-Cost Ratio (BCR). "
     "The optimization selects the mathematically optimal portfolio under the stated objective, budget, equity, treatment, and screening constraints."
@@ -316,7 +315,7 @@ fig_bcr.update_layout(
     yaxis=dict(title=""),
 )
 
-st.plotly_chart(fig_bcr, use_container_width=True)
+st.plotly_chart(fig_bcr, width="stretch")
 
 # Legend indicator
 c_leg1, c_leg2 = st.columns(2)
@@ -344,14 +343,22 @@ with st.expander("Comprehensive severity & economic accounts (Detailed KABCO bre
         {"Outcome Tier": "Secondary (Property Damage)", "Severity Category": "Property damage only crashes (PDO / O)", "Estimated Crashes Avoided / Yr": f"{o_val:.2f}", "Share of Total": f"{(o_val/tot_val)*100:.2f}%"},
         {"Outcome Tier": "Total", "Severity Category": "All-severity crashes (Total)", "Estimated Crashes Avoided / Yr": f"{tot_val:,.2f}", "Share of Total": "100.00%"},
     ])
-    st.dataframe(sev_df, use_container_width=True, hide_index=True)
+    st.dataframe(sev_df, width="stretch", hide_index=True)
 
 # -----------------------------------------------------------------------------
-# Section 5 — What-If Capital Planner
+# Section 5 — What-if Capital Planner
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("5. What-if capital planner")
 st.caption("Interactive optimization engine: evaluate alternative capital budgets and equity spending floors under active cost and CMF assumptions.")
+
+st.warning(
+    "**Planning disclaimer:** The what-if planner runs a fresh mathematical optimization (MILP) at runtime "
+    "over planning-level costs, CMF-based crash estimates, and probabilistic crash forecasts. Results are "
+    "**illustrative decision-support scenarios — not official City budgets, commitments, or engineering approvals.** "
+    "Physical applicability for most corridors remains **UNKNOWN pending engineering field review**; screened "
+    "inapplicable corridors are excluded. Final capital authority stays with City staff and engineering teams."
+)
 
 st.markdown(
     "Explore how capital allocation, corridor funding rosters, and equity outcomes adjust under different budget ceilings and equity floors."
@@ -391,7 +398,7 @@ with wif_col2:
         index=default_we_idx,
         key="wif_equity_select",
         format_func=lambda ef: f"{int(round(ef * 100))}%",
-        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors (15% to 50%).",
+        help="Select minimum percentage of funding reserved for high-SVI equity priority corridors (15% to 40%).",
     )
 
 wif_s_row, wif_sel_benefits = evaluate_portfolio_scenario(
@@ -406,7 +413,7 @@ target_portfolio_id = str(wif_s_row["portfolio_id"])
 wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum() if not wif_sel_benefits.empty else 0.0
 
 st.info(
-    f"**What-If Scenario Evaluated:** Budget Ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
+    f"**What-if scenario evaluated:** Budget ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
     f"Equity Floor: **{int(round(wif_s_row['equity_floor']*100))}%** | "
     f"Cost: **{scenario_params['cost_case'].title()}** | "
     f"CMF: **{scenario_params['cmf_case'].title()}** | "
@@ -417,7 +424,7 @@ wc1, wc2, wc3, wc4 = st.columns(4)
 with wc1:
     st.metric("Estimated capital cost", format_currency_compact(wif_s_row["selected_capital_cost"]), help=f"Planning-level estimate: {format_currency(wif_s_row['selected_capital_cost'])}")
 with wc2:
-    st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} / {total_corridors_count}")
+    st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} of {total_corridors_count}")
 with wc3:
     st.metric("Estimated KSI avoided / year", f"{format_ksi_compact(wif_ksi)} / yr", help=f"Denominator: {int(wif_s_row['selected_project_count'])} funded corridors in what-if portfolio. Severity scope: Fatal (K) + Serious injury (A) crashes. Planning-level estimate: ~{wif_ksi:,.1f} / yr")
 with wc4:
@@ -455,7 +462,7 @@ st.dataframe(
         "Estimated Fatal (K) Avoided / Yr": "{:,.2f}",
         "Estimated Serious Injury (A) Avoided / Yr": "{:,.2f}",
     }),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
     height=280,
 )

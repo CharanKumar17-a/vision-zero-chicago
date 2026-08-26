@@ -10,8 +10,6 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from dashboard.streamlit.data_access import DEFAULT_PORTFOLIO_ID
-
 
 def inject_global_css() -> None:
     """Inject global typography and visual consistency CSS.
@@ -28,6 +26,8 @@ def inject_global_css() -> None:
              letter-spacing: -0.3px !important; margin-bottom: 0.25rem !important; }
         h2 { font-size: 22px !important; font-weight: 600 !important;
              margin-top: 0.25rem !important; margin-bottom: 0.15rem !important; }
+        h3 { font-size: 18px !important; font-weight: 600 !important;
+             margin-top: 1.1rem !important; margin-bottom: 0.35rem !important; }
 
         /* ── Section headings (#### in st.markdown) ─────────────────────── */
         h4 { font-size: 16px !important; font-weight: 600 !important;
@@ -92,7 +92,7 @@ def render_sidebar_controls(
     """
     st.sidebar.markdown("### Vision Zero Chicago")
     st.sidebar.caption("Safety capital investment prioritization")
-    st.sidebar.title("Scenario Controls")
+    st.sidebar.markdown("#### Scenario controls")
     st.sidebar.markdown("---")
 
     # Reset to defaults button
@@ -156,15 +156,16 @@ def render_sidebar_controls(
 
     # Resolve portfolio_id string
     b_m = int(selected_b_val / 1e6) if selected_b_val >= 1e6 else int(selected_b_val / 1e3)
+    b_label = f"{b_m}M" if selected_b_val >= 1e6 else f"{b_m}k"
     eq_pct = int(round(selected_ef_val * 100))
 
     cost_norm = "CONSERVATIVE" if selected_cost_val == "LOW" else ("OPTIMISTIC" if selected_cost_val == "HIGH" else "BASE")
     if selected_scen == cost_norm and selected_b_val in [15e6, 25e6, 40e6] and selected_ef_val in [0.20, 0.30, 0.40]:
-        selected_pid = f"PORT_OFF_{selected_scen}_B{b_m}M_EQ{eq_pct}"
+        selected_pid = f"PORT_OFF_{selected_scen}_B{b_label}_EQ{eq_pct}"
     elif selected_scen == cost_norm and selected_b_val in [2e6, 4e6, 6e6] and selected_ef_val in [0.20, 0.30, 0.40]:
-        selected_pid = f"PORT_STR_{selected_scen}_B{b_m}M_EQ{eq_pct}"
+        selected_pid = f"PORT_STR_{selected_scen}_B{b_label}_EQ{eq_pct}"
     else:
-        selected_pid = f"PORT_DYN_{selected_scen[:3]}_{selected_cost_val[:3]}_B{b_m}M_EQ{eq_pct}"
+        selected_pid = f"PORT_DYN_{selected_scen[:3]}_{selected_cost_val[:3]}_B{b_label}_EQ{eq_pct}"
 
     # Human-readable scenario descriptor badge
     b_label = f"${int(selected_b_val/1e6)}M" if selected_b_val >= 1e6 else f"${int(selected_b_val/1e3)}k"
@@ -228,7 +229,7 @@ def render_page_header(page_title: str, subtitle: str | None = None) -> None:
         pass
 
     st.title("Vision Zero Chicago — Safety Capital Investment Prioritization")
-    st.subheader(page_title)
+    st.header(page_title)
     if subtitle:
         st.caption(subtitle)
 

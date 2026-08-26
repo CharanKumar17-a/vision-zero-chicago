@@ -477,11 +477,12 @@ def evaluate_portfolio_scenario(
     solver_status = "OPTIMAL" if status_code == 0 else f"STATUS_{status_code}"
 
     b_m = int(budget / 1e6) if budget >= 1e6 else int(budget / 1e3)
+    b_label = f"{b_m}M" if budget >= 1e6 else f"{b_m}k"
     eq_pct = int(round(equity_floor * 100))
 
     if status_code != 0:
         summary = pd.Series({
-            "portfolio_id": f"PORT_INFEASIBLE_B{b_m}M_EQ{eq_pct}",
+            "portfolio_id": f"PORT_INFEASIBLE_B{b_label}_EQ{eq_pct}",
             "run_group": "DYNAMIC",
             "uncertainty_scenario": cmf_level,
             "cost_case": cost_level,
@@ -549,13 +550,13 @@ def evaluate_portfolio_scenario(
 
     # Canonical portfolio ID mapping if matching official
     if cmf_level == cost_level and budget in [15e6, 25e6, 40e6] and equity_floor in [0.20, 0.30, 0.40]:
-        portfolio_id = f"PORT_OFF_{cmf_level}_B{b_m}M_EQ{eq_pct}"
+        portfolio_id = f"PORT_OFF_{cmf_level}_B{b_label}_EQ{eq_pct}"
         run_group = "OFFICIAL"
     elif cmf_level == cost_level and budget in [2e6, 4e6, 6e6] and equity_floor in [0.20, 0.30, 0.40]:
-        portfolio_id = f"PORT_STR_{cmf_level}_B{b_m}M_EQ{eq_pct}"
+        portfolio_id = f"PORT_STR_{cmf_level}_B{b_label}_EQ{eq_pct}"
         run_group = "BINDING-BUDGET STRESS TEST"
     else:
-        portfolio_id = f"PORT_DYN_{cmf_level[:3]}_{cost_level[:3]}_B{b_m}M_EQ{eq_pct}"
+        portfolio_id = f"PORT_DYN_{cmf_level[:3]}_{cost_level[:3]}_B{b_label}_EQ{eq_pct}"
         run_group = "DYNAMIC"
 
     df_selected["portfolio_id"] = portfolio_id
