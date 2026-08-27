@@ -19,10 +19,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           cache: "pip"
 
       - name: Create virtual environment (.venv)
@@ -49,7 +49,7 @@ jobs:
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "## Vision Zero Chicago — Monthly QA Audit Summary"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "**Status**: All Quality Gates Passed"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "### Key Verification Summary"
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Pytest Test Suite**: PASS (297 passed)"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Pytest Test Suite**: PASS (327 passed)"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Verification Protocol**: PASS (11 mandatory completion gates)"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Human Governance**: Artifacts uploaded for reviewer inspection prior to refresh commit."
         shell: powershell

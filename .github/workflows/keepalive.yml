@@ -1,0 +1,51 @@
+name: Streamlit Keep-Alive Ping
+
+# Prevents Streamlit Community Cloud (free tier) from hibernating the app.
+# Streamlit sleeps apps after ~7 days of no traffic. This workflow pings the
+# public URL every 3 days so the app is always awake for any visitor.
+#
+# No secrets or tokens are required — it is a plain HTTP GET.
+# If the app URL changes, update STREAMLIT_APP_URL below.
+
+on:
+  schedule:
+    # Every 3 days at 04:00 UTC (well within the 7-day sleep threshold)
+    - cron: "0 4 */3 * *"
+  workflow_dispatch:   # Allow manual trigger from the Actions tab
+
+env:
+  STREAMLIT_APP_URL: "https://charan.streamlit.app"
+
+jobs:
+  keepalive:
+    name: Ping Streamlit App
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Wake Streamlit app
+        run: |
+          echo "Pinging $STREAMLIT_APP_URL to prevent hibernation..."
+          HTTP_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+            --max-time 60 \
+            --retry 3 \
+            --retry-delay 10 \
+            --retry-connrefused \
+            "$STREAMLIT_APP_URL")
+          echo "HTTP status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ App is awake and responding (HTTP $HTTP_STATUS)."
+          else
+            echo "⚠️  Unexpected HTTP status $HTTP_STATUS — app may be starting up."
+            echo "    This is normal if the app was deeply hibernated. Streamlit"
+            echo "    will finish waking on the next visitor request."
+            # Do NOT fail the workflow — a non-2xx during wake-up is expected.
+          fi
+
+      - name: Log keep-alive result
+        if: always()
+        run: |
+          echo "## Streamlit Keep-Alive — $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**App URL**: $STREAMLIT_APP_URL" >> $GITHUB_STEP_SUMMARY
+          echo "**Schedule**: Every 3 days at 04:00 UTC" >> $GITHUB_STEP_SUMMARY
+          echo "**Purpose**: Prevents Streamlit Community Cloud free-tier hibernation." >> $GITHUB_STEP_SUMMARY
