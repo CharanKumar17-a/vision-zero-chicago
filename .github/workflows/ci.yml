@@ -15,10 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           cache: "pip"
 
       - name: Create virtual environment (.venv)
@@ -32,7 +32,7 @@ jobs:
 
       - name: Run Pytest Suite
         run: |
-          .\.venv\Scripts\python.exe -m pytest -q
+          .\.venv\Scripts\python.exe -m pytest -q --tb=short
 
       - name: Run Mandatory Verification Protocol
         run: |

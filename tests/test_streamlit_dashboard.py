@@ -26,6 +26,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 ROOT = Path(__file__).resolve().parents[1]
+PAGES_DIR = ROOT / "dashboard" / "streamlit" / "pages"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -303,7 +304,7 @@ class TestStreamlitDashboard:
 
     def test_what_if_planner_apptest_interaction(self):
         """AppTest interaction with What-If planner discrete selectors dynamically updates Scenario ID."""
-        at = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at = AppTest.from_file(str(PAGES_DIR / "1_Portfolio_Overview.py"), default_timeout=30)
         at.run()
         assert not at.exception
 
@@ -385,7 +386,7 @@ class TestStreamlitDashboard:
 
     def test_portfolio_stability_apptest_section_rendering(self):
         """AppTest verifies Section 3 Portfolio Robustness renders metrics, filters, and tables cleanly (Decision DEC-07)."""
-        at = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at = AppTest.from_file(str(PAGES_DIR / "1_Portfolio_Overview.py"), default_timeout=30)
         at.run()
         assert not at.exception
 
@@ -457,10 +458,10 @@ class TestStreamlitDashboard:
     def test_all_pages_render_without_exception_in_apptest(self):
         """AppTest renders all 4 pages cleanly with zero exceptions."""
         pages = [
-            "dashboard/streamlit/pages/0_Executive_Recommendation.py",
-            "dashboard/streamlit/pages/1_Portfolio_Overview.py",
-            "dashboard/streamlit/pages/2_Corridor_Explorer.py",
-            "dashboard/streamlit/pages/3_Governance_and_Methodology.py",
+            str(PAGES_DIR / "0_Executive_Recommendation.py"),
+            str(PAGES_DIR / "1_Portfolio_Overview.py"),
+            str(PAGES_DIR / "2_Corridor_Explorer.py"),
+            str(PAGES_DIR / "3_Governance_and_Methodology.py"),
         ]
         for page_path in pages:
             at = AppTest.from_file(page_path, default_timeout=30)
@@ -535,7 +536,7 @@ class TestStreamlitDashboard:
 
     def test_governance_authority_statement_and_language_compliance(self):
         """Verify that Page 0 renders the mandatory authority statement and standard planning-level language."""
-        at = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at = AppTest.from_file(str(PAGES_DIR / "0_Executive_Recommendation.py"), default_timeout=30)
         at.run()
         assert not at.exception
 
@@ -556,7 +557,7 @@ class TestStreamlitDashboard:
 
     def test_false_precision_remediation_and_planning_estimate_labels(self):
         """Verify that executive cards use decision-relevant rounded formats and include planning-level estimate notes."""
-        at = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at = AppTest.from_file(str(PAGES_DIR / "0_Executive_Recommendation.py"), default_timeout=30)
         at.run()
         assert not at.exception
 
@@ -572,7 +573,7 @@ class TestStreamlitDashboard:
         assert any("Planning-level estimate" in h for h in metric_helps)
 
         # Check Page 1 (Portfolio Overview) metric cards
-        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1 = AppTest.from_file(str(PAGES_DIR / "1_Portfolio_Overview.py"), default_timeout=30)
         at1.run()
         assert not at1.exception
 
@@ -582,7 +583,7 @@ class TestStreamlitDashboard:
 
     def test_severity_and_denominator_clarity(self):
         """Verify that KPI labels explicitly distinguish all-severity crashes, KSI, and baseline forecasts with tooltips."""
-        at = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at = AppTest.from_file(str(PAGES_DIR / "0_Executive_Recommendation.py"), default_timeout=30)
         at.run()
         assert not at.exception
 
@@ -595,7 +596,7 @@ class TestStreamlitDashboard:
         assert any("Denominator:" in h and "Severity scope:" in h for h in helps0)
 
         # Check Page 1 (Portfolio Overview)
-        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1 = AppTest.from_file(str(PAGES_DIR / "1_Portfolio_Overview.py"), default_timeout=30)
         at1.run()
         assert not at1.exception
 
@@ -609,7 +610,7 @@ class TestStreamlitDashboard:
 
     def test_safety_outcome_visualization_prominence(self):
         """Verify that Vision Zero life-safety outcomes (KSI, Fatal K, Serious Injury A) are prominent on Page 0 and Page 1."""
-        at0 = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at0 = AppTest.from_file(str(PAGES_DIR / "0_Executive_Recommendation.py"), default_timeout=30)
         at0.run()
         assert not at0.exception
 
@@ -618,13 +619,13 @@ class TestStreamlitDashboard:
         assert "Serious injuries (A) avoided" in labels0
         assert "All-severity crashes avoided" in labels0
 
-        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1 = AppTest.from_file(str(PAGES_DIR / "1_Portfolio_Overview.py"), default_timeout=30)
         at1.run()
         assert not at1.exception
 
     def test_equity_interpretation_and_methodology_distinction(self):
         """Verify that equity metrics use 'High-SVI capital share', include 'KSI benefit share in high-SVI areas', and state SVI methodology note."""
-        at0 = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at0 = AppTest.from_file(str(PAGES_DIR / "0_Executive_Recommendation.py"), default_timeout=30)
         at0.run()
         assert not at0.exception
 
@@ -638,7 +639,7 @@ class TestStreamlitDashboard:
         assert any("SVI is used as a spatial equity proxy" in h for h in helps0)
 
         # Check Page 1 (Portfolio Overview)
-        at1 = AppTest.from_file("dashboard/streamlit/pages/1_Portfolio_Overview.py", default_timeout=30)
+        at1 = AppTest.from_file(str(PAGES_DIR / "1_Portfolio_Overview.py"), default_timeout=30)
         at1.run()
         assert not at1.exception
 
@@ -650,7 +651,7 @@ class TestStreamlitDashboard:
         assert any("SVI is used as a spatial equity proxy" in h for h in helps1)
 
         # Check Page 3 (Governance and Methodology) contains methodology note
-        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3 = AppTest.from_file(str(PAGES_DIR / "3_Governance_and_Methodology.py"), default_timeout=30)
         at3.run()
         assert not at3.exception
         page3_text = " ".join(m.value for m in at3.markdown)
@@ -668,7 +669,7 @@ class TestStreamlitDashboard:
         assert format_engineering_status(None) == "Engineering review required"
 
         # Check Page 0 contains planning portfolio and engineering review statements
-        at0 = AppTest.from_file("dashboard/streamlit/pages/0_Executive_Recommendation.py", default_timeout=30)
+        at0 = AppTest.from_file(str(PAGES_DIR / "0_Executive_Recommendation.py"), default_timeout=30)
         at0.run()
         assert not at0.exception
 
@@ -677,7 +678,7 @@ class TestStreamlitDashboard:
         assert "Analytical planning portfolio" in page0_markdown_text
 
         # Check Page 3 contains engineering hierarchy and feasibility constraint documentation
-        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3 = AppTest.from_file(str(PAGES_DIR / "3_Governance_and_Methodology.py"), default_timeout=30)
         at3.run()
         assert not at3.exception
 
@@ -796,7 +797,7 @@ assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
 
     def test_governance_page_documents_analytics_and_privacy(self):
         """Verify Governance page (Page 3) renders Section 5 on Usage Analytics."""
-        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3 = AppTest.from_file(str(PAGES_DIR / "3_Governance_and_Methodology.py"), default_timeout=30)
         at3.run()
         assert not at3.exception
 
@@ -810,7 +811,7 @@ assert "pydeck" not in sys.modules, "pydeck should not be imported by Page 1"
 
     def test_data_freshness_indicator_rendered(self):
         """Verify data freshness indicator renders analysis period (2018–2025), valid date, and validated status."""
-        at3 = AppTest.from_file("dashboard/streamlit/pages/3_Governance_and_Methodology.py", default_timeout=30)
+        at3 = AppTest.from_file(str(PAGES_DIR / "3_Governance_and_Methodology.py"), default_timeout=30)
         at3.run()
         assert not at3.exception
 
