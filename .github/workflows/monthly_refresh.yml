@@ -35,10 +35,12 @@ jobs:
           .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 
       - name: Execute Full Pytest Suite
+        id: pytest
         run: |
           .\.venv\Scripts\python.exe -m pytest -q
 
       - name: Execute Project Verification Protocol
+        id: verify
         run: |
           pwsh -NoProfile -ExecutionPolicy Bypass -File automation/verify_project.ps1
         continue-on-error: false
@@ -46,11 +48,18 @@ jobs:
       - name: Generate Workflow Summary Report
         if: always()
         run: |
+          $pytestOutcome = "${{ steps.pytest.outcome }}"
+          $verifyOutcome = "${{ steps.verify.outcome }}"
+          if ($pytestOutcome -eq 'success' -and $verifyOutcome -eq 'success') {
+            $status = "All Quality Gates Passed"
+          } else {
+            $status = "GATE FAILURE — see step details (pytest: $pytestOutcome, verify: $verifyOutcome)"
+          }
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "## Vision Zero Chicago — Monthly QA Audit Summary"
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "**Status**: All Quality Gates Passed"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "**Status**: $status"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "### Key Verification Summary"
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Pytest Test Suite**: PASS (327 passed)"
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Verification Protocol**: PASS (11 mandatory completion gates)"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Pytest Test Suite**: $pytestOutcome (fresh checkout may legitimately skip artifact-dependent tests)"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Verification Protocol**: $verifyOutcome (11 mandatory completion gates)"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- **Human Governance**: Artifacts uploaded for reviewer inspection prior to refresh commit."
         shell: powershell
 

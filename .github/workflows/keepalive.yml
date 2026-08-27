@@ -1,16 +1,22 @@
 name: Streamlit Keep-Alive Ping
 
-# Prevents Streamlit Community Cloud (free tier) from hibernating the app.
-# Streamlit sleeps apps after ~7 days of no traffic. This workflow pings the
-# public URL every 3 days so the app is always awake for any visitor.
+# Best-effort keep-alive for Streamlit Community Cloud (free tier).
+# Official policy: "All apps without traffic for 12 hours go to sleep"
+# (https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app).
+# This workflow pings the public URL every 8 hours so the idle timer is reset
+# well inside the 12-hour window. Community practice treats periodic HTTP
+# requests as traffic; Streamlit does not guarantee this, so treat the
+# workflow as reducing cold starts, NOT as a guarantee — a sleeping app still
+# shows a one-click "Get this app back up" screen to any visitor.
 #
 # No secrets or tokens are required — it is a plain HTTP GET.
 # If the app URL changes, update STREAMLIT_APP_URL below.
 
 on:
   schedule:
-    # Every 3 days at 04:00 UTC (well within the 7-day sleep threshold)
-    - cron: "0 4 */3 * *"
+    # Every 8 hours (3x/day) — inside the 12-hour sleep window. Public repo:
+    # GitHub Actions on public repos is free, so this costs nothing.
+    - cron: "0 */8 * * *"
   workflow_dispatch:   # Allow manual trigger from the Actions tab
 
 env:
@@ -34,7 +40,9 @@ jobs:
             "$STREAMLIT_APP_URL")
           echo "HTTP status: $HTTP_STATUS"
           if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
-            echo "✅ App is awake and responding (HTTP $HTTP_STATUS)."
+            echo "✅ Request reached the app (HTTP $HTTP_STATUS)."
+            echo "    Note: Streamlit may return its sleeping/wake page with HTTP 200,"
+            echo "    so a 200 cannot prove the app is fully awake; it only resets traffic."
           else
             echo "⚠️  Unexpected HTTP status $HTTP_STATUS — app may be starting up."
             echo "    This is normal if the app was deeply hibernated. Streamlit"
@@ -47,5 +55,5 @@ jobs:
         run: |
           echo "## Streamlit Keep-Alive — $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
           echo "**App URL**: $STREAMLIT_APP_URL" >> $GITHUB_STEP_SUMMARY
-          echo "**Schedule**: Every 3 days at 04:00 UTC" >> $GITHUB_STEP_SUMMARY
+          echo "**Schedule**: Every 8 hours" >> $GITHUB_STEP_SUMMARY
           echo "**Purpose**: Prevents Streamlit Community Cloud free-tier hibernation." >> $GITHUB_STEP_SUMMARY
