@@ -86,7 +86,7 @@ Scenarios are planning tools. They are not official City of Chicago budget commi
   - `src/treatments/` — Treatment readiness scoring and CMF safety benefit calculations
   - `src/optimization/` — MILP capital allocation and equity-floor optimization
   - `src/validation/` — Automated quality validation scripts
-- `tests/` — Automated pytest verification suite (301 acceptance tests)
+- `tests/` — Automated pytest verification suite (327 acceptance tests)
 - `sql/` — Analytical and serving SQL views for DuckDB and Power BI
 - `dashboard/` — Interactive decision-support interface:
   - `dashboard/streamlit/` — Multi-page Streamlit application and published deployment data

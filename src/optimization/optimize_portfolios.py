@@ -2,9 +2,9 @@
 
 Contract: docs/data_quality/cleaning_contract.md, spatial_assignment_contract.md
 Config:   config/modeling.yml, project.yml
-Decision: D001 (Corridor grain), D004 (Analytical scope), D005 (Governance authority), D021 (Economic costs)
+Decision: D001 (Corridor grain), D004 (Analytical scope), D005 (Governance authority), D021 (Economic costs), D026 (Diversification cap), D027 (Functional-class screening)
 
-Performs MILP portfolio optimization using scipy.optimize.milp:
+Performs MILP portfolio optimization using scipy.optimize.milp (HiGHS solver):
 1. Scenario Panel: Reads 387 candidate rows from Phase 4B panel data/processed/corridor_treatment_benefits.parquet.
 2. MILP Solver Formulation:
    - Objective: Maximize total present_value_benefit (c = -present_value_benefit).
@@ -13,14 +13,16 @@ Performs MILP portfolio optimization using scipy.optimize.milp:
      b. Capital project cost <= budget.
      c. Equity spending >= equity_floor * total capital project cost.
      d. Selected project count >= 1.
+     e. Road Diet (TRT_002) share <= 70% of selected projects (Decision D026).
 3. Repeat-Solve Determinism:
    - Solves each scenario 3 times to verify identical binary selections, portfolio hash, and objective value.
 4. Run Groups:
    - A. OFFICIAL: 3 uncertainty scenarios (CONSERVATIVE, BASE, OPTIMISTIC) x 3 budgets ($15M, $25M, $40M) x 3 equity floors (20%, 30%, 40%) = 27 runs.
    - B. BINDING-BUDGET STRESS TEST: BASE uncertainty x 3 budgets ($2M, $4M, $6M) x 3 equity floors (20%, 30%, 40%) = 9 runs.
+   - C. WHAT-IF PLANNER GRID: BASE uncertainty x 26 budgets x 6 equity floors = 156 runs.
 5. Output Datasets:
-   - data/processed/portfolio_scenario_summary.parquet & .csv (36 summary rows)
-   - data/processed/portfolio_project_selections.parquet & .csv (1,212 detail rows across 36 scenarios)
+   - data/processed/portfolio_scenario_summary.parquet & .csv (192 summary rows; 36 canonical scenarios)
+   - data/processed/portfolio_project_selections.parquet & .csv (6,999 detail rows across 192 scenarios; 1,362 canonical detail rows)
 """
 
 from __future__ import annotations

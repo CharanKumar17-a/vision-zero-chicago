@@ -101,7 +101,7 @@ Derived from `power_bi_portfolio_summary.parquet` (Run Group: `WHAT-IF PLANNER G
 1. **Python Bytecode Compilation**:
    - 67 of 67 Python files compiled cleanly with 0 syntax or type errors.
 2. **Pytest Acceptance Suite**:
-   - **323 passed, 0 failed, 0 skipped** (Execution time: ~255s).
+   - **327 passed, 0 failed, 0 skipped** (Execution time: ~854s).
 3. **Mandatory Governance Verifier (`automation/verify_project.ps1`)**:
    - **All 11 mandatory completion gates passed cleanly (PASS)**.
    - Zero prohibited staged artifacts.

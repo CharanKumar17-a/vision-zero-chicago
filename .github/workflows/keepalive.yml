@@ -20,7 +20,7 @@ on:
   workflow_dispatch:   # Allow manual trigger from the Actions tab
 
 env:
-  STREAMLIT_APP_URL: "https://charan.streamlit.app"
+  STREAMLIT_APP_URL: "https://vision-zero-chicago-charan.streamlit.app/"
 
 jobs:
   keepalive:
