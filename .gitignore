@@ -52,11 +52,9 @@ outputs/models/*
 # Previous project-material folder
 zero-vision/
 
-
-
-
-
-
+# Generated local QA reports and scenario traces
+reports/*_report.json
+reports/*_trace.json
 
 
 # Preserve project folder structure
