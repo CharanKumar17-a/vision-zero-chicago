@@ -32,6 +32,7 @@ from dashboard.streamlit.components import (
     format_percent,
     format_plural,
     render_governance_footer,
+    render_governance_header_banner,
     render_page_header,
     render_sidebar_controls,
 )
@@ -127,15 +128,18 @@ is_default_baseline = (
 )
 header_tag = "Baseline Recommendation" if is_default_baseline else "Active Planning Scenario"
 
-# Consolidated Executive Recommendation Callout
-st.info(
-    f"**{header_tag}: {b_title} Budget • {ef_title} Equity Floor • {cost_title} Cost • {cmf_title} CMF**\n\n"
-    "Planning-level decision support for corridor safety capital prioritization. "
-    "This tool does not authorize projects, establish construction scope, or replace engineering review."
+# Consolidated Executive Recommendation Callout Banner
+render_governance_header_banner(
+    run_group="OFFICIAL",
+    is_official=True,
+    scenario_params=scenario_params,
+    custom_subtitle=(
+        "&dollar;15M budget is binding (&dollar;14.99M allocated across 39 corridors); "
+        "&dollar;25M / &dollar;40M allow full 43-corridor coverage. "
+        "All selections require engineering field review. "
+        "This tool does not authorize projects, establish construction scope, or replace engineering review."
+    ),
 )
-
-
-
 
 # 4 Key Decision Metrics Hero
 col1, col2, col3, col4 = st.columns(4)
@@ -165,7 +169,7 @@ with col4:
         help=f"Denominator: Total selected capital cost ({format_currency(selected_capital_cost)}). Numerator: Capital allocated to high-SVI corridors ({format_currency(high_svi_cost)}). Measures capital spending input only; not proof of equitable safety outcomes. SVI is used as a spatial equity proxy.",
     )
 
-st.caption(f"Optimization status: Mathematically optimal under stated planning constraints (${selected_capital_cost/1e6:.2f}M of {b_title} allocated • {format_currency(budget_slack)} budget slack)")
+st.caption(f"Optimization status: Mathematically optimal under stated planning constraints (&dollar;{selected_capital_cost/1e6:.2f}M of {b_title.replace('$', '&dollar;')} allocated • {format_currency(budget_slack).replace('$', '&dollar;')} budget slack)")
 
 # -----------------------------------------------------------------------------
 # Section 1 — What This Investment Buys
@@ -329,8 +333,8 @@ deferred_count_str = format_plural(len(df_deferred), "corridor")
 deferred_all_positive_roi = all(float(r["raw_bcr"]) >= 1.0 for _, r in df_deferred.iterrows()) if not df_deferred.empty else True
 
 st.markdown(
-    f"Under the **{b_title} budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred: "
-    f"the optimized portfolio exhausts the available budget, and the remaining **{format_currency(budget_slack)}** "
+    f"Under the **{b_title.replace('$', '&dollar;')} budget ceiling**, **{deferred_count_str}** {'is' if len(df_deferred) == 1 else 'are'} deferred: "
+    f"the optimized portfolio exhausts the available budget, and the remaining **{format_currency(budget_slack).replace('$', '&dollar;')}** "
     f"is insufficient to fund those alternatives. "
     f"{'All deferred corridors have positive planning-level BCRs (>1.0)' if deferred_all_positive_roi else 'Viable candidate projects exist'}. "
     "All figures represent planning-level estimates subject to engineering review."
@@ -438,7 +442,7 @@ with col_sens_chart:
 
 st.info(
     f"**Budget finding (planning-level estimate):** Under {cost_title} costs and {cmf_title} CMFs, "
-    f"at the **{b_title} budget ceiling**, **{selected_corridors_count} of {total_corridors_count} corridors** are shortlisted."
+    f"at the **{b_title.replace('$', '&dollar;')} budget ceiling**, **{selected_corridors_count} of {total_corridors_count} corridors** are shortlisted."
 )
 
 # -----------------------------------------------------------------------------

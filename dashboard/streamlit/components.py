@@ -21,55 +21,159 @@ def inject_global_css() -> None:
     st.markdown(
         """
         <style>
+        /* ── Base Font Hierarchy ─────────────────────────────────────────── */
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* ── Preserve Material Icons & Streamlit Glyphs ─────────────────── */
+        [data-testid="stIconMaterial"], [class*="material-symbols"], [class*="stIcon"], .material-symbols-rounded, .material-symbols-outlined {
+            font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+            font-style: normal !important;
+        }
+
         /* ── App & page titles ──────────────────────────────────────────── */
-        h1 { font-size: 28px !important; font-weight: 700 !important;
-             letter-spacing: -0.3px !important; margin-bottom: 0.25rem !important; }
-        h2 { font-size: 22px !important; font-weight: 600 !important;
-             margin-top: 0.25rem !important; margin-bottom: 0.15rem !important; }
-        h3 { font-size: 18px !important; font-weight: 600 !important;
-             margin-top: 1.1rem !important; margin-bottom: 0.35rem !important; }
+        h1 {
+            font-size: 26px !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.3px !important;
+            margin-top: 0.1rem !important;
+            margin-bottom: 0.2rem !important;
+            color: #0F172A !important;
+        }
+        h2 {
+            font-size: 21px !important;
+            font-weight: 600 !important;
+            letter-spacing: -0.2px !important;
+            margin-top: 0.2rem !important;
+            margin-bottom: 0.2rem !important;
+            color: #1E293B !important;
+        }
+        h3 {
+            font-size: 17px !important;
+            font-weight: 600 !important;
+            margin-top: 0.9rem !important;
+            margin-bottom: 0.3rem !important;
+            color: #1E293B !important;
+        }
 
         /* ── Section headings (#### in st.markdown) ─────────────────────── */
-        h4 { font-size: 16px !important; font-weight: 600 !important;
-             margin-top: 0.75rem !important; margin-bottom: 0.25rem !important; }
+        h4 {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            margin-top: 0.6rem !important;
+            margin-bottom: 0.25rem !important;
+            color: #334155 !important;
+        }
 
-        /* ── Body text ──────────────────────────────────────────────────── */
-        p, li { font-size: 14px !important; line-height: 1.65 !important; }
-        .stMarkdown p { margin-bottom: 0.3rem !important; }
+        /* ── Body text & paragraphs ─────────────────────────────────────── */
+        p, li {
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            color: #334155 !important;
+        }
+        .stMarkdown p {
+            margin-bottom: 0.35rem !important;
+        }
 
         /* ── Caption / secondary text ───────────────────────────────────── */
-        .stCaption, small { font-size: 13px !important; color: #666 !important; }
+        .stCaption, small {
+            font-size: 13px !important;
+            line-height: 1.5 !important;
+            color: #64748B !important;
+        }
 
         /* ── Alert / info / success / warning boxes ─────────────────────── */
+        [data-testid="stAlert"] {
+            border-radius: 8px !important;
+            padding: 0.75rem 1rem !important;
+        }
         [data-testid="stAlert"] p,
-        [data-testid="stAlert"] li { font-size: 14px !important; line-height: 1.65 !important; }
+        [data-testid="stAlert"] li {
+            font-size: 14px !important;
+            line-height: 1.55 !important;
+        }
 
         /* ── KPI metrics ────────────────────────────────────────────────── */
         [data-testid="stMetricValue"] {
-            font-size: 26px !important; font-weight: 700 !important; }
+            font-size: 24px !important;
+            font-weight: 700 !important;
+            color: #0F172A !important;
+            letter-spacing: -0.2px !important;
+        }
         [data-testid="stMetricLabel"] {
-            font-size: 13px !important; font-weight: 500 !important;
-            text-transform: none !important; }
-        [data-testid="stMetricDelta"] { font-size: 12px !important; }
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #475569 !important;
+            text-transform: none !important;
+            margin-bottom: 2px !important;
+        }
+        [data-testid="stMetricDelta"] {
+            font-size: 12px !important;
+            font-weight: 500 !important;
+        }
 
         /* ── Sidebar ────────────────────────────────────────────────────── */
-        [data-testid="stSidebar"] label { font-size: 13px !important; }
-        [data-testid="stSidebar"] p    { font-size: 13px !important; }
-        [data-testid="stSidebarNavLink"] { font-size: 14px !important; }
+        [data-testid="stSidebar"] {
+            background-color: #F8FAFC !important;
+        }
+        [data-testid="stSidebar"] label {
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #334155 !important;
+        }
+        [data-testid="stSidebar"] p {
+            font-size: 13px !important;
+            color: #475569 !important;
+        }
+        [data-testid="stSidebarNavLink"] {
+            font-size: 14px !important;
+            font-weight: 500 !important;
+        }
 
         /* ── Inline code / badges ───────────────────────────────────────── */
-        code { font-size: 12px !important; padding: 1px 4px !important;
-               border-radius: 3px !important; }
+        code {
+            font-size: 12px !important;
+            padding: 2px 5px !important;
+            border-radius: 4px !important;
+            background-color: #F1F5F9 !important;
+            color: #0F172A !important;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+        }
 
-        /* ── Dataframe headers ──────────────────────────────────────────── */
-        .dvn-scroller thead th { font-size: 13px !important; font-weight: 600 !important; }
-        .dvn-scroller tbody td { font-size: 13px !important; }
+        /* ── Dataframe headers & cells ──────────────────────────────────── */
+        .dvn-scroller thead th {
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #1E293B !important;
+        }
+        .dvn-scroller tbody td {
+            font-size: 13px !important;
+        }
 
         /* ── Expander labels ────────────────────────────────────────────── */
-        [data-testid="stExpander"] summary p { font-size: 14px !important; font-weight: 600 !important; }
+        [data-testid="stExpander"] {
+            border-radius: 8px !important;
+            border: 1px solid #E2E8F0 !important;
+        }
+        [data-testid="stExpander"] summary p {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #1E293B !important;
+        }
 
         /* ── Divider spacing ────────────────────────────────────────────── */
-        hr { margin: 0.75rem 0 !important; }
+        hr {
+            margin: 0.75rem 0 !important;
+            border-color: #E2E8F0 !important;
+        }
+
+        /* ── Buttons ────────────────────────────────────────────────────── */
+        button[kind="primary"], button[kind="secondary"] {
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            border-radius: 6px !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -234,18 +338,48 @@ def render_page_header(page_title: str, subtitle: str | None = None) -> None:
         st.caption(subtitle)
 
 
-def render_governance_header_banner(run_group: str, is_official: bool) -> None:
-    """Render user-facing scenario note based on run group."""
-    if is_official:
-        st.info(
-            "$15M budget is binding ($14.99M across 39 corridors); $25M/$40M allow full 43-corridor coverage. "
+def render_governance_header_banner(
+    run_group: str = "OFFICIAL",
+    is_official: bool = True,
+    scenario_params: dict[str, Any] | None = None,
+    custom_subtitle: str | None = None,
+) -> None:
+    """Render unified information/notice banner across all application pages."""
+    if scenario_params:
+        b_val = scenario_params.get("budget", 15000000.0)
+        b_label = f"&dollar;{int(b_val/1e6)}M" if b_val >= 1e6 else f"&dollar;{int(b_val/1e3)}k"
+        ef_label = f"{int(round(scenario_params.get('equity_floor', 0.20) * 100))}%"
+        cost_label = str(scenario_params.get("cost_case", "BASE")).title()
+        cmf_label = str(scenario_params.get("cmf_case", "BASE")).title()
+
+        is_baseline = (
+            b_val == 15000000.0
+            and scenario_params.get("equity_floor", 0.20) == 0.20
+            and scenario_params.get("cost_case") == "BASE"
+            and scenario_params.get("cmf_case") == "BASE"
+        )
+        tag = "Baseline Recommendation" if is_baseline else "Active Planning Scenario"
+        header_line = f"**{tag}: {b_label} Budget • {ef_label} Equity Floor • {cost_label} Cost • {cmf_label} CMF**"
+    elif is_official:
+        header_line = "**Active Planning Scenario: Official Planning Portfolio**"
+    else:
+        header_line = "**Diagnostic Stress Scenario: Constrained Budget Analysis**"
+
+    if custom_subtitle:
+        body_line = custom_subtitle
+    elif is_official:
+        body_line = (
+            "&dollar;15M budget is binding (&dollar;14.99M allocated across 39 corridors); "
+            "&dollar;25M / &dollar;40M allow full 43-corridor coverage. "
             "All selections require engineering field review."
         )
     else:
-        st.warning(
-            "Diagnostic stress scenario ($2M–$6M budget constraints). "
+        body_line = (
+            "Diagnostic stress scenario (&dollar;2M–&dollar;6M budget constraints). "
             "Planning-level decision support only; does not constitute City policy or project authorization."
         )
+
+    st.info(f"{header_line}\n\n{body_line}")
 
 
 def render_engineering_review_banner() -> None:

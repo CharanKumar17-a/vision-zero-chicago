@@ -76,7 +76,11 @@ if not df_sel_benefits.empty:
     df_sel_benefits = compute_economic_only_benefits(df_sel_benefits)
 
 portfolio_id = str(s_row["portfolio_id"])
-render_governance_header_banner(s_row["run_group"], (s_row["run_group"] == "OFFICIAL"))
+render_governance_header_banner(
+    run_group=s_row["run_group"],
+    is_official=(s_row["run_group"] == "OFFICIAL"),
+    scenario_params=scenario_params,
+)
 
 # -----------------------------------------------------------------------------
 # Section 1 — Corridor Detail Inspector (Inspector-First Hierarchy)
@@ -150,21 +154,21 @@ st.markdown(f"#### {selected_cid} — {m_row['corridor_name']}")
 
 ic1, ic2, ic3, ic4 = st.columns(4)
 with ic1:
-    st.markdown(f"**Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
-    st.markdown(f"**Length:** {m_row['spatial_total_length_miles']:.2f} miles")
-    st.markdown(f"**SVI Weighted Index:** {m_row['corridor_length_weighted_svi']:.3f}")
+    st.markdown(f"• **Corridor Limits:** {m_row.get('from_street', 'N/A')} to {m_row.get('to_street', 'N/A')}")
+    st.markdown(f"• **Length:** {m_row['spatial_total_length_miles']:.2f} miles")
+    st.markdown(f"• **SVI Weighted Index:** {m_row['corridor_length_weighted_svi']:.3f}")
 with ic2:
-    st.markdown(f"**Baseline Total Crashes / Year:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr")
-    st.markdown(f"**Baseline KSI / Year:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr")
-    st.markdown(f"**Demand Risk Rank (2026 Forecast):** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
+    st.markdown(f"• **Baseline Total Crashes:** {m_row['annual_forecast_total_crashes_2026']:.1f} / yr")
+    st.markdown(f"• **Baseline KSI:** {m_row['annual_forecast_ksi_crashes_2026']:.1f} / yr")
+    st.markdown(f"• **Demand Risk Rank:** #{int(m_row['demand_risk_rank_2026'])} of {total_corridors_count}")
 with ic3:
-    st.markdown(f"**Recommended Treatment:** {c_trt}")
-    st.markdown(f"**Estimated Capital Cost:** {format_currency_compact(c_cost)} ({format_currency(c_cost)})")
-    st.markdown(f"**Engineering Status:** **Engineering review required** (Provisional: `UNKNOWN`)")
+    st.markdown(f"• **Recommended Treatment:** {c_trt}")
+    st.markdown(f"• **Estimated Capital Cost:** {format_currency_compact(c_cost).replace('$', '&dollar;')} ({format_currency(c_cost).replace('$', '&dollar;')})")
+    st.markdown(f"• **Engineering Status:** **Engineering review required** (Provisional status)")
 with ic4:
-    st.markdown(f"**Estimated Avoided Crashes:** {format_count_compact(c_tot_averted)} all-severity / yr (KSI: {format_ksi_compact(c_ksi_averted)} / yr)")
-    st.markdown(f"**BCR (Comprehensive, Planning-Level):** `{format_bcr_compact(c_comp_bcr)}` ({c_comp_bcr:.1f} : 1)")
-    st.markdown(f"**Portfolio Status:** **{c_status}**")
+    st.markdown(f"• **Estimated Avoided Crashes:** {format_count_compact(c_tot_averted)} all-severity / yr (KSI: {format_ksi_compact(c_ksi_averted)} / yr)")
+    st.markdown(f"• **BCR (Comprehensive):** `{format_bcr_compact(c_comp_bcr)}` ({c_comp_bcr:.1f} : 1)")
+    st.markdown(f"• **Portfolio Status:** **{c_status}**")
 
 # Explicit Selection Rationale Note
 if is_selected:
@@ -175,7 +179,7 @@ if is_selected:
 else:
     st.warning(
         f"**Deferred Rationale:** Corridor `{selected_cid}` was deferred under active scenario `{portfolio_id}` because its capital cost "
-        f"({format_currency(c_cost)}) exceeds remaining budget slack or higher-efficiency alternatives took precedence. "
+        f"({format_currency(c_cost).replace('$', '&dollar;')}) exceeds remaining budget slack or higher-efficiency alternatives took precedence. "
         f"Best candidate treatment provides a positive ROI ({c_comp_bcr:.1f}:1) and would be considered under expanded funding."
     )
 

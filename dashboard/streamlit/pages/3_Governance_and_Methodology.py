@@ -18,6 +18,7 @@ import streamlit as st
 
 from dashboard.streamlit.components import (
     render_governance_footer,
+    render_governance_header_banner,
     render_page_header,
     render_sidebar_controls,
 )
@@ -29,6 +30,18 @@ from dashboard.streamlit.data_access import (
 render_page_header(
     "Governance & methodology",
     "Dynamic audit of governance warning registers, source evidence lineage, and decision-support contracts.",
+)
+
+# Unified Information & Governance Banner
+render_governance_header_banner(
+    run_group="OFFICIAL",
+    is_official=True,
+    custom_subtitle=(
+        "&dollar;15M budget is binding (&dollar;14.99M allocated across 39 corridors); "
+        "&dollar;25M / &dollar;40M allow full 43-corridor coverage. "
+        "All selections require engineering field review. "
+        "Planning-level decision support only; does not authorize projects or replace engineering review."
+    ),
 )
 
 # Load serving datasets & validation evidence
@@ -125,11 +138,11 @@ st.markdown(r"""
 - **Methodology Note**: **SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.**
 - **Spending Equity vs. Benefit Equity**:
   - *Equity of Spending (`High-SVI capital share`)*: Tracks the percentage of capital project investment allocated to corridors in high-SVI areas (subject to the policy floor, e.g., 20%, 30%, or 40%).
-  - *Equity of Estimated Safety Benefit (`KSI benefit share in high-SVI areas`)*: Tracks the percentage of estimated life-safety crash reductions (Fatal K + Serious Injury A) realized within high-SVI corridors (e.g., 55.9% of portfolio KSI avoided in the $15M Baseline Scenario).
+  - *Equity of Estimated Safety Benefit (`KSI benefit share in high-SVI areas`)*: Tracks the percentage of estimated life-safety crash reductions (Fatal K + Serious Injury A) realized within high-SVI corridors (e.g., 55.9% of portfolio KSI avoided in the &dollar;15M Baseline Scenario).
 
 #### Scenario definitions
-- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating $15M, $25M, and $40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official $15M planning budgets bind strictly under realistic unit costs ($14.99M cost, selecting 39 corridors in the Baseline Scenario under Road Diet diversification and screening), while $25M and $40M budget ceilings allow network-wide coverage.
-- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating $2M, $4M, and $6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
+- **OFFICIAL (27 runs)**: Approved planning scenario group evaluating &dollar;15M, &dollar;25M, and &dollar;40M planning budgets and 20%, 30%, 40% equity floors across CONSERVATIVE, BASE (Baseline Scenario), and OPTIMISTIC uncertainty. Official &dollar;15M planning budgets bind strictly under realistic unit costs (&dollar;14.99M cost, selecting 39 corridors in the Baseline Scenario under Road Diet diversification and screening), while &dollar;25M and &dollar;40M budget ceilings allow network-wide coverage.
+- **BINDING-BUDGET STRESS TEST (9 runs)**: Analyst-defined diagnostic scenarios evaluating &dollar;2M, &dollar;4M, and &dollar;6M budgets under BASE uncertainty. Stress budgets bind effectively (`EFFECTIVELY_BINDING_NO_ADDITIONAL_CORRIDOR`).
 
 #### Crash severity definitions and analytical denominators
 - **All-Severity Crashes**: Comprehensive sum of all police-reported crash severities under the KABCO scale (`K` + `A` + `B` + `C` + `O`).
@@ -138,7 +151,7 @@ st.markdown(r"""
 - **Property Damage Only (PDO / O)**: Non-injury property damage crashes.
 - **Analytical Denominators**:
   - *Network Baseline*: Evaluated across all 43 candidate high-crash corridors (~196.0 Baseline KSI / yr).
-  - *Portfolio Averted Metrics*: Aggregated strictly over the subset of shortlisted corridors funded within each active scenario (e.g., 39 funded corridors in the $15M Baseline Scenario).
+  - *Portfolio Averted Metrics*: Aggregated strictly over the subset of shortlisted corridors funded within each active scenario (e.g., 39 funded corridors in the &dollar;15M Baseline Scenario).
 
 #### Engineering feasibility and portfolio classification
 - **Engineering Status Hierarchy**:
@@ -181,11 +194,11 @@ An offline spatial sensitivity analysis was conducted comparing candidate crash 
 
 - **Production Rule Status**: **UNCHANGED**. The approved 100-foot distance threshold and 10-foot tie tolerance remain the authoritative standard for all production pipelines and official planning scenarios.
 - **Corridor Prioritization Stability**: Corridor crash rankings maintain high Spearman rank correlations of **0.9784 (at 50 ft)** and **0.9878 (at 150 ft)** against the 100-ft baseline.
-- **Portfolio Selection Stability**: Under the $15M Baseline Scenario (`PORT_OFF_BASE_B15M_EQ20`), **38 of 39 selected corridors (97.4%)** remain identical between 50 ft and the 100-ft baseline.
+- **Portfolio Selection Stability**: Under the &dollar;15M Baseline Scenario (`PORT_OFF_BASE_B15M_EQ20`), **38 of 39 selected corridors (97.4%)** remain identical between 50 ft and the 100-ft baseline.
 - **Sensitivity Conclusion**:
   > **{conclusion_text}**
   >
-  > {justification_text}
+  > {justification_text.replace('$', '&dollar;')}
 """)
 
 st.markdown("---")

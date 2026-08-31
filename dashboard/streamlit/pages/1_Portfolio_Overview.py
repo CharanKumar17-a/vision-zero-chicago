@@ -68,11 +68,14 @@ s_row, df_sel_benefits = evaluate_portfolio_scenario(
 )
 
 is_official = (s_row["run_group"] == "OFFICIAL")
-render_governance_header_banner(s_row["run_group"], is_official)
+render_governance_header_banner(
+    run_group=s_row["run_group"],
+    is_official=is_official,
+    scenario_params=scenario_params,
+)
 
 st.markdown("---")
 st.subheader("1. Core portfolio metrics")
-
 
 # Hero KPI Cards (4 primary decision metrics)
 col1, col2, col3, col4 = st.columns(4)
@@ -413,7 +416,7 @@ target_portfolio_id = str(wif_s_row["portfolio_id"])
 wif_ksi = wif_sel_benefits["crashes_averted_ksi"].sum() if not wif_sel_benefits.empty else 0.0
 
 st.info(
-    f"**What-if scenario evaluated:** Budget ceiling: **${int(wif_s_row['budget_usd']/1e6)}M** | "
+    f"**What-if scenario evaluated:** Budget ceiling: **&dollar;{int(wif_s_row['budget_usd']/1e6)}M** | "
     f"Equity Floor: **{int(round(wif_s_row['equity_floor']*100))}%** | "
     f"Cost: **{scenario_params['cost_case'].title()}** | "
     f"CMF: **{scenario_params['cmf_case'].title()}** | "
@@ -422,13 +425,29 @@ st.info(
 
 wc1, wc2, wc3, wc4 = st.columns(4)
 with wc1:
-    st.metric("Estimated capital cost", format_currency_compact(wif_s_row["selected_capital_cost"]), help=f"Planning-level estimate: {format_currency(wif_s_row['selected_capital_cost'])}")
+    st.metric(
+        "Estimated capital cost",
+        format_currency_compact(wif_s_row["selected_capital_cost"]),
+        help=f"Planning-level estimate: {format_currency(wif_s_row['selected_capital_cost'])} total initial construction cost for shortlisted corridor projects.",
+    )
 with wc2:
-    st.metric("Corridors funded", f"{int(wif_s_row['selected_project_count'])} of {total_corridors_count}")
+    st.metric(
+        "Corridors funded",
+        f"{int(wif_s_row['selected_project_count'])} of {total_corridors_count}",
+        help=f"Denominator: {total_corridors_count} candidate corridors in the network. Numerator: {int(wif_s_row['selected_project_count'])} corridors selected in what-if portfolio. Subject to engineering review.",
+    )
 with wc3:
-    st.metric("Estimated KSI avoided / year", f"{format_ksi_compact(wif_ksi)} / yr", help=f"Denominator: {int(wif_s_row['selected_project_count'])} funded corridors in what-if portfolio. Severity scope: Fatal (K) + Serious injury (A) crashes. Planning-level estimate: ~{wif_ksi:,.1f} / yr")
+    st.metric(
+        "Estimated KSI avoided / year",
+        f"{format_ksi_compact(wif_ksi)} / yr",
+        help=f"Denominator: {int(wif_s_row['selected_project_count'])} funded corridors in what-if portfolio. Severity scope: Fatal (K) + Serious injury (A) crashes. Planning-level estimate: ~{wif_ksi:,.1f} KSI avoided / yr.",
+    )
 with wc4:
-    st.metric("High-SVI capital share", format_percent(wif_s_row["achieved_equity_share"]), help="Measures capital spending input only; not proof of equitable safety outcomes.")
+    st.metric(
+        "High-SVI capital share",
+        format_percent(wif_s_row["achieved_equity_share"]),
+        help="Denominator: Selected what-if capital cost. Numerator: Capital allocated to high-SVI corridors. Measures capital spending input only; not proof of equitable safety outcomes. SVI is used as a spatial equity proxy.",
+    )
 
 wif_table = wif_sel_benefits[[
     "corridor_id",
