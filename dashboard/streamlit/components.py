@@ -14,16 +14,17 @@ import streamlit as st
 def inject_global_css() -> None:
     """Inject global typography and visual consistency CSS.
 
-    Called once from app.py after st.set_page_config(). Establishes a
-    consistent typography hierarchy across all four application pages.
-    No user-supplied content is embedded — only static CSS rules.
+    Establishes a cohesive, minimal dark executive analytics theme across all
+    four application pages. No user-supplied content is embedded.
     """
     st.markdown(
         """
         <style>
-        /* ── Base Font Hierarchy ─────────────────────────────────────────── */
-        html, body {
+        /* ── Global Font Hierarchy & App Background ─────────────────────── */
+        html, body, .stApp {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0B0F19;
+            color: #CBD5E1;
         }
 
         /* ── Preserve Material Icons & Streamlit Glyphs ─────────────────── */
@@ -32,79 +33,76 @@ def inject_global_css() -> None:
             font-style: normal !important;
         }
 
-        /* ── App & page titles ──────────────────────────────────────────── */
+        /* ── App & Page Titles ──────────────────────────────────────────── */
         h1 {
-            font-size: 26px !important;
+            font-size: 24px !important;
             font-weight: 700 !important;
             letter-spacing: -0.3px !important;
             margin-top: 0.1rem !important;
             margin-bottom: 0.2rem !important;
-            color: #0F172A !important;
+            color: #F8FAFC !important;
         }
         h2 {
-            font-size: 21px !important;
+            font-size: 19px !important;
             font-weight: 600 !important;
             letter-spacing: -0.2px !important;
             margin-top: 0.2rem !important;
             margin-bottom: 0.2rem !important;
-            color: #1E293B !important;
+            color: #F1F5F9 !important;
         }
         h3 {
-            font-size: 17px !important;
+            font-size: 16px !important;
             font-weight: 600 !important;
-            margin-top: 0.9rem !important;
+            margin-top: 0.8rem !important;
             margin-bottom: 0.3rem !important;
-            color: #1E293B !important;
+            color: #E2E8F0 !important;
         }
-
-        /* ── Section headings (#### in st.markdown) ─────────────────────── */
         h4 {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 600 !important;
-            margin-top: 0.6rem !important;
+            margin-top: 0.5rem !important;
             margin-bottom: 0.25rem !important;
-            color: #334155 !important;
+            color: #CBD5E1 !important;
         }
 
-        /* ── Body text & paragraphs ─────────────────────────────────────── */
+        /* ── Body Text & Paragraphs ─────────────────────────────────────── */
         p, li {
             font-size: 14px !important;
             line-height: 1.6 !important;
-            color: #334155 !important;
+            color: #94A3B8 !important;
         }
         .stMarkdown p {
             margin-bottom: 0.35rem !important;
         }
+        strong, b {
+            color: #F1F5F9 !important;
+            font-weight: 600 !important;
+        }
 
-        /* ── Caption / secondary text ───────────────────────────────────── */
+        /* ── Caption / Secondary Text ───────────────────────────────────── */
         .stCaption, small {
             font-size: 13px !important;
             line-height: 1.5 !important;
             color: #64748B !important;
         }
 
-        /* ── Alert / info / success / warning boxes ─────────────────────── */
-        [data-testid="stAlert"] {
+        /* ── KPI Metric Cards ───────────────────────────────────────────── */
+        [data-testid="stMetric"] {
+            background-color: #111827 !important;
+            border: 1px solid #1E293B !important;
             border-radius: 8px !important;
-            padding: 0.75rem 1rem !important;
+            padding: 0.65rem 0.85rem !important;
         }
-        [data-testid="stAlert"] p,
-        [data-testid="stAlert"] li {
-            font-size: 14px !important;
-            line-height: 1.55 !important;
-        }
-
-        /* ── KPI metrics ────────────────────────────────────────────────── */
         [data-testid="stMetricValue"] {
-            font-size: 24px !important;
+            font-size: 22px !important;
             font-weight: 700 !important;
-            color: #0F172A !important;
+            color: #FFFFFF !important;
             letter-spacing: -0.2px !important;
         }
         [data-testid="stMetricLabel"] {
-            font-size: 13px !important;
+            font-size: 12px !important;
             font-weight: 600 !important;
-            color: #475569 !important;
+            color: #94A3B8 !important;
             text-transform: none !important;
             margin-bottom: 2px !important;
         }
@@ -113,59 +111,82 @@ def inject_global_css() -> None:
             font-weight: 500 !important;
         }
 
+        /* ── Alert / Info / Governance Banners ──────────────────────────── */
+        [data-testid="stAlert"] {
+            border-radius: 8px !important;
+            padding: 0.65rem 0.95rem !important;
+            margin-top: 0.4rem !important;
+            margin-bottom: 0.6rem !important;
+        }
+        [data-testid="stAlert"] p,
+        [data-testid="stAlert"] li {
+            font-size: 13.5px !important;
+            line-height: 1.5 !important;
+        }
+
         /* ── Sidebar ────────────────────────────────────────────────────── */
         [data-testid="stSidebar"] {
-            background-color: #F8FAFC !important;
+            background-color: #0E131F !important;
+            border-right: 1px solid #1E293B !important;
         }
         [data-testid="stSidebar"] label {
             font-size: 13px !important;
             font-weight: 600 !important;
-            color: #334155 !important;
+            color: #CBD5E1 !important;
         }
         [data-testid="stSidebar"] p {
             font-size: 13px !important;
-            color: #475569 !important;
+            color: #94A3B8 !important;
         }
         [data-testid="stSidebarNavLink"] {
-            font-size: 14px !important;
+            font-size: 13.5px !important;
             font-weight: 500 !important;
+            color: #94A3B8 !important;
+            border-radius: 6px !important;
+        }
+        [data-testid="stSidebarNavLink"][aria-current="page"] {
+            background-color: #1E293B !important;
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
         }
 
-        /* ── Inline code / badges ───────────────────────────────────────── */
+        /* ── Inline Code / Badges ───────────────────────────────────────── */
         code {
             font-size: 12px !important;
             padding: 2px 5px !important;
             border-radius: 4px !important;
-            background-color: #F1F5F9 !important;
-            color: #0F172A !important;
+            background-color: #1E293B !important;
+            color: #93C5FD !important;
+            border: 1px solid #334155 !important;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
         }
 
-        /* ── Dataframe headers & cells ──────────────────────────────────── */
+        /* ── Dataframe Headers & Cells ──────────────────────────────────── */
         .dvn-scroller thead th {
             font-size: 13px !important;
             font-weight: 600 !important;
-            color: #1E293B !important;
+            color: #E2E8F0 !important;
         }
         .dvn-scroller tbody td {
             font-size: 13px !important;
         }
 
-        /* ── Expander labels ────────────────────────────────────────────── */
+        /* ── Expander ───────────────────────────────────────────────────── */
         [data-testid="stExpander"] {
             border-radius: 8px !important;
-            border: 1px solid #E2E8F0 !important;
+            border: 1px solid #1E293B !important;
+            background-color: #111827 !important;
         }
         [data-testid="stExpander"] summary p {
-            font-size: 14px !important;
+            font-size: 13.5px !important;
             font-weight: 600 !important;
-            color: #1E293B !important;
+            color: #E2E8F0 !important;
         }
 
-        /* ── Divider spacing ────────────────────────────────────────────── */
+        /* ── Divider Spacing ────────────────────────────────────────────── */
         hr {
-            margin: 0.75rem 0 !important;
-            border-color: #E2E8F0 !important;
+            margin: 0.6rem 0 !important;
+            border-color: #1E293B !important;
         }
 
         /* ── Buttons ────────────────────────────────────────────────────── */
