@@ -116,7 +116,7 @@ st.markdown(r"""
 
 #### Analytical grains and lineage
 - **Portfolio Summary Grain**: `portfolio_id` × 1 row (36 canonical optimization runs: 27 Official, 9 Stress; 192 total serving mart scenarios including What-if grid).
-- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,362 detail rows across 36 canonical runs; 6,999 detail rows across all serving mart scenarios).
+- **Portfolio Project Selection Grain**: `portfolio_id` × `corridor_id` (1,341 detail rows across 36 canonical runs; 6,999 detail rows across all serving mart scenarios).
 - **Master Corridor Grain**: `corridor_id` × 1 row (43 high-crash corridors).
 - **Treatment Benefits Candidate Panel Grain**: `corridor_id` × `treatment_id` × `scenario_level` (387 candidate rows).
 

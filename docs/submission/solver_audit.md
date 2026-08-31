@@ -53,12 +53,12 @@
 
 | Scenario Group | Count | Budgets | Equity Floors | Uncertainty Tiers | Output Rows |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **OFFICIAL** | 27 | $15M, $25M, $40M | 20%, 30%, 40% | BASE, CONSERVATIVE, OPTIMISTIC | 27 summary / 1,065 detail |
-| **STRESS TEST** | 9 | $2M, $4M, $6M | 20%, 30%, 40% | BASE | 9 summary / 297 detail |
-| **WHAT-IF GRID**| 156 | $2M to $40M (26 steps)| 15% to 40% (6 steps)| BASE | 156 summary / 5,637 detail |
+| **OFFICIAL** | 27 | $15M, $25M, $40M | 20%, 30%, 40% | BASE, CONSERVATIVE, OPTIMISTIC | 27 summary / 1,143 detail |
+| **STRESS TEST** | 9 | $2M, $4M, $6M | 20%, 30%, 40% | BASE | 9 summary / 198 detail |
+| **WHAT-IF GRID**| 156 | $2M to $40M (26 steps)| 15% to 40% (6 steps)| BASE | 156 summary / 5,658 detail |
 | **Total** | **192** | | | | **192 summary / 6,999 detail** |
 
-*Note*: 36 canonical scenarios represent the core 27 official and 9 stress test runs (1,362 canonical detail rows).
+*Note*: 36 canonical scenarios represent the core 27 official and 9 stress test runs (1,341 canonical detail rows).
 
 ---
 
