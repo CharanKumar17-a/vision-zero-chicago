@@ -2,7 +2,7 @@
 
 ## 1. Overview & Business Objective
 
-The Phase 5A Decision-Output Mart serves as the single source of truth for Vision Zero Chicago decision-support user interfaces (Power BI dashboards, Streamlit web applications, and Cloud Run deployments). It connects portfolio optimization selections, treatment economics, spatial corridor equity, 2026 crash risk forecasts, and master corridor linework into decoupled, high-performance relational tables.
+The Phase 5A Decision-Output Mart serves as the single source of truth for Vision Zero Chicago decision-support user interfaces (Power BI dashboards and Streamlit web applications). It connects portfolio optimization selections, treatment economics, spatial corridor equity, 2026 crash risk forecasts, and master corridor linework into decoupled, high-performance relational tables.
 
 ---
 

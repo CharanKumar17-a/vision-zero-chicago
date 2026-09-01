@@ -8,7 +8,7 @@ Chicago cannot fund every high-crash corridor at once. This project builds a tra
 1. Forecasts where future recorded crash burden is likely highest across the 43 official high-crash corridors;
 2. Estimates the safety benefits of applicable treatments using FHWA Crash Modification Factors (CMFs) and USDOT crash costs;
 3. Optimizes project portfolios under budget and equity constraints using Mixed-Integer Linear Programming (MILP); and
-4. Presents results in deployed interactive decision-support applications (Streamlit Cloud, Google Cloud Run container specification, and Power BI data mart) with explicit governance and limitation reporting.
+4. Presents results in deployed interactive decision-support applications (Streamlit Cloud and Power BI data mart) with explicit governance and limitation reporting.
 
 ### Key Metrics: Baseline Recommendation vs. Aggregate Candidate Pool
 

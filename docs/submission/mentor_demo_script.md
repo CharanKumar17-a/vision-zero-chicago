@@ -70,5 +70,5 @@ This walkthrough provides a structured, 5–8 minute demonstration script for pr
 ## 5. Technical Robustness & Deployment Architecture (30 Seconds)
 
 - **Test Suite**: 327 passing automated tests covering spatial joins, data cleaning, ML forecasting, MILP determinism, and Streamlit AppTests.
-- **Deployment**: Live on Streamlit Community Cloud with GitHub Actions keepalive ping, supported by Google Cloud Run container specifications configured for zero minimum instances (scale-to-zero).
+- **Deployment**: Live on Streamlit Community Cloud with GitHub Actions keepalive ping.
 - **Data Mart**: Star-schema SQL data mart supporting decoupled analytical consumption.
