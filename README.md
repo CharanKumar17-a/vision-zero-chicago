@@ -5,6 +5,8 @@
 > A data-driven decision-support tool aligned with the City of Chicago's Vision Zero goals.
 > Final project selection authority remains with City staff and qualified transportation-engineering teams.
 
+**Live dashboard:** [vision-zero-chicago-charan.streamlit.app](https://vision-zero-chicago-charan.streamlit.app/)
+
 ## Project Purpose
 
 Chicago has a limited road-safety budget and cannot fund every high-crash
@@ -78,7 +80,9 @@ Scenarios are planning tools. They are not official City of Chicago budget commi
 - `config/` — Project configurations, spatial thresholds, CMF parameters, and cleaning rules
 - `data/` — Data pipeline storage (immutable `raw/`, staged `interim/`, validated `processed/`)
 - `docs/` — Decision register (`decision_log.csv`), methodological contracts, and run-level validation JSONs
-- `notebooks/` — Reproducible exploratory data analysis and spatial/portfolio diagnostics (01–09)
+- `notebooks/` — Reproducible exploratory data analysis and spatial/portfolio diagnostics
+  (01 crash EDA, 02 corridor profiles, 03 feature importance, 04 spatial analysis,
+  05 portfolio comparison, 08 treatment diversity diagnostic, 09 hindsight backtest)
 - `src/` — Production Python pipeline modules:
   - `src/data/` — Source verification, coordinate cleaning, spatial assignment, and mart builders
   - `src/features/` — Time-safe corridor-month feature engineering
@@ -89,7 +93,9 @@ Scenarios are planning tools. They are not official City of Chicago budget commi
 - `tests/` — Automated pytest verification suite (327 acceptance tests)
 - `sql/` — Analytical and serving SQL views for DuckDB and Power BI
 - `dashboard/` — Interactive decision-support interface:
-  - `dashboard/streamlit/` — Multi-page Streamlit application and published deployment data
+  - `dashboard/streamlit/` — Four-page Streamlit application deployed to Streamlit Community Cloud;
+    includes 2026 pre-treatment crash forecast baseline context, ranked corridor risk table,
+    live MILP portfolio optimizer, scenario sensitivity analysis, and governance audit log
   - `dashboard/powerbi/` — Power BI template and workbook documentation
 - `automation/` — Verification scripts and automated pipeline orchestration
 - `reports/` — Authoritative technical report (`vision_zero_technical_report.md`)
