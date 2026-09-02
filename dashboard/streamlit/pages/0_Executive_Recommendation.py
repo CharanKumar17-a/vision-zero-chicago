@@ -171,6 +171,16 @@ with col4:
 
 st.caption(f"Optimization status: Mathematically optimal under stated planning constraints (&dollar;{selected_capital_cost/1e6:.2f}M of {b_title.replace('$', '&dollar;')} allocated • {format_currency(budget_slack).replace('$', '&dollar;')} budget slack)")
 
+# 2026 pre-treatment baseline context line — makes KSI-avoided figures interpretable
+_baseline_total_2026 = float(df_master["annual_forecast_total_crashes_2026"].sum())
+_baseline_ksi_2026 = float(df_master["annual_forecast_ksi_crashes_2026"].sum())
+st.info(
+    f"**2026 pre-treatment network baseline (all 43 corridors, no intervention):** "
+    f"~{_baseline_total_2026:,.0f} total crashes / yr · ~{_baseline_ksi_2026:.0f} KSI / yr — "
+    f"the forecast starting point that the recommended portfolio acts against.",
+    icon="📊",
+)
+
 # -----------------------------------------------------------------------------
 # Section 1 — What This Investment Buys
 # -----------------------------------------------------------------------------

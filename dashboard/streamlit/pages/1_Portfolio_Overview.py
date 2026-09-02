@@ -135,6 +135,62 @@ with st.expander("View secondary metrics and economic indicators", expanded=Fals
         st.metric("KSI benefit share in high-SVI areas", f"{high_svi_ksi_share:.1f}%", help=f"Denominator: Total annual KSI crashes avoided across funded corridors (~{annual_ksi:.1f}/yr). Numerator: Annual KSI avoided in high-SVI corridors (~{high_svi_ksi:.1f}/yr). SVI is used as a spatial equity proxy; it does not directly measure safety benefit equity.")
 
 # -----------------------------------------------------------------------------
+# Section 1 — 2026 Corridor Risk Forecast (Pre-Treatment Baseline)
+# -----------------------------------------------------------------------------
+st.markdown("---")
+st.subheader("1. 2026 corridor risk forecast — pre-treatment baseline")
+st.caption(
+    "Modelled 2026 annual crash and KSI (Fatal + Serious Injury) predictions for all 43 high-crash corridors, "
+    "before any safety treatment is applied. Demand risk rank is derived from the KSI forecast. "
+    "These forecasts are the analytical baseline against which treatment benefits and portfolio optimization operate."
+)
+
+_funded_ids = set(df_sel_benefits["corridor_id"]) if not df_sel_benefits.empty else set()
+
+df_forecast = df_master[[
+    "corridor_id",
+    "corridor_name",
+    "demand_risk_rank_2026",
+    "annual_forecast_total_crashes_2026",
+    "annual_forecast_ksi_crashes_2026",
+    "equity_classification_A_weighted_ge_0_75",
+]].copy()
+
+df_forecast["portfolio_status"] = df_forecast["corridor_id"].apply(
+    lambda cid: "✅ Funded" if cid in _funded_ids else "⏸️ Deferred"
+)
+df_forecast["equity_classification_A_weighted_ge_0_75"] = df_forecast[
+    "equity_classification_A_weighted_ge_0_75"
+].apply(lambda v: "✅ Yes" if v else "—")
+df_forecast = df_forecast.sort_values("demand_risk_rank_2026")
+df_forecast.columns = [
+    "Corridor ID",
+    "Corridor Name",
+    "2026 Forecast Rank",
+    "Predicted Total Crashes / Yr",
+    "Predicted KSI / Yr",
+    "High-SVI Equity Area",
+    "Portfolio Status",
+]
+
+st.dataframe(
+    df_forecast.style.format({
+        "Predicted Total Crashes / Yr": "{:,.1f}",
+        "Predicted KSI / Yr": "{:,.2f}",
+    }),
+    width="stretch",
+    hide_index=True,
+    height=350,
+)
+
+_net_total_2026 = float(df_master["annual_forecast_total_crashes_2026"].sum())
+_net_ksi_2026 = float(df_master["annual_forecast_ksi_crashes_2026"].sum())
+st.caption(
+    f"Network total (all 43 corridors): ~{_net_total_2026:,.0f} predicted total crashes / yr · "
+    f"~{_net_ksi_2026:.1f} predicted KSI / yr. Planning-level estimates; not official City projections."
+)
+
+# -----------------------------------------------------------------------------
 # Section 2 — Selected Projects Detail Register
 # -----------------------------------------------------------------------------
 st.markdown("---")
